@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package daemon;
+
+option go_package = "proto/daemon";
+
+service DaemonService {
+    rpc GetStatus (StatusRequest) returns (StatusResponse);
+}
+
+message StatusRequest {
+    string server_id = 1;
+}
+
+message StatusResponse {
+    string status = 1;
+}
