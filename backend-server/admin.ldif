@@ -1,0 +1,12 @@
+dn: uid=admin,ou=users,dc=example,dc=org
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: Admin User
+sn: User
+uid: admin
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/admin
+loginShell: /bin/bash
+userPassword: {SSHA}epKC2fz888FJOTxeUwxNlt8kml6BKAF4

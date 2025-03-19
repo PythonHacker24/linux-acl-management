@@ -35,12 +35,19 @@ func main() {
     mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
 
     // Frontend Handlers 
-    mux.Handle("/login", middleware.LoggingMiddleware(http.HandleFunc(handlers.LoginHandler)))
+    // For all the handlers for the frontend exposure, use the authentication middleware
+    mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
+    
+    // list files handler -> GET METHOD
 
-    // Daemons Handlers
+    // A FULL CONTENT HANDLER FOR ALL THE CRUD OPERATIONS IN HTTP METHODS
+    // get file content handler     -> GET Method
+    // delete file content handler  -> DEL Method
+    // upload file content handler  -> POST METHOD
+    // update file content handler  -> UPDATE METHOD
 
     slog.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Host, config.Port), mux); err != nil {
-        slog.Error("Failed to start server at port 8080", "Error", err.Error())
+        slog.Error(fmt.Sprintf("Failed to start server at port %s", config.Port), "Error", err.Error())
     }
 }

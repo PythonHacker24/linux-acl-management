@@ -2,9 +2,10 @@ package config
 
 const(
     Host = "localhost"
-    Port = "8080"
+    Port = "9999"
 
-    LdapServer = "ldap.example.com:389"
-    LdapBindDN = "cn=admin,dc=example,dc=com"
+    LdapServer = "ldap://localhost:389"
+    LdapBindDN = "cn=admin,dc=example,dc=org"
     LdapPassword = "admin"
+    LdapSearchBase = "dc=example,dc=org"
 )

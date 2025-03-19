@@ -16,3 +16,8 @@ type Config struct {
 	Servers []ServerConfig `yaml:"servers"`
 }
 
+// User struct for login request
+type User struct {
+    Username string `json:"username"`
+    Password string `json:"password"`
+}
