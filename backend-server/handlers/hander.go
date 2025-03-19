@@ -18,3 +18,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
         slog.Error("Failed to send health response from the handler", err)
     }
 }
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+    
+}

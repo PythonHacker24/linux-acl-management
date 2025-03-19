@@ -13,11 +13,13 @@ import (
 )
 
 func main() {
+    // Loading Config file 
     backendConfig, err := utils.LoadConfig("./backend.yaml")
     if err != nil {
         slog.Error("Error loading config", "Error", err.Error())
     }
 
+    // Connecting to File Server Daemons
     for _, server := range backendConfig.Servers {
         fmt.Printf("Loaded gRPC server: %s at %s \n", server.Name, server.Address)
     }
@@ -26,12 +28,14 @@ func main() {
 		go services.ConnectToServer(server)
 	}
 
+    // Setting up endpoints for interactions
     mux := http.NewServeMux()
 
     // Health Check Endpoint
     mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
 
     // Frontend Handlers 
+    mux.Handle("/login", middleware.LoggingMiddleware(http.HandleFunc(handlers.LoginHandler)))
 
     // Daemons Handlers
 

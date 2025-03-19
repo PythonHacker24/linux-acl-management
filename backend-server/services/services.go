@@ -32,6 +32,6 @@ func ConnectToServer(server models.ServerConfig) {
 			slog.Info("Status", server.Name, response.Status)
 		}
 
-		time.Sleep(10 * time.Second) // Poll every 10 seconds
+		time.Sleep(10 * time.Second)
 	}
 }
