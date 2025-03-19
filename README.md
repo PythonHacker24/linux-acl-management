@@ -85,7 +85,3 @@ The backend server provides the following endpoints:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-# Linux ACL Management 
-
-
