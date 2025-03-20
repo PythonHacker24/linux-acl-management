@@ -5,7 +5,9 @@ import (
 	"backend-server/config"
 	"backend-server/ldap"
 	"backend-server/models"
+	"backend-server/sessionmanager"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 )
@@ -47,6 +49,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    sessionmanager.CreateSession(user.Username)
+
     token, err := authentication.GenerateJWT(user.Username)
     if err != nil {
         slog.Error("Error generating token", "error", err.Error())
@@ -61,4 +65,26 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Failed to encode response", http.StatusInternalServerError)
         return
     }
+}
+
+func TransactionHandler(w http.ResponseWriter, r *http.Request) {
+	username, err := authentication.GetUsernameFromJWT(r)
+	if err != nil {
+		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
+		return
+	}
+
+	var txnReq models.TransactionRequest
+	if err := json.NewDecoder(r.Body).Decode(&txnReq); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	err = sessionmanager.AddTransaction(username, txnReq.Transaction)
+    if err != nil {
+        fmt.Fprintf(w, "Failed to add transaction")
+        return
+    }
+
+	fmt.Fprintf(w, "Transaction added")
 }

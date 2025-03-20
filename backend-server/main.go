@@ -9,6 +9,7 @@ import (
 	"backend-server/handlers"
 	"backend-server/middleware"
 	"backend-server/services"
+	"backend-server/sessionmanager"
 	"backend-server/utils"
 )
 
@@ -28,6 +29,9 @@ func main() {
 		go services.ConnectToServer(server)
 	}
 
+	// Start Transaction Worker in background
+	go sessionmanager.TransactionWorker()
+
     // Setting up endpoints for interactions
     mux := http.NewServeMux()
 
@@ -37,6 +41,7 @@ func main() {
     // Frontend Handlers 
     // For all the handlers for the frontend exposure, use the authentication middleware
     mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
+    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(handlers.TransactionHandler))
     
     // list files handler -> GET METHOD
 

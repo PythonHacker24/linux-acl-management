@@ -36,3 +36,8 @@ type Session struct {
     TransactionQueue    *list.List
     Mutex               sync.Mutex
 }
+
+// Transaction request body
+type TransactionRequest struct {
+	Transaction string `json:"transaction"`
+}
