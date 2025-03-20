@@ -1,5 +1,11 @@
 package models
 
+import (
+	"container/list"
+	"sync"
+	"time"
+)
+
 // Health Response Structure
 type HealthResponse struct {
     Status string `json:"status"`
@@ -20,4 +26,13 @@ type Config struct {
 type User struct {
     Username string `json:"username"`
     Password string `json:"password"`
+}
+
+// Session Struct for Session Manager
+type Session struct {
+    Username            string 
+    Expiry              time.Time
+    Timer               *time.Timer
+    TransactionQueue    *list.List
+    Mutex               sync.Mutex
 }
