@@ -1,55 +1,51 @@
 package sessionmanager
 
 import (
-	"backend-server/models"
 	"container/list"
 	"fmt"
 	"log/slog"
-	"sync"
 	"time"
+
+	"backend-server/models"
+	"backend-server/config"
 )
 
-var sessions = make(map[string]*models.Session)
-var sessionMutex = sync.Mutex{}
-
-const sesstionTimeout = 5 * time.Minute
-
 func CreateSession(username string) {
-    sessionMutex.Lock()
-    defer sessionMutex.Unlock()
+    config.SessionMutex.Lock()
+    defer config.SessionMutex.Unlock()
 
     // Check if the session already exists
-    if _, exists := sessions[username]; exists {
+    if _, exists := config.Sessions[username]; exists {
         return 
     }
 
     session := &models.Session{
         Username:           username,
-        Expiry:             time.Now().Add(sesstionTimeout),
-        Timer:              time.AfterFunc(sesstionTimeout, func() { ExpireSession(username) }),
+        Expiry:             time.Now().Add(config.SessionTimeout),
+        Timer:              time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) }),
         TransactionQueue:   list.New(),
     }
 
-    sessions[username] = session 
+    config.Sessions[username] = session 
 }
 
 func ExpireSession(username string) {
-    sessionMutex.Lock()
-    defer sessionMutex.Unlock()
+    config.SessionMutex.Lock()
+    defer config.SessionMutex.Unlock()
 
     // Delete session if it exists
-    if _, exists := sessions[username]; exists {
+    if _, exists := config.Sessions[username]; exists {
         slog.Info("Session Expired", "User", username)
-        delete(sessions, username)
+        delete(config.Sessions, username)
     }
 }
 
 func AddTransaction(username string, txn string) error {
-    sessionMutex.Lock()
-    defer sessionMutex.Unlock()
+    config.SessionMutex.Lock()
+    defer config.SessionMutex.Unlock()
 
     // First check if the session exists
-    session, exists := sessions[username]
+    session, exists := config.Sessions[username]
     if !exists {
         slog.Info("Session Not Found, Transaction Rejected", "User", username, "Transaction", txn)
         return fmt.Errorf("Session Not Found Transaction Rejected")
@@ -89,7 +85,7 @@ func ProcessTransactions(username string, session *models.Session) {
     if session.Timer != nil {
         session.Timer.Stop()
     }
-    session.Timer = time.AfterFunc(sesstionTimeout, func() { ExpireSession(username) })
+    session.Timer = time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) })
     slog.Info("Session timeout restarted", "User", username)
 }
 
@@ -101,22 +97,23 @@ func dummyFunc(counter int) {
 func TransactionWorker() {
     slog.Info("Transaction worker started")
     for {
-        sessionMutex.Lock()
-        // Create a local copy of sessions to process
-        sessionsToProcess := make(map[string]*models.Session)
-        for username, session := range sessions {
+        config.SessionMutex.Lock()
+        // Create a local copy of config.Sessions to process
+        SessionsToProcess := make(map[string]*models.Session)
+        for username, session := range config.Sessions {
             if session.TransactionQueue.Len() > 0 {
-                sessionsToProcess[username] = session
+                SessionsToProcess[username] = session
             }
         }
-        sessionMutex.Unlock()
+
+        config.SessionMutex.Unlock()
 
         // Process transactions for each session without holding the global lock
-        for username, session := range sessionsToProcess {
+        for username, session := range SessionsToProcess {
             ProcessTransactions(username, session)
         }
 
         slog.Info("Transaction worker finished all the transactions")
-        time.Sleep(2 * time.Second) // Adjust based on processing needs
+        time.Sleep(2 * time.Second)
     }
 }

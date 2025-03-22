@@ -31,6 +31,7 @@ type User struct {
 // Session Struct for Session Manager
 type Session struct {
     Username            string 
+    CurrentWorkingDir   string
     Expiry              time.Time
     Timer               *time.Timer
     TransactionQueue    *list.List

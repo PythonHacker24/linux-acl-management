@@ -86,5 +86,37 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Transaction added")
+}
+
+func GetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
+	username, err := authentication.GetUsernameFromJWT(r)
+	if err != nil {
+		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
+		return
+	}
+
+    currentDir := config.Sessions[username].CurrentWorkingDir
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "{'currentDir': %s}", currentDir)
+}
+
+func GetFile(w http.ResponseWriter, r *http.Request) {
+     
+}
+
+func UploadFile(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func DeleteFile(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func UpdateFile(w http.ResponseWriter, r *http.Request) {
+
 }
