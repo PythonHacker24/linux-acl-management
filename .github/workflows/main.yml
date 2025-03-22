@@ -1,21 +1,15 @@
-# Workflow for deploying Sphinx docs to GitHub Pages
 name: Deploy Sphinx Docs to Pages
 
 on:
-  # Runs on pushes targeting the main branch
   push:
     branches: ["main"]
-
-  # Allows manual workflow runs
   workflow_dispatch:
 
-# Set permissions for deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Ensure only one deployment runs at a time
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -40,7 +34,7 @@ jobs:
 
       - name: Build Sphinx Documentation
         run: |
-          sphinx-build docs/ docs/_build/html
+          sphinx-build docs/source docs/_build/html
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
