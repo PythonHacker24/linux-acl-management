@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Linux ACL Management Progress Docs'
+project = 'Linux ACL Management Progress'
 copyright = '2025, Aditya Patil'
 author = 'Aditya Patil'
 

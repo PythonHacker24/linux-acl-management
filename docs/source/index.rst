@@ -22,3 +22,5 @@ Currently, the prototype is under development and would continue till the start 
    :maxdepth: 2
    :caption: Contents:
 
+   prototype
+
