@@ -18,15 +18,15 @@ func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
     })
 } 
 
-func AuthenticationMiddlware(next http.HandlerFunc) http.HandlerFunc {
+func AuthenticationMiddleware(next http.HandlerFunc) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         authHeader := r.Header.Get("Authorization")
-        if authHeader == "" || strings.HasPrefix(authHeader, "Bearer ") {
+        if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
             http.Error(w, "Missing or Invalid Token", http.StatusUnauthorized)
             return
         }
 
-        tokenString := strings.TrimPrefix(authHeader, "Bearer: ")
+        tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
         claims, err := authentication.ValidateJWT(tokenString)
         if err != nil {
@@ -34,7 +34,13 @@ func AuthenticationMiddlware(next http.HandlerFunc) http.HandlerFunc {
             return
         }
 
-        r.Header.Set("X-User", claims["username"].(string))
+        username, ok := claims["username"].(string)
+        if !ok {
+            http.Error(w, "Invalid Token Payload", http.StatusUnauthorized)
+            return
+        }
+
+        r.Header.Set("X-User", username)
 
         next(w, r)
     }

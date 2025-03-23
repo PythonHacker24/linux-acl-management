@@ -17,9 +17,14 @@ type ServerConfig struct {
 	Address string `yaml:"address"`
 }
 
+type Mount struct {
+    MountPoint string `yaml:"mount-point"`
+}
+
 // Config represents the entire YAML structure
 type Config struct {
-	Servers []ServerConfig `yaml:"servers"`
+    MountPath   []Mount           `yaml:"mount"` 
+	Servers     []ServerConfig  `yaml:"servers"`
 }
 
 // User struct for login request

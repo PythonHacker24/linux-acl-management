@@ -8,9 +8,16 @@ import (
 
 	"backend-server/models"
 	"backend-server/config"
+    "backend-server/utils"
 )
 
 func CreateSession(username string) {
+
+    backendConfig, err := utils.LoadConfig("./backend.yaml")
+    if err != nil {
+        slog.Error("Error loading config", "Error", err.Error())
+    }
+
     config.SessionMutex.Lock()
     defer config.SessionMutex.Unlock()
 
@@ -24,6 +31,7 @@ func CreateSession(username string) {
         Expiry:             time.Now().Add(config.SessionTimeout),
         Timer:              time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) }),
         TransactionQueue:   list.New(),
+        CurrentWorkingDir:  backendConfig.MountPath[0].MountPoint,
     }
 
     config.Sessions[username] = session 

@@ -22,7 +22,7 @@ func main() {
 
     // Connecting to File Server Daemons
     for _, server := range backendConfig.Servers {
-        fmt.Printf("Loaded gRPC server: %s at %s \n", server.Name, server.Address)
+        fmt.Printf("Loaded gRPC server: %s at %s mounted \n", server.Name, server.Address)
     }
 
     for _, server := range backendConfig.Servers {
@@ -44,18 +44,18 @@ func main() {
 
     // Frontend Handlers 
     mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
-    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.TransactionHandler)))
+    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.TransactionHandler)))
     
     // list files handler -> GET METHOD
 
-    mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.GetCurrentWorkingDir)))
-    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.SetCurrentWorkingDir)))
+    mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetCurrentWorkingDir)))
+    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
 
     // This works on files only and not directories. These hanlders allow you to get download the file, delete the file from the servers, upload a new file or update the file. These files must be in the current directory - which is tracked in the session itself.
-    mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.GetFile)))
-    mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.DeleteFile)))
-    mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.UploadFile)))
-    mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.UpdateFile)))
+    mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetFile)))
+    mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.DeleteFile)))
+    mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UploadFile)))
+    mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UpdateFile)))
 
     // Permission Management Endpoints
 
