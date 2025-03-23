@@ -42,3 +42,8 @@ type Session struct {
 type TransactionRequest struct {
 	Transaction string `json:"transaction"`
 }
+
+// Request Payload Structure
+type SetWorkingDirRequest struct {
+	SetWorkingDir string `json:"setWorkingDir"`
+}

@@ -43,22 +43,18 @@ func main() {
     mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
 
     // Frontend Handlers 
-    // For all the handlers for the frontend exposure, use the authentication middleware
     mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
     mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.TransactionHandler)))
     
     // list files handler -> GET METHOD
 
-    // A FULL FILE HANDLER FOR ALL THE CRUD OPERATIONS IN HTTP METHODS
-    // This works on files only and not directories. These hanlders allow you to get download the file, delete the file from the servers, upload a new file or update the file. These files must be in the current directory - which is tracked in the session itself.
     mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.GetCurrentWorkingDir)))
-    // get file content handler     -> GET Method
+    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.SetCurrentWorkingDir)))
+
+    // This works on files only and not directories. These hanlders allow you to get download the file, delete the file from the servers, upload a new file or update the file. These files must be in the current directory - which is tracked in the session itself.
     mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.GetFile)))
-    // delete file content handler  -> DEL Method
-    mux.Handle("DEL /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.DeleteFile)))
-    // upload file content handler  -> POST METHOD
+    mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.DeleteFile)))
     mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.UploadFile)))
-    // update file content handler  -> UPDATE METHOD
     mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddlware(handlers.UpdateFile)))
 
     // Permission Management Endpoints

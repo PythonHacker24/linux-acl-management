@@ -1,15 +1,17 @@
 package handlers
 
 import (
+	"encoding/json"
+    "path/filepath"
+	"fmt"
+	"log/slog"
+	"net/http"
+
 	"backend-server/authentication"
 	"backend-server/config"
 	"backend-server/ldap"
 	"backend-server/models"
 	"backend-server/sessionmanager"
-	"encoding/json"
-	"fmt"
-	"log/slog"
-	"net/http"
 )
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,11 +100,44 @@ func GetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+    config.Sessions[username].Mutex.Lock()
+    defer config.Sessions[username].Mutex.Unlock()
+
     currentDir := config.Sessions[username].CurrentWorkingDir
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, "{'currentDir': %s}", currentDir)
+}
+
+func SetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
+	username, err := authentication.GetUsernameFromJWT(r)
+	if err != nil {
+		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
+		return
+	}
+    
+    var req models.SetWorkingDirRequest
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "Invalid JSON Request", http.StatusBadRequest)
+        return
+    }
+
+    if req.SetWorkingDir == "" {
+        http.Error(w, "Directory name cannot be empty", http.StatusBadRequest)
+        return
+    }
+
+    config.Sessions[username].Mutex.Lock()
+    defer config.Sessions[username].Mutex.Unlock()
+
+    currentDir := config.Sessions[username].CurrentWorkingDir
+	newDir := filepath.Join(currentDir, req.SetWorkingDir)
+	config.Sessions[username].CurrentWorkingDir = newDir
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "{'currentDir': %s}", newDir)
 }
 
 func GetFile(w http.ResponseWriter, r *http.Request) {
