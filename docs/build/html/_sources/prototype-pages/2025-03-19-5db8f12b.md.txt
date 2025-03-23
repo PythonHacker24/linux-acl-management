@@ -1,0 +1,58 @@
+Commit: removed Makefile for now
+=====================
+
+**Date**: 2025-03-19
+**Commit Hash**: 5db8f12bc62fe877932116d43b3b5bf5a327d918
+
+Description
+-----------
+This commit removes the Makefile from the project temporarily. The Makefile had been used for building the Go backend server with commands for build, clean, and run operations. The removal suggests a transition to a different build approach or system, possibly to accommodate more complex requirements or to standardize the build process across the project.
+
+Changes
+-------
+.. code-block:: diff
+commit 5db8f12bc62fe877932116d43b3b5bf5a327d918
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Wed Mar 19 12:55:07 2025 +0530
+
+    removed Makefile for now
+
+diff --git a/Makefile b/Makefile
+deleted file mode 100644
+index fa49359..0000000
+--- a/Makefile
++++ /dev/null
+@@ -1,32 +0,0 @@
+-# Makefile for building Go backend server
+-
+-# Variables
+-APP_NAME = backend-server
+-BUILD_DIR = build
+-SRC_DIR = backend-server/main.go
+-
+-# Go commands
+-GO = go
+-GO_BUILD = $(GO) build
+-
+-# Paths
+-BINARY = $(BUILD_DIR)/$(APP_NAME)
+-
+-.PHONY: all clean build run
+-
+-all: build
+-
+-# Build the Go application
+-build:
+-	@mkdir -p $(BUILD_DIR)
+-	$(GO_BUILD) -o $(BINARY) $(SRC_DIR)
+-	@echo "Build completed: $(BINARY)"
+-
+-# Clean build artifacts
+-clean:
+-	rm -rf $(BUILD_DIR)
+-	@echo "Cleaned build artifacts."
+-
+-# Run the compiled binary
+-run: build
+-	$(BINARY)
+```

@@ -1,0 +1,59 @@
+Commit: Update main.yml
+=====================
+
+**Date**: 2025-03-23
+**Commit Hash**: 58912db01062f2e871bd059bb7c07f7fa0631d1c
+
+Description
+-----------
+This commit updates the GitHub Actions workflow configuration for deploying Sphinx documentation to GitHub Pages. Key changes include:
+- Simplified workflow configuration by removing redundant comments
+- Fixed the Sphinx build path to use the correct source directory structure (`docs/source` instead of `docs/`)
+- Streamlined the workflow triggers and permissions settings
+- Maintained all core functionality while making the configuration more concise
+
+Changes
+-------
+.. code-block:: diff
+commit 58912db01062f2e871bd059bb7c07f7fa0631d1c
+Author: Aditya Patil <72488360+PythonHacker24@users.noreply.github.com>
+Date:   Sun Mar 23 00:08:54 2025 +0530
+
+    Update main.yml
+
+diff --git a/.github/workflows/main.yml b/.github/workflows/main.yml
+index 4dcdcb4..9ce63f8 100644
+--- a/.github/workflows/main.yml
++++ b/.github/workflows/main.yml
+@@ -1,21 +1,15 @@
+-# Workflow for deploying Sphinx docs to GitHub Pages
+ name: Deploy Sphinx Docs to Pages
+ 
+ on:
+-  # Runs on pushes targeting the main branch
+   push:
+     branches: ["main"]
+-
+-  # Allows manual workflow runs
+   workflow_dispatch:
+ 
+-# Set permissions for deployment
+ permissions:
+   contents: read
+   pages: write
+   id-token: write
+ 
+-# Ensure only one deployment runs at a time
+ concurrency:
+   group: "pages"
+   cancel-in-progress: false
+@@ -40,7 +34,7 @@ jobs:
+ 
+       - name: Build Sphinx Documentation
+         run: |
+-          sphinx-build docs/ docs/_build/html
++          sphinx-build docs/source docs/_build/html
+ 
+       - name: Upload Artifact
+         uses: actions/upload-pages-artifact@v3
+```

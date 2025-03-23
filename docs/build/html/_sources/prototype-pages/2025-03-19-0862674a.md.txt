@@ -1,0 +1,326 @@
+# Commit: LDAP Authentication successful
+## Date: 2025-03-19
+## Commit Hash: 0862674a5a04b9d081e43246c7d4eb9157b4046c
+```diff
+commit 0862674a5a04b9d081e43246c7d4eb9157b4046c
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Wed Mar 19 23:14:36 2025 +0530
+
+    LDAP Authentication successful
+
+diff --git a/backend-server/.DS_Store b/backend-server/.DS_Store
+new file mode 100644
+index 0000000..a7c78ca
+Binary files /dev/null and b/backend-server/.DS_Store differ
+diff --git a/backend-server/admin.ldif b/backend-server/admin.ldif
+new file mode 100644
+index 0000000..9efef53
+--- /dev/null
++++ b/backend-server/admin.ldif
+@@ -0,0 +1,12 @@
++dn: uid=admin,ou=users,dc=example,dc=org
++objectClass: inetOrgPerson
++objectClass: posixAccount
++objectClass: shadowAccount
++cn: Admin User
++sn: User
++uid: admin
++uidNumber: 1001
++gidNumber: 1001
++homeDirectory: /home/admin
++loginShell: /bin/bash
++userPassword: {SSHA}epKC2fz888FJOTxeUwxNlt8kml6BKAF4
+diff --git a/backend-server/authentication/authencation.go b/backend-server/authentication/authencation.go
+deleted file mode 100644
+index 0c3e08e..0000000
+--- a/backend-server/authentication/authencation.go
++++ /dev/null
+@@ -1,3 +0,0 @@
+-package authentication
+-
+-
+diff --git a/backend-server/authentication/authentication.go b/backend-server/authentication/authentication.go
+new file mode 100644
+index 0000000..0fd6331
+--- /dev/null
++++ b/backend-server/authentication/authentication.go
+@@ -0,0 +1,39 @@
++package authentication
++
++import (
++    "time"
++    "fmt"
++
++    "github.com/golang-jwt/jwt/v5"
++)
++
++// FOR TESTING PURPOSES ONLY
++var jwtSecret = []byte("supersecretkey")
++
++func GenerateJWT(username string) (string, error) {
++	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
++		"username": username,
++		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Expires in 24 hours
++	})
++
++	return token.SignedString(jwtSecret)
++}
++
++func ValidateJWT(tokenString string) (jwt.MapClaims, error) {
++	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
++		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
++			return nil, fmt.Errorf("unexpected signing method")
++		}
++		return jwtSecret, nil
++	})
++
++	if err != nil {
++		return nil, err
++	}
++
++	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
++		return claims, nil
++	}
++
++	return nil, fmt.Errorf("invalid token")
++}
+diff --git a/backend-server/config/config.go b/backend-server/config/config.go
+index 8e8a36e..585ed69 100644
+--- a/backend-server/config/config.go
++++ b/backend-server/config/config.go
+@@ -2,9 +2,10 @@ package config
+ 
+ const(
+     Host = "localhost"
+-    Port = "8080"
++    Port = "9999"
+ 
+-    LdapServer = "ldap.example.com:389"
+-    LdapBindDN = "cn=admin,dc=example,dc=com"
++    LdapServer = "ldap://localhost:389"
++    LdapBindDN = "cn=admin,dc=example,dc=org"
+     LdapPassword = "admin"
++    LdapSearchBase = "dc=example,dc=org"
+ )
+diff --git a/backend-server/go.mod b/backend-server/go.mod
+index 409f780..d64dae4 100644
+--- a/backend-server/go.mod
++++ b/backend-server/go.mod
+@@ -6,6 +6,7 @@ require (
+ 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+ 	github.com/go-asn1-ber/asn1-ber v1.5.7 // indirect
+ 	github.com/go-ldap/ldap/v3 v3.4.10 // indirect
++	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+ 	github.com/google/uuid v1.6.0 // indirect
+ 	golang.org/x/crypto v0.32.0 // indirect
+ 	golang.org/x/net v0.34.0 // indirect
+diff --git a/backend-server/go.sum b/backend-server/go.sum
+index 02681ae..efbb133 100644
+--- a/backend-server/go.sum
++++ b/backend-server/go.sum
+@@ -7,6 +7,8 @@ github.com/go-asn1-ber/asn1-ber v1.5.7 h1:DTX+lbVTWaTw1hQ+PbZPlnDZPEIs0SS/GCZAl5
+ github.com/go-asn1-ber/asn1-ber v1.5.7/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
+ github.com/go-ldap/ldap/v3 v3.4.10 h1:ot/iwPOhfpNVgB1o+AVXljizWZ9JTp7YF5oeyONmcJU=
+ github.com/go-ldap/ldap/v3 v3.4.10/go.mod h1:JXh4Uxgi40P6E9rdsYqpUtbW46D9UTjJ9QSwGRznplY=
++github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
++github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
+ github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+ github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+ github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+index bef7be1..cd4b2ab 100644
+--- a/backend-server/handlers/hander.go
++++ b/backend-server/handlers/hander.go
+@@ -1,10 +1,13 @@
+ package handlers
+ 
+ import (
+-    "net/http"
+-    "log/slog"
+-    "encoding/json"
+-    "backend-server/models"
++	"backend-server/authentication"
++	"backend-server/config"
++	"backend-server/ldap"
++	"backend-server/models"
++	"encoding/json"
++	"log/slog"
++	"net/http"
+ )
+ 
+ func HealthHandler(w http.ResponseWriter, r *http.Request) {
+@@ -15,10 +18,47 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
+ 
+     response.Status = "ok"
+     if err := json.NewEncoder(w).Encode(response); err != nil {
+-        slog.Error("Failed to send health response from the handler", err)
++        slog.Error("Failed to send health response from the handler", "Error", err.Error())
+     }
+ }
+ 
+ func LoginHandler(w http.ResponseWriter, r *http.Request) {
+-    
++    if r.Method != http.MethodPost {
++        http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
++        return 
++    }
++
++    var user models.User
++    err := json.NewDecoder(r.Body).Decode(&user)
++    if err != nil {
++        http.Error(w, "Invalid request body", http.StatusBadRequest)
++        return
++    }
++
++    // Validate input
++    if user.Username == "" || user.Password == "" {
++        http.Error(w, "Username and password are required", http.StatusBadRequest)
++        return
++    }
++
++    authStatus := ldap.AuthenticateUser(user.Username, user.Password, config.LdapSearchBase)
++    if !authStatus {
++        http.Error(w, "Invalid credentials", http.StatusUnauthorized)
++        return
++    }
++
++    token, err := authentication.GenerateJWT(user.Username)
++    if err != nil {
++        slog.Error("Error generating token", "error", err.Error())
++        http.Error(w, "Error generating token", http.StatusInternalServerError)
++        return
++    }
++
++    response := map[string]string{"token": token}
++    w.Header().Set("Content-Type", "application/json")
++    if err := json.NewEncoder(w).Encode(response); err != nil {
++        slog.Error("Failed to encode response", "error", err.Error())
++        http.Error(w, "Failed to encode response", http.StatusInternalServerError)
++        return
++    }
+ }
+diff --git a/backend-server/ldap/ldap.go b/backend-server/ldap/ldap.go
+index ec1447c..b8f7ae3 100644
+--- a/backend-server/ldap/ldap.go
++++ b/backend-server/ldap/ldap.go
+@@ -1,9 +1,9 @@
+ package ldap
+ 
+ import (
+-	"backend-server/config"
+ 	"fmt"
+ 	"log/slog"
++	"backend-server/config"
+ 
+ 	"github.com/go-ldap/ldap/v3"
+ )
+@@ -16,36 +16,43 @@ func AuthenticateUser(username, userPassword, searchBase string) bool {
+     l, err := ldap.DialURL(config.LdapServer)
+     if err != nil {
+         slog.Error("Failed to connect to LDAP Server", "Error", err.Error())
++        return false
+     }
+     defer l.Close()
+ 
+     err = l.Bind(config.LdapBindDN, config.LdapPassword)
+     if err != nil {
+         slog.Error("Admin authentication failed", "Error", err.Error())
++        return false
+     }
+ 
+     searchRequest := ldap.NewSearchRequest(
+-		searchBase,
+-		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+-		fmt.Sprintf("(uid=%s)", username), // Searching by username
+-		[]string{"dn"}, // We only need the DN
+-		nil,
+-	)
++        searchBase,
++        ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
++        fmt.Sprintf("(uid=%s)", username), // Searching by username
++        []string{"dn"}, // We only need the DN
++        nil,
++    )
+ 
+     sr, err := l.Search(searchRequest)
+-	if err != nil || len(sr.Entries) == 0 {
+-		slog.Error("User not found in LDAP", "Error", err.Error())
+-		return false
+-	}
++    if err != nil {
++        slog.Error("LDAP search failed", "Error", err.Error())
++        return false
++    }
++
++    if len(sr.Entries) == 0 {
++        slog.Error("User not found in LDAP", "username", username)
++        return false
++    }
+ 
+     userDN := sr.Entries[0].DN 
+ 
+     err = l.Bind(userDN, userPassword)
+-	if err != nil {
+-		slog.Error("User authentication failed", "Error", err.Error())
+-		return false
+-	}
++    if err != nil {
++        slog.Error("User authentication failed", "Error", err.Error())
++        return false
++    }
+ 
+-    fmt.Println("User authentication successful")
+-	return true
++    slog.Info("User authentication successful", "username", username)
++    return true
+ }
+diff --git a/backend-server/main.go b/backend-server/main.go
+index 3a8ab41..2be5f2a 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -35,12 +35,19 @@ func main() {
+     mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
+ 
+     // Frontend Handlers 
+-    mux.Handle("/login", middleware.LoggingMiddleware(http.HandleFunc(handlers.LoginHandler)))
++    // For all the handlers for the frontend exposure, use the authentication middleware
++    mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
++    
++    // list files handler -> GET METHOD
+ 
+-    // Daemons Handlers
++    // A FULL CONTENT HANDLER FOR ALL THE CRUD OPERATIONS IN HTTP METHODS
++    // get file content handler     -> GET Method
++    // delete file content handler  -> DEL Method
++    // upload file content handler  -> POST METHOD
++    // update file content handler  -> UPDATE METHOD
+ 
+     slog.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
+     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Host, config.Port), mux); err != nil {
+-        slog.Error("Failed to start server at port 8080", "Error", err.Error())
++        slog.Error(fmt.Sprintf("Failed to start server at port %s", config.Port), "Error", err.Error())
+     }
+ }
+diff --git a/backend-server/models/models.go b/backend-server/models/models.go
+index cab0a0d..8436927 100644
+--- a/backend-server/models/models.go
++++ b/backend-server/models/models.go
+@@ -16,3 +16,8 @@ type Config struct {
+ 	Servers []ServerConfig `yaml:"servers"`
+ }
+ 
++// User struct for login request
++type User struct {
++    Username string `json:"username"`
++    Password string `json:"password"`
++}
+diff --git a/backend-server/ou_users.ldif b/backend-server/ou_users.ldif
+new file mode 100644
+index 0000000..97490a6
+--- /dev/null
++++ b/backend-server/ou_users.ldif
+@@ -0,0 +1,3 @@
++dn: ou=users,dc=example,dc=org
++objectClass: organizationalUnit
++ou: users
+```

@@ -1,0 +1,76 @@
+# Commit: added slog for better logging
+## Date: 2025-03-10
+## Commit Hash: 42322c251b655f67d8ed4c914210b5fb9fdca92f
+```diff
+commit 42322c251b655f67d8ed4c914210b5fb9fdca92f
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Mon Mar 10 22:58:50 2025 +0530
+
+    added slog for better logging
+
+diff --git a/backend-server/config/config.go b/backend-server/config/config.go
+new file mode 100644
+index 0000000..14c0425
+--- /dev/null
++++ b/backend-server/config/config.go
+@@ -0,0 +1,6 @@
++package config 
++
++const(
++    Host = "localhost"
++    Port = "8080"
++)
+diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+new file mode 100644
+index 0000000..60d1c85
+--- /dev/null
++++ b/backend-server/handlers/hander.go
+@@ -0,0 +1,8 @@
++package handlers
++
++import (
++    "log"
++    "net/http"
++)
++
++
+diff --git a/backend-server/main.go b/backend-server/main.go
+index 5046b0d..a202d35 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -1,11 +1,31 @@
+ package main
+ 
+ import (
+-    "fmt"
+-//     "net/http"
++	"fmt"
++	"log/slog"
++	"net/http"
++    "os"
++
++    "backend-server/config"
+ )
+ 
++func healthHandler(w http.ResponseWriter, r *http.Request) {
++    fmt.Fprintf(w, "Ok")
++}
+ 
+ func main() {
+-   fmt.Println("Hello World!") 
++    opts := &slog.HandlerOptions{Level: slog.LevelWarn}
++	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
++
++    mux := http.NewServeMux()
++
++    // Frontend Handlers 
++    mux.HandleFunc("/health", healthHandler)
++
++    // Backend Handlers
++
++    logger.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
++    if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Host, config.Port), mux); err != nil {
++        slog.Error("Failed to start server at port 8080", err)
++    }
+ }
+```

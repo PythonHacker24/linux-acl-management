@@ -1,0 +1,31 @@
+Commit: Fixed end of the README.md
+=====================
+
+**Date**: 2025-03-19
+**Commit Hash**: 518b12cacae9391d576cd3b6a562121ba6d00cdc
+
+Description
+-----------
+This commit makes a small but important correction to the README.md file by removing redundant content at the end of the document. The fix addresses a formatting issue where the project title was accidentally duplicated at the end of the file, improving the overall documentation quality and readability.
+
+Changes
+-------
+.. code-block:: diff
+commit 518b12cacae9391d576cd3b6a562121ba6d00cdc
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Wed Mar 19 12:52:52 2025 +0530
+
+    Fixed end of the README.md
+
+diff --git a/README.md b/README.md
+index 3045b5e..ad5acee 100644
+--- a/README.md
++++ b/README.md
+@@ -85,7 +85,3 @@ The backend server provides the following endpoints:
+ ## License
+ 
+ This project is licensed under the MIT License - see the LICENSE file for details.
+-
+-# Linux ACL Management 
+-
+-

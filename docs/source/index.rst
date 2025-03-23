@@ -16,6 +16,8 @@ Mentors: Robert Tweedy and Mahmoud Zeydabadinezhad, PhD
 
 Prototype Repository: https://github.com/PythonHacker24/linux-acl-management
 
+First Meeting Revised Slides: `Download PDF <_static/Introduction-meeting-revised-slides.pdf>`_
+
 Currently, the prototype is under development and would continue till the start of the final project. Evevrything during the prototype development would be recorded here and since components of the prototype are going to be used in the final project, journaling them here would explain the decisions made in the initial days of this Open Source Project.
 
 .. toctree::

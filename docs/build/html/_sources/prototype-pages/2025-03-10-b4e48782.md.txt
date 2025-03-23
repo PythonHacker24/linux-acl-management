@@ -1,0 +1,65 @@
+# Commit: Added Makefile
+## Date: 2025-03-10
+## Commit Hash: b4e48782b4754c9c8f96a26341752f7c88639119
+```diff
+commit b4e48782b4754c9c8f96a26341752f7c88639119
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Mon Mar 10 22:16:08 2025 +0530
+
+    Added Makefile
+
+diff --git a/Makefile b/Makefile
+index e69de29..fa49359 100644
+--- a/Makefile
++++ b/Makefile
+@@ -0,0 +1,32 @@
++# Makefile for building Go backend server
++
++# Variables
++APP_NAME = backend-server
++BUILD_DIR = build
++SRC_DIR = backend-server/main.go
++
++# Go commands
++GO = go
++GO_BUILD = $(GO) build
++
++# Paths
++BINARY = $(BUILD_DIR)/$(APP_NAME)
++
++.PHONY: all clean build run
++
++all: build
++
++# Build the Go application
++build:
++	@mkdir -p $(BUILD_DIR)
++	$(GO_BUILD) -o $(BINARY) $(SRC_DIR)
++	@echo "Build completed: $(BINARY)"
++
++# Clean build artifacts
++clean:
++	rm -rf $(BUILD_DIR)
++	@echo "Cleaned build artifacts."
++
++# Run the compiled binary
++run: build
++	$(BINARY)
+diff --git a/backend-server/main.go b/backend-server/main.go
+index 88e4877..5046b0d 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -2,10 +2,10 @@ package main
+ 
+ import (
+     "fmt"
+-    "net/http"
++//     "net/http"
+ )
+ 
+ 
+ func main() {
+-    
++   fmt.Println("Hello World!") 
+ }
+```

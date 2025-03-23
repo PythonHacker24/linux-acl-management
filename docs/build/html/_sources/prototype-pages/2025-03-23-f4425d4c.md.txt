@@ -1,0 +1,36 @@
+Commit: Updated docs with prototype section and README.md with updated progress docs link
+=====================
+
+**Date**: 2025-03-23
+**Commit Hash**: f4425d4c3047367e3cd0ee2bd41ce3e13f836455
+
+Description
+-----------
+This commit finalizes the documentation updates by adding a prototype section and updating the documentation links in the README.md. The changes make the documentation more accessible to users by:
+- Adding a dedicated prototype section to document the development progress
+- Updating the README.md file with the correct GitHub Pages URL for the project documentation
+- Replacing the placeholder repository link with the actual deployed documentation site
+- Ensuring that users can access the latest documentation through the GitHub Pages interface
+
+Changes
+-------
+.. code-block:: diff
+commit f4425d4c3047367e3cd0ee2bd41ce3e13f836455
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Sun Mar 23 00:31:22 2025 +0530
+
+    Updated docs with prototype section and README.md with updated progress docs link
+
+diff --git a/README.md b/README.md
+index e28de09..dc9104d 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ A system for managing Linux Access Control Lists (ACLs) through a web interface with gRPC backend communication.
+ 
+-Progress Docs: [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
++Progress Docs: [https://pythonhacker24.github.io/linux-acl-management/](https://pythonhacker24.github.io/linux-acl-management/)
+ 
+ ## Project Structure
+ ```

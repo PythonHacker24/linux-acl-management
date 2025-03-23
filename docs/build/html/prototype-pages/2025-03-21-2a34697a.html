@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
-  <head>
-<meta charset="utf-8"/>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="#" />
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Commit: Updated docs with prototype section and README.md with updated progress docs link" href="2025-03-23-f4425d4c.html" /><link rel="prev" title="Commit: Added gRPC daemons and connected to the backend with yaml fikes" href="2025-03-19-6e062a15.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-<meta name="robots" content="noindex" />
-<title>Search - Linux ACL Management Progress  documentation</title><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+        <title>Commit: Session Management Completed and Refined - Linux ACL Management Progress documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
     
 
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
+      <a href="../index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -187,21 +187,25 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
   <span class="sidebar-brand-text">Linux ACL Management Progress  documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="#" role="search">
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="prototype.html">Prototype</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="prototype-pages/CHANGELOG.html">Changelog</a></li>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../prototype.html">Prototype</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-1e574981.html">Commit: initial commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-0862674a.html">Commit: LDAP Authentication successful</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-6e062a15.html">Commit: Added gRPC daemons and connected to the backend with yaml fikes</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Commit: Session Management Completed and Refined</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-f4425d4c.html">Commit: Updated docs with prototype section and README.md with updated progress docs link</a></li>
 </ul>
 </li>
 </ul>
@@ -223,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/prototype-pages/2025-03-21-2a34697a.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
@@ -232,31 +242,59 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<noscript>
-<div class="admonition error">
-  <p class="admonition-title">Error</p>
-  <p>
-    Please activate JavaScript to enable the search functionality.
-  </p>
-</div>
-</noscript>
+          <section id="commit-session-management-completed-and-refined">
+<h1>Commit: Session Management Completed and Refined<a class="headerlink" href="#commit-session-management-completed-and-refined" title="Link to this heading">¶</a></h1>
+<section id="date-2025-03-21">
+<h2>Date: 2025-03-21<a class="headerlink" href="#date-2025-03-21" title="Link to this heading">¶</a></h2>
+</section>
+<section id="commit-hash-2a34697a069eab2a1a0f5951904da85eefb2fce7">
+<h2>Commit Hash: 2a34697a069eab2a1a0f5951904da85eefb2fce7<a class="headerlink" href="#commit-hash-2a34697a069eab2a1a0f5951904da85eefb2fce7" title="Link to this heading">¶</a></h2>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>commit 2a34697a069eab2a1a0f5951904da85eefb2fce7
+Author: PythonHacker24 &lt;adityapatil24680@gmail.com&gt;
+Date:   Fri Mar 21 11:36:27 2025 +0530
 
-<div id="search-results"></div>
+<span class="w"> </span>   Session Management Completed and Refined
+
+<span class="gh">diff --git a/backend-server/.DS_Store b/backend-server/.DS_Store</span>
+deleted file mode 100644
+<span class="gh">index a7c78ca..0000000</span>
+Binary files a/backend-server/.DS_Store and /dev/null differ
+</pre></div>
+</div>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="2025-03-23-f4425d4c.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Commit: Updated docs with prototype section and README.md with updated progress docs link</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="2025-03-19-6e062a15.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Commit: Added gRPC daemons and connected to the backend with yaml fikes</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -275,18 +313,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Commit: Session Management Completed and Refined</a><ul>
+<li><a class="reference internal" href="#date-2025-03-21">Date: 2025-03-21</a></li>
+<li><a class="reference internal" href="#commit-hash-2a34697a069eab2a1a0f5951904da85eefb2fce7">Commit Hash: 2a34697a069eab2a1a0f5951904da85eefb2fce7</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
-    
-<script src="_static/searchtools.js"></script>
-<script src="_static/language_data.js"></script>
-<script src="searchindex.js"></script></body>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
 </html>

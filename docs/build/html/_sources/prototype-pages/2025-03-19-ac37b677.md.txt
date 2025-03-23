@@ -1,0 +1,414 @@
+Commit: started JWT auth, implemented middleware
+=====================
+
+**Date**: 2025-03-19
+**Commit Hash**: ac37b677f3f76764a49dd737fbfd75e94c5a4b76
+
+Description
+-----------
+This commit introduces JWT (JSON Web Token) authentication to the project and implements middleware for request handling. Key changes include:
+- Implementation of JWT-based authentication system with middleware for token validation
+- Creation of LDAP authentication module for user verification
+- Enhanced server configuration with LDAP connection parameters
+- Modified middleware to support both logging and authentication workflows
+- Added login endpoint and handler structure 
+- Updated backend server configuration to support multiple server instances
+
+Changes
+-------
+.. code-block:: diff
+commit ac37b677f3f76764a49dd737fbfd75e94c5a4b76
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Wed Mar 19 17:54:22 2025 +0530
+
+    started JWT auth, implemented middleware
+
+diff --git a/backend-server/authentication/authencation.go b/backend-server/authentication/authencation.go
+new file mode 100644
+index 0000000..0c3e08e
+--- /dev/null
++++ b/backend-server/authentication/authencation.go
+@@ -0,0 +1,3 @@
++package authentication
++
++
+diff --git a/backend-server/backend.yaml b/backend-server/backend.yaml
+index 55953e8..fd95f9e 100644
+--- a/backend-server/backend.yaml
++++ b/backend-server/backend.yaml
+@@ -1,3 +1,8 @@
+ servers:
+   - name: "server1"
+-    address: "127.0.0.1:4444"
++    address: "127.0.0.1:3333"
++  - name: "server2"
++    address: "127.0.0.1:5555"
++  - name: "server3"
++    address: "127.0.0.1:6666"
++
+diff --git a/backend-server/config/config.go b/backend-server/config/config.go
+index 14c0425..8e8a36e 100644
+--- a/backend-server/config/config.go
++++ b/backend-server/config/config.go
+@@ -3,4 +3,8 @@ package config
+ const(
+     Host = "localhost"
+     Port = "8080"
++
++    LdapServer = "ldap.example.com:389"
++    LdapBindDN = "cn=admin,dc=example,dc=com"
++    LdapPassword = "admin"
+ )
+diff --git a/backend-server/go.mod b/backend-server/go.mod
+index 70f4a1a..409f780 100644
+--- a/backend-server/go.mod
++++ b/backend-server/go.mod
+@@ -3,6 +3,11 @@ module backend-server
+ go 1.23.6
+ 
+ require (
++	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
++	github.com/go-asn1-ber/asn1-ber v1.5.7 // indirect
++	github.com/go-ldap/ldap/v3 v3.4.10 // indirect
++	github.com/google/uuid v1.6.0 // indirect
++	golang.org/x/crypto v0.32.0 // indirect
+ 	golang.org/x/net v0.34.0 // indirect
+ 	golang.org/x/sys v0.29.0 // indirect
+ 	golang.org/x/text v0.21.0 // indirect
+diff --git a/backend-server/go.sum b/backend-server/go.sum
+index 17ec3be..02681ae 100644
+--- a/backend-server/go.sum
++++ b/backend-server/go.sum
+@@ -1,9 +1,107 @@
++github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 h1:mFRzDkZVAjdal+s7s0MwaRv9igoPqLRdzOLzw/8Xvq8=
++github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358/go.mod h1:chxPXzSsl7ZWRAuOIE23GDNzjWuZquvFlgA8xmpunjU=
++github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
++github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
++github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
++github.com/go-asn1-ber/asn1-ber v1.5.7 h1:DTX+lbVTWaTw1hQ+PbZPlnDZPEIs0SS/GCZAl535dDk=
++github.com/go-asn1-ber/asn1-ber v1.5.7/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
++github.com/go-ldap/ldap/v3 v3.4.10 h1:ot/iwPOhfpNVgB1o+AVXljizWZ9JTp7YF5oeyONmcJU=
++github.com/go-ldap/ldap/v3 v3.4.10/go.mod h1:JXh4Uxgi40P6E9rdsYqpUtbW46D9UTjJ9QSwGRznplY=
++github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
++github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
++github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
++github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
++github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
++github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
++github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
++github.com/jcmturner/aescts/v2 v2.0.0/go.mod h1:AiaICIRyfYg35RUkr8yESTqvSy7csK90qZ5xfvvsoNs=
++github.com/jcmturner/dnsutils/v2 v2.0.0/go.mod h1:b0TnjGOvI/n42bZa+hmXL+kFJZsFT7G4t3HTlQ184QM=
++github.com/jcmturner/gofork v1.7.6/go.mod h1:1622LH6i/EZqLloHfE7IeZ0uEJwMSUyQ/nDd82IeqRo=
++github.com/jcmturner/goidentity/v6 v6.0.1/go.mod h1:X1YW3bgtvwAXju7V3LCIMpY0Gbxyjn/mY9zx4tFonSg=
++github.com/jcmturner/gokrb5/v8 v8.4.4/go.mod h1:1btQEpgT6k+unzCwX1KdWMEwPPkkgBtP+F6aCACiMrs=
++github.com/jcmturner/rpc/v2 v2.0.3/go.mod h1:VUJYCIDm3PVOEHw8sgt091/20OJjskO/YJki3ELg/Hc=
++github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
++github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
++github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
++github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
++github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
++github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
++github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
++github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
++github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
++golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
++golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
++golang.org/x/crypto v0.6.0/go.mod h1:OFC/31mSvZgRz0V1QTNCzfAI1aIRzbiufJtkMIlEp58=
++golang.org/x/crypto v0.13.0/go.mod h1:y6Z2r+Rw4iayiXXAIxJIDAJ1zMW4yaTpebo8fPOliYc=
++golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDfU=
++golang.org/x/crypto v0.23.0/go.mod h1:CKFgDieR+mRhux2Lsu27y0fO304Db0wZe70UKqHu0v8=
++golang.org/x/crypto v0.31.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
++golang.org/x/crypto v0.32.0 h1:euUpcYgM8WcP71gNpTqQCn6rC2t6ULUPiOzfWaXVVfc=
++golang.org/x/crypto v0.32.0/go.mod h1:ZnnJkOaASj8g0AjIduWNlq2NRxL0PlBrbKVyZ6V/Ugc=
++golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
++golang.org/x/mod v0.8.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
++golang.org/x/mod v0.12.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
++golang.org/x/mod v0.15.0/go.mod h1:hTbmBsO62+eylJbnUtE2MGJUyE7QWk4xUqPFrRgJ+7c=
++golang.org/x/mod v0.17.0/go.mod h1:hTbmBsO62+eylJbnUtE2MGJUyE7QWk4xUqPFrRgJ+7c=
++golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
++golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
++golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
++golang.org/x/net v0.0.0-20220722155237-a158d28d115b/go.mod h1:XRhObCWvk6IyKnWLug+ECip1KBveYUHfp+8e9klMJ9c=
++golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
++golang.org/x/net v0.7.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
++golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
++golang.org/x/net v0.15.0/go.mod h1:idbUs1IY1+zTqbi8yxTbhexhEEk5ur9LInksu6HrEpk=
++golang.org/x/net v0.21.0/go.mod h1:bIjVDfnllIU7BJ2DNgfnXvpSvtn8VRwhlsaeUTyUS44=
++golang.org/x/net v0.25.0/go.mod h1:JkAGAh7GEvH74S6FOH42FLoXpXbE/aqXSrIQjXgsiwM=
++golang.org/x/net v0.33.0/go.mod h1:HXLR5J+9DxmrqMwG9qjGCxZ+zKXxBru04zlTvWlWuN4=
+ golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=
+ golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=
++golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.3.0/go.mod h1:FU7BRWz2tNW+3quACPkgCx/L+uEAv1htQ0V83Z9Rj+Y=
++golang.org/x/sync v0.6.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sync v0.10.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
++golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
++golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.12.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.17.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/sys v0.20.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/sys v0.28.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
+ golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=
+ golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/telemetry v0.0.0-20240228155512-f48c80bd79b2/go.mod h1:TeRTkGYfJXctD9OcfyVLyj2J3IxLnKwHJR8f4D8a3YE=
++golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
++golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
++golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
++golang.org/x/term v0.8.0/go.mod h1:xPskH00ivmX89bAKVGSKKtLOWNx2+17Eiy94tnKShWo=
++golang.org/x/term v0.12.0/go.mod h1:owVbMEjm3cBLCHdkQu9b1opXd4ETQWc3BhuQGKgXgvU=
++golang.org/x/term v0.17.0/go.mod h1:lLRBjIVuehSbZlaOtGMbcMncT+aqLLLmKrsjNrUguwk=
++golang.org/x/term v0.20.0/go.mod h1:8UkIAJTvZgivsXaD6/pH6U9ecQzZ45awqEOzuCvwpFY=
++golang.org/x/term v0.27.0/go.mod h1:iMsnZpn0cago0GOrHO2+Y7u7JPn5AylBrcoWkElMTSM=
++golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
++golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
++golang.org/x/text v0.3.7/go.mod h1:u+2+/6zg+i71rQMx5EYifcz6MCKuco9NR6JIITiCfzQ=
++golang.org/x/text v0.7.0/go.mod h1:mrYo+phRRbMaCq/xk9113O4dZlRixOauAjOtrjsXDZ8=
++golang.org/x/text v0.9.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
++golang.org/x/text v0.13.0/go.mod h1:TvPlkZtksWOMsz7fbANvkp4WM8x/WCo/om8BMLbz+aE=
++golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
++golang.org/x/text v0.15.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
+ golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=
+ golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
++golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
++golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
++golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
++golang.org/x/tools v0.6.0/go.mod h1:Xwgl3UAJ/d3gWutnCtw505GrjyAbvKui8lOU390QaIU=
++golang.org/x/tools v0.13.0/go.mod h1:HvlwmtVNQAhOuCjW7xxvovg8wbNq7LwfXh/k7wXUl58=
++golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d/go.mod h1:aiJjzUbINMkxbQROHiO6hDPo2LHcIPhhQsa9DLh0yGk=
++golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+ google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=
+ google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=
+ google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=
+@@ -11,5 +109,7 @@ google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd
+ google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=
+ google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
++gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
++gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+ gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+index 96449d4..bef7be1 100644
+--- a/backend-server/handlers/hander.go
++++ b/backend-server/handlers/hander.go
+@@ -18,3 +18,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
+         slog.Error("Failed to send health response from the handler", err)
+     }
+ }
++
++func LoginHandler(w http.ResponseWriter, r *http.Request) {
++    
++}
+diff --git a/backend-server/ldap/ldap.go b/backend-server/ldap/ldap.go
+new file mode 100644
+index 0000000..ec1447c
+--- /dev/null
++++ b/backend-server/ldap/ldap.go
+@@ -0,0 +1,51 @@
++package ldap
++
++import (
++	"backend-server/config"
++	"fmt"
++	"log/slog"
++
++	"github.com/go-ldap/ldap/v3"
++)
++
++// For failed authentications, we will log the requests and not for authenticated ones.
++// Those who are properly authenticated don't need to be in the logs, they will just be printed on the console. 
++// Failed authentication can potentially mean attempt to unauthorized access, so it would be logged.
++
++func AuthenticateUser(username, userPassword, searchBase string) bool {
++    l, err := ldap.DialURL(config.LdapServer)
++    if err != nil {
++        slog.Error("Failed to connect to LDAP Server", "Error", err.Error())
++    }
++    defer l.Close()
++
++    err = l.Bind(config.LdapBindDN, config.LdapPassword)
++    if err != nil {
++        slog.Error("Admin authentication failed", "Error", err.Error())
++    }
++
++    searchRequest := ldap.NewSearchRequest(
++		searchBase,
++		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
++		fmt.Sprintf("(uid=%s)", username), // Searching by username
++		[]string{"dn"}, // We only need the DN
++		nil,
++	)
++
++    sr, err := l.Search(searchRequest)
++	if err != nil || len(sr.Entries) == 0 {
++		slog.Error("User not found in LDAP", "Error", err.Error())
++		return false
++	}
++
++    userDN := sr.Entries[0].DN 
++
++    err = l.Bind(userDN, userPassword)
++	if err != nil {
++		slog.Error("User authentication failed", "Error", err.Error())
++		return false
++	}
++
++    fmt.Println("User authentication successful")
++	return true
++}
+diff --git a/backend-server/main.go b/backend-server/main.go
+index 8c13b91..3a8ab41 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -13,11 +13,13 @@ import (
+ )
+ 
+ func main() {
++    // Loading Config file 
+     backendConfig, err := utils.LoadConfig("./backend.yaml")
+     if err != nil {
+         slog.Error("Error loading config", "Error", err.Error())
+     }
+ 
++    // Connecting to File Server Daemons
+     for _, server := range backendConfig.Servers {
+         fmt.Printf("Loaded gRPC server: %s at %s \n", server.Name, server.Address)
+     }
+@@ -26,12 +28,14 @@ func main() {
+ 		go services.ConnectToServer(server)
+ 	}
+ 
++    // Setting up endpoints for interactions
+     mux := http.NewServeMux()
+ 
+     // Health Check Endpoint
+     mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
+ 
+     // Frontend Handlers 
++    mux.Handle("/login", middleware.LoggingMiddleware(http.HandleFunc(handlers.LoginHandler)))
+ 
+     // Daemons Handlers
+ 
+diff --git a/backend-server/middleware/middleware.go b/backend-server/middleware/middleware.go
+index 759b4a1..22940ea 100644
+--- a/backend-server/middleware/middleware.go
++++ b/backend-server/middleware/middleware.go
+@@ -3,10 +3,13 @@ package middleware
+ import (
+ 	"log/slog"
+ 	"net/http"
++	"strings"
+ 	"time"
++
++    "backend-server/authentication"
+ )
+ 
+-func LoggingMiddleware(next http.Handler) http.Handler {
++func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
+     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+         start := time.Now()
+         slog.Info("Received request", slog.String("method", r.Method), slog.String("path", r.URL.Path))
+@@ -14,3 +17,25 @@ func LoggingMiddleware(next http.Handler) http.Handler {
+         slog.Info("Request completed", slog.String("method", r.Method), slog.String("path", r.URL.Path), slog.Duration("duration", time.Since(start)))
+     })
+ } 
++
++func AuthenticationMiddlware(next http.HandlerFunc) http.HandlerFunc {
++    return func(w http.ResponseWriter, r *http.Request) {
++        authHeader := r.Header.Get("Authorization")
++        if authHeader == "" || strings.HasPrefix(authHeader, "Bearer ") {
++            http.Error(w, "Missing or Invalid Token", http.StatusUnauthorized)
++            return
++        }
++
++        tokenString := strings.TrimPrefix(authHeader, "Bearer: ")
++
++        claims, err := authentication.ValidateJWT(tokenString)
++        if err != nil {
++            http.Error(w, "Invalid Token", http.StatusUnauthorized)
++            return
++        }
++
++        r.Header.Set("X-User", claims["username"].(string))
++
++        next(w, r)
++    }
++}
+diff --git a/backend-server/services/services.go b/backend-server/services/services.go
+index 8f26904..1536ce8 100644
+--- a/backend-server/services/services.go
++++ b/backend-server/services/services.go
+@@ -32,6 +32,6 @@ func ConnectToServer(server models.ServerConfig) {
+ 			slog.Info("Status", server.Name, response.Status)
+ 		}
+ 
+-		time.Sleep(10 * time.Second) // Poll every 10 seconds
++		time.Sleep(10 * time.Second)
+ 	}
+ }
+diff --git a/file-server-daemon/grpcdef/grpcdef.go b/file-server-daemon/grpcdef/grpcdef.go
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/file-server-daemon/main.go b/file-server-daemon/main.go
+index ecf979f..d664bb4 100644
+--- a/file-server-daemon/main.go
++++ b/file-server-daemon/main.go
+@@ -1,17 +1,26 @@
+ package main
+ 
+ import (
++	"fmt"
+ 	"log/slog"
+ 	"net"
++	"os"
+ 
+-    "file-server-daemon/models"
+-    pb "file-server-daemon/proto"
++	"file-server-daemon/models"
++	pb "file-server-daemon/proto"
+ 
+ 	"google.golang.org/grpc"
+ )
+ 
+ func main() {
+-    lis, err := net.Listen("tcp", ":4444")
++    if len(os.Args) < 2 {
++		slog.Error("Usage: go run main.go <port>")
++		os.Exit(1)
++	}
++
++    port := os.Args[1]
++
++    lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
+     if err != nil {
+         slog.Error("Failed to listen", "Error", err.Error())
+         return
+@@ -20,7 +29,7 @@ func main() {
+     grpcServer := grpc.NewServer()
+     pb.RegisterDaemonServiceServer(grpcServer, &models.Server{})
+ 
+-    slog.Info("gRPC server listening on :4444")
++    slog.Info("gRPC server started", "port", port)
+     if err := grpcServer.Serve(lis); err != nil {
+         slog.Error("Failed to serve", "Error", err.Error())
+     }
+diff --git a/file-server-daemon/models/models.go b/file-server-daemon/models/models.go
+index f8e4900..3cb79c6 100644
+--- a/file-server-daemon/models/models.go
++++ b/file-server-daemon/models/models.go
+@@ -12,6 +12,6 @@ type Server struct {
+ }
+ 
+ func (s *Server) GetStatus(ctx context.Context, req *pb.StatusRequest) (*pb.StatusResponse, error) {
+-    slog.Info("Received request for server: %s", "Server ID", req.ServerId)
++    slog.Info("Received request for server", "Server ID", req.ServerId)
+     return &pb.StatusResponse{Status: "Running"}, nil
+ }

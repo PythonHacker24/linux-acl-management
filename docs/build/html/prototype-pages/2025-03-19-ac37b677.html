@@ -1,0 +1,866 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Commit: Made progress with Session Manager" href="2025-03-20-0642d782.html" /><link rel="prev" title="Commit: Added gRPC daemons and connected to the backend with yaml fikes" href="2025-03-19-6e062a15.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>Commit: started JWT auth, implemented middleware - Linux ACL Management Progress documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Linux ACL Management Progress  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../prototype.html">Prototype</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-1e574981.html">Commit: initial commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-42322c25.html">Commit: added slog for better logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-b4e48782.html">Commit: Added Makefile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-0862674a.html">Commit: LDAP Authentication successful</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-28bc4389.html">Commit: Added README.md</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-518b12ca.html">Commit: Fixed end of the README.md</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-5db8f12b.html">Commit: removed Makefile for now</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-6e062a15.html">Commit: Added gRPC daemons and connected to the backend with yaml fikes</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Commit: started JWT auth, implemented middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-20-0642d782.html">Commit: Made progress with Session Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-20-1036e0a4.html">Commit: Session Manager Completed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-20-99f0083e.html">Commit: Completed Session Management and successfully tested</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-21-2a34697a.html">Commit: Session Management Completed and Refined</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html">Commit: Updated docs with Prototype Section and README.md for Progress Docs Link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#sphinx-build-info-version-1">Sphinx build info version 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#this-file-records-the-configuration-used-when-building-these-files-when-it-is-not-found-a-full-rebuild-will-be-done">This file records the configuration used when building these files. When it is not found, a full rebuild will be done.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#id1">Sphinx build info version 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#id2">This file records the configuration used when building these files. When it is not found, a full rebuild will be done.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#project-information">– Project information —————————————————–</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-2ee34848.html#https-www-sphinx-doc-org-en-master-usage-configuration-html-project-information">https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-423654e6.html">Commit: Added current working directory, intialized handlers and started progress documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-58912db0.html">Commit: Update main.yml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-87f85acb.html">Commit: Create main.yml for docs deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-f4425d4c.html">Commit: Updated docs with prototype section and README.md with updated progress docs link</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/prototype-pages/2025-03-19-ac37b677.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="commit-started-jwt-auth-implemented-middleware">
+<h1>Commit: started JWT auth, implemented middleware<a class="headerlink" href="#commit-started-jwt-auth-implemented-middleware" title="Link to this heading">¶</a></h1>
+<p><strong>Date</strong>: 2025-03-19
+<strong>Commit Hash</strong>: ac37b677f3f76764a49dd737fbfd75e94c5a4b76</p>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This commit introduces JWT (JSON Web Token) authentication to the project and implements middleware for request handling. Key changes include:</p>
+<ul class="simple">
+<li><p>Implementation of JWT-based authentication system with middleware for token validation</p></li>
+<li><p>Creation of LDAP authentication module for user verification</p></li>
+<li><p>Enhanced server configuration with LDAP connection parameters</p></li>
+<li><p>Modified middleware to support both logging and authentication workflows</p></li>
+<li><p>Added login endpoint and handler structure</p></li>
+<li><p>Updated backend server configuration to support multiple server instances</p></li>
+</ul>
+</section>
+<section id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
+<p>.. code-block:: diff
+commit ac37b677f3f76764a49dd737fbfd75e94c5a4b76
+Author: PythonHacker24 <a class="reference external" href="mailto:adityapatil24680&#37;&#52;&#48;gmail&#46;com">adityapatil24680<span>&#64;</span>gmail<span>&#46;</span>com</a>
+Date:   Wed Mar 19 17:54:22 2025 +0530</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>started JWT auth, implemented middleware
+</pre></div>
+</div>
+<p>diff –git a/backend-server/authentication/authencation.go b/backend-server/authentication/authencation.go
+new file mode 100644
+index 0000000..0c3e08e
+— /dev/null</p>
+<p>&#64;&#64; -0,0 +1,3 &#64;&#64;
++package authentication
++
++
+diff –git a/backend-server/backend.yaml b/backend-server/backend.yaml
+index 55953e8..fd95f9e 100644
+— a/backend-server/backend.yaml</p>
+<p>&#64;&#64; -1,3 +1,8 &#64;&#64;
+servers:</p>
+<ul class="simple">
+<li><p>name: “server1”</p></li>
+<li><p>address: “127.0.0.1:4444”</p></li>
+</ul>
+<ul class="simple">
+<li><p>address: “127.0.0.1:3333”</p></li>
+<li><ul>
+<li><p>name: “server2”</p></li>
+</ul>
+</li>
+<li><p>address: “127.0.0.1:5555”</p></li>
+<li><ul>
+<li><p>name: “server3”</p></li>
+</ul>
+</li>
+<li><p>address: “127.0.0.1:6666”</p></li>
+<li></li>
+</ul>
+<p>diff –git a/backend-server/config/config.go b/backend-server/config/config.go
+index 14c0425..8e8a36e 100644
+— a/backend-server/config/config.go</p>
+<p>&#64;&#64; -3,4 +3,8 &#64;&#64; package config
+const(
+Host = “localhost”
+Port = “8080”
++</p>
+<ul class="simple">
+<li><p>LdapServer = “ldap.example.com:389”</p></li>
+<li><p>LdapBindDN = “cn=admin,dc=example,dc=com”</p></li>
+<li><p>LdapPassword = “admin”
+)
+diff –git a/backend-server/go.mod b/backend-server/go.mod
+index 70f4a1a..409f780 100644
+— a/backend-server/go.mod</p></li>
+</ul>
+<p>&#64;&#64; -3,6 +3,11 &#64;&#64; module backend-server
+go 1.23.6</p>
+<p>require (</p>
+<ul class="simple">
+<li><p>github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect</p></li>
+<li><p>github.com/go-asn1-ber/asn1-ber v1.5.7 // indirect</p></li>
+<li><p>github.com/go-ldap/ldap/v3 v3.4.10 // indirect</p></li>
+<li><p>github.com/google/uuid v1.6.0 // indirect</p></li>
+<li><p>golang.org/x/crypto v0.32.0 // indirect
+golang.org/x/net v0.34.0 // indirect
+golang.org/x/sys v0.29.0 // indirect
+golang.org/x/text v0.21.0 // indirect
+diff –git a/backend-server/go.sum b/backend-server/go.sum
+index 17ec3be..02681ae 100644
+— a/backend-server/go.sum</p></li>
+</ul>
+<p>&#64;&#64; -1,9 +1,107 &#64;&#64;
++github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 h1:mFRzDkZVAjdal+s7s0MwaRv9igoPqLRdzOLzw/8Xvq8=
++github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358/go.mod h1:chxPXzSsl7ZWRAuOIE23GDNzjWuZquvFlgA8xmpunjU=
++github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
++github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
++github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
++github.com/go-asn1-ber/asn1-ber v1.5.7 h1:DTX+lbVTWaTw1hQ+PbZPlnDZPEIs0SS/GCZAl535dDk=
++github.com/go-asn1-ber/asn1-ber v1.5.7/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
++github.com/go-ldap/ldap/v3 v3.4.10 h1:ot/iwPOhfpNVgB1o+AVXljizWZ9JTp7YF5oeyONmcJU=
++github.com/go-ldap/ldap/v3 v3.4.10/go.mod h1:JXh4Uxgi40P6E9rdsYqpUtbW46D9UTjJ9QSwGRznplY=
++github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
++github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
++github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
++github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
++github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
++github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
++github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
++github.com/jcmturner/aescts/v2 v2.0.0/go.mod h1:AiaICIRyfYg35RUkr8yESTqvSy7csK90qZ5xfvvsoNs=
++github.com/jcmturner/dnsutils/v2 v2.0.0/go.mod h1:b0TnjGOvI/n42bZa+hmXL+kFJZsFT7G4t3HTlQ184QM=
++github.com/jcmturner/gofork v1.7.6/go.mod h1:1622LH6i/EZqLloHfE7IeZ0uEJwMSUyQ/nDd82IeqRo=
++github.com/jcmturner/goidentity/v6 v6.0.1/go.mod h1:X1YW3bgtvwAXju7V3LCIMpY0Gbxyjn/mY9zx4tFonSg=
++github.com/jcmturner/gokrb5/v8 v8.4.4/go.mod h1:1btQEpgT6k+unzCwX1KdWMEwPPkkgBtP+F6aCACiMrs=
++github.com/jcmturner/rpc/v2 v2.0.3/go.mod h1:VUJYCIDm3PVOEHw8sgt091/20OJjskO/YJki3ELg/Hc=
++github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
++github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
++github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
++github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
++github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
++github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
++github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
++github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
++github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
++golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
++golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
++golang.org/x/crypto v0.6.0/go.mod h1:OFC/31mSvZgRz0V1QTNCzfAI1aIRzbiufJtkMIlEp58=
++golang.org/x/crypto v0.13.0/go.mod h1:y6Z2r+Rw4iayiXXAIxJIDAJ1zMW4yaTpebo8fPOliYc=
++golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDfU=
++golang.org/x/crypto v0.23.0/go.mod h1:CKFgDieR+mRhux2Lsu27y0fO304Db0wZe70UKqHu0v8=
++golang.org/x/crypto v0.31.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
++golang.org/x/crypto v0.32.0 h1:euUpcYgM8WcP71gNpTqQCn6rC2t6ULUPiOzfWaXVVfc=
++golang.org/x/crypto v0.32.0/go.mod h1:ZnnJkOaASj8g0AjIduWNlq2NRxL0PlBrbKVyZ6V/Ugc=
++golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
++golang.org/x/mod v0.8.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
++golang.org/x/mod v0.12.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
++golang.org/x/mod v0.15.0/go.mod h1:hTbmBsO62+eylJbnUtE2MGJUyE7QWk4xUqPFrRgJ+7c=
++golang.org/x/mod v0.17.0/go.mod h1:hTbmBsO62+eylJbnUtE2MGJUyE7QWk4xUqPFrRgJ+7c=
++golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
++golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
++golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
++golang.org/x/net v0.0.0-20220722155237-a158d28d115b/go.mod h1:XRhObCWvk6IyKnWLug+ECip1KBveYUHfp+8e9klMJ9c=
++golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
++golang.org/x/net v0.7.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
++golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
++golang.org/x/net v0.15.0/go.mod h1:idbUs1IY1+zTqbi8yxTbhexhEEk5ur9LInksu6HrEpk=
++golang.org/x/net v0.21.0/go.mod h1:bIjVDfnllIU7BJ2DNgfnXvpSvtn8VRwhlsaeUTyUS44=
++golang.org/x/net v0.25.0/go.mod h1:JkAGAh7GEvH74S6FOH42FLoXpXbE/aqXSrIQjXgsiwM=
++golang.org/x/net v0.33.0/go.mod h1:HXLR5J+9DxmrqMwG9qjGCxZ+zKXxBru04zlTvWlWuN4=
+golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=
+golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=
++golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
++golang.org/x/sync v0.3.0/go.mod h1:FU7BRWz2tNW+3quACPkgCx/L+uEAv1htQ0V83Z9Rj+Y=
++golang.org/x/sync v0.6.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sync v0.10.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
++golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
++golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
++golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.12.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.17.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/sys v0.20.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/sys v0.28.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
+golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=
+golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/telemetry v0.0.0-20240228155512-f48c80bd79b2/go.mod h1:TeRTkGYfJXctD9OcfyVLyj2J3IxLnKwHJR8f4D8a3YE=
++golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
++golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
++golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
++golang.org/x/term v0.8.0/go.mod h1:xPskH00ivmX89bAKVGSKKtLOWNx2+17Eiy94tnKShWo=
++golang.org/x/term v0.12.0/go.mod h1:owVbMEjm3cBLCHdkQu9b1opXd4ETQWc3BhuQGKgXgvU=
++golang.org/x/term v0.17.0/go.mod h1:lLRBjIVuehSbZlaOtGMbcMncT+aqLLLmKrsjNrUguwk=
++golang.org/x/term v0.20.0/go.mod h1:8UkIAJTvZgivsXaD6/pH6U9ecQzZ45awqEOzuCvwpFY=
++golang.org/x/term v0.27.0/go.mod h1:iMsnZpn0cago0GOrHO2+Y7u7JPn5AylBrcoWkElMTSM=
++golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
++golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
++golang.org/x/text v0.3.7/go.mod h1:u+2+/6zg+i71rQMx5EYifcz6MCKuco9NR6JIITiCfzQ=
++golang.org/x/text v0.7.0/go.mod h1:mrYo+phRRbMaCq/xk9113O4dZlRixOauAjOtrjsXDZ8=
++golang.org/x/text v0.9.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
++golang.org/x/text v0.13.0/go.mod h1:TvPlkZtksWOMsz7fbANvkp4WM8x/WCo/om8BMLbz+aE=
++golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
++golang.org/x/text v0.15.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
+golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=
+golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
++golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
++golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
++golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
++golang.org/x/tools v0.6.0/go.mod h1:Xwgl3UAJ/d3gWutnCtw505GrjyAbvKui8lOU390QaIU=
++golang.org/x/tools v0.13.0/go.mod h1:HvlwmtVNQAhOuCjW7xxvovg8wbNq7LwfXh/k7wXUl58=
++golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d/go.mod h1:aiJjzUbINMkxbQROHiO6hDPo2LHcIPhhQsa9DLh0yGk=
++golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=
+google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=
+&#64;&#64; -11,5 +109,7 &#64;&#64; google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd
+google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=
+google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
++gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
++gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+diff –git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+index 96449d4..bef7be1 100644
+— a/backend-server/handlers/hander.go</p>
+<p>&#64;&#64; -18,3 +18,7 &#64;&#64; func HealthHandler(w http.ResponseWriter, r *http.Request) {
+slog.Error(“Failed to send health response from the handler”, err)
+}
+}
++
++func LoginHandler(w http.ResponseWriter, r *http.Request) {
++<br />
++}
+diff –git a/backend-server/ldap/ldap.go b/backend-server/ldap/ldap.go
+new file mode 100644
+index 0000000..ec1447c
+— /dev/null</p>
+<p>&#64;&#64; -0,0 +1,51 &#64;&#64;
++package ldap
++
++import (</p>
+<ul class="simple">
+<li><p>“backend-server/config”</p></li>
+<li><p>“fmt”</p></li>
+<li><p>“log/slog”</p></li>
+<li></li>
+<li><p>“github.com/go-ldap/ldap/v3”
++)</p></li>
+<li></li>
+</ul>
+<p>+// For failed authentications, we will log the requests and not for authenticated ones.
++// Those who are properly authenticated don’t need to be in the logs, they will just be printed on the console.
++// Failed authentication can potentially mean attempt to unauthorized access, so it would be logged.
++
++func AuthenticateUser(username, userPassword, searchBase string) bool {</p>
+<ul>
+<li><p>l, err := ldap.DialURL(config.LdapServer)</p></li>
+<li><p>if err != nil {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   slog.Error(&quot;Failed to connect to LDAP Server&quot;, &quot;Error&quot;, err.Error())
+</pre></div>
+</div>
+</li>
+<li><p>}</p></li>
+<li><p>defer l.Close()</p></li>
+<li></li>
+<li><p>err = l.Bind(config.LdapBindDN, config.LdapPassword)</p></li>
+<li><p>if err != nil {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   slog.Error(&quot;Admin authentication failed&quot;, &quot;Error&quot;, err.Error())
+</pre></div>
+</div>
+</li>
+<li><p>}</p></li>
+<li></li>
+<li><p>searchRequest := ldap.NewSearchRequest(</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  searchBase,
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  fmt.Sprintf(&quot;(uid=%s)&quot;, username), // Searching by username
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  []string{&quot;dn&quot;}, // We only need the DN
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  nil,
+</pre></div>
+</div>
+</li>
+<li><p>)</p></li>
+<li></li>
+<li><p>sr, err := l.Search(searchRequest)</p></li>
+<li><p>if err != nil || len(sr.Entries) == 0 {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  slog.Error(&quot;User not found in LDAP&quot;, &quot;Error&quot;, err.Error())
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  return false
+</pre></div>
+</div>
+</li>
+<li><p>}</p></li>
+<li></li>
+<li><p>userDN := sr.Entries[0].DN</p></li>
+<li></li>
+<li><p>err = l.Bind(userDN, userPassword)</p></li>
+<li><p>if err != nil {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  slog.Error(&quot;User authentication failed&quot;, &quot;Error&quot;, err.Error())
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  return false
+</pre></div>
+</div>
+</li>
+<li><p>}</p></li>
+<li></li>
+<li><p>fmt.Println(“User authentication successful”)</p></li>
+<li><p>return true
++}
+diff –git a/backend-server/main.go b/backend-server/main.go
+index 8c13b91..3a8ab41 100644
+— a/backend-server/main.go</p></li>
+</ul>
+<p>&#64;&#64; -13,11 +13,13 &#64;&#64; import (
+)</p>
+<p>func main() {</p>
+<ul>
+<li><p>// Loading Config file
+backendConfig, err := utils.LoadConfig(“./backend.yaml”)
+if err != nil {
+slog.Error(“Error loading config”, “Error”, err.Error())
+}</p></li>
+<li><p>// Connecting to File Server Daemons
+for _, server := range backendConfig.Servers {
+fmt.Printf(“Loaded gRPC server: %s at %s \n”, server.Name, server.Address)
+}
+&#64;&#64; -26,12 +28,14 &#64;&#64; func main() {
+go services.ConnectToServer(server)
+}</p></li>
+<li><p>// Setting up endpoints for interactions
+mux := http.NewServeMux()</p>
+<p>// Health Check Endpoint
+mux.Handle(“/health”, middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))</p>
+<p>// Frontend Handlers</p>
+</li>
+<li><p>mux.Handle(“/login”, middleware.LoggingMiddleware(http.HandleFunc(handlers.LoginHandler)))</p>
+<p>// Daemons Handlers</p>
+</li>
+</ul>
+<p>diff –git a/backend-server/middleware/middleware.go b/backend-server/middleware/middleware.go
+index 759b4a1..22940ea 100644
+— a/backend-server/middleware/middleware.go</p>
+<p>&#64;&#64; -3,10 +3,13 &#64;&#64; package middleware
+import (
+“log/slog”
+“net/http”</p>
+<ul class="simple">
+<li><p>“strings”
+“time”</p></li>
+<li></li>
+<li><p>“backend-server/authentication”
+)</p></li>
+</ul>
+<p>-func LoggingMiddleware(next http.Handler) http.Handler {
++func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
+return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+start := time.Now()
+slog.Info(“Received request”, slog.String(“method”, r.Method), slog.String(“path”, r.URL.Path))
+&#64;&#64; -14,3 +17,25 &#64;&#64; func LoggingMiddleware(next http.Handler) http.Handler {
+slog.Info(“Request completed”, slog.String(“method”, r.Method), slog.String(“path”, r.URL.Path), slog.Duration(“duration”, time.Since(start)))
+})
+}
++
++func AuthenticationMiddlware(next http.HandlerFunc) http.HandlerFunc {</p>
+<ul>
+<li><p>return func(w http.ResponseWriter, r *http.Request) {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   authHeader := r.Header.Get(&quot;Authorization&quot;)
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   if authHeader == &quot;&quot; || strings.HasPrefix(authHeader, &quot;Bearer &quot;) {
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       http.Error(w, &quot;Missing or Invalid Token&quot;, http.StatusUnauthorized)
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       return
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   }
+</pre></div>
+</div>
+</li>
+<li></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   tokenString := strings.TrimPrefix(authHeader, &quot;Bearer: &quot;)
+</pre></div>
+</div>
+</li>
+<li></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   claims, err := authentication.ValidateJWT(tokenString)
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   if err != nil {
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       http.Error(w, &quot;Invalid Token&quot;, http.StatusUnauthorized)
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       return
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   }
+</pre></div>
+</div>
+</li>
+<li></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   r.Header.Set(&quot;X-User&quot;, claims[&quot;username&quot;].(string))
+</pre></div>
+</div>
+</li>
+<li></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   next(w, r)
+</pre></div>
+</div>
+</li>
+<li><p>}
++}
+diff –git a/backend-server/services/services.go b/backend-server/services/services.go
+index 8f26904..1536ce8 100644
+— a/backend-server/services/services.go</p></li>
+</ul>
+<p>&#64;&#64; -32,6 +32,6 &#64;&#64; func ConnectToServer(server models.ServerConfig) {
+slog.Info(“Status”, server.Name, response.Status)
+}</p>
+<ul>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  time.Sleep(10 * time.Second) // Poll every 10 seconds
+</pre></div>
+</div>
+</li>
+</ul>
+<ul>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  time.Sleep(10 * time.Second)
+</pre></div>
+</div>
+<p>}
+}
+diff –git a/file-server-daemon/grpcdef/grpcdef.go b/file-server-daemon/grpcdef/grpcdef.go
+deleted file mode 100644
+index e69de29..0000000
+diff –git a/file-server-daemon/main.go b/file-server-daemon/main.go
+index ecf979f..d664bb4 100644
+— a/file-server-daemon/main.go</p>
+</li>
+</ul>
+<p>&#64;&#64; -1,17 +1,26 &#64;&#64;
+package main</p>
+<p>import (</p>
+<ul class="simple">
+<li><p>“fmt”
+“log/slog”
+“net”</p></li>
+<li><p>“os”</p></li>
+</ul>
+<ul class="simple">
+<li><p>“file-server-daemon/models”</p></li>
+<li><p>pb “file-server-daemon/proto”</p></li>
+</ul>
+<ul>
+<li><p>“file-server-daemon/models”</p></li>
+<li><p>pb “file-server-daemon/proto”</p>
+<p>“google.golang.org/grpc”
+)</p>
+</li>
+</ul>
+<p>func main() {</p>
+<ul class="simple">
+<li><p>lis, err := net.Listen(“tcp”, “:4444”)</p></li>
+</ul>
+<ul>
+<li><p>if len(os.Args) &lt; 2 {</p></li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  slog.Error(&quot;Usage: go run main.go &lt;port&gt;&quot;)
+</pre></div>
+</div>
+</li>
+<li><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  os.Exit(1)
+</pre></div>
+</div>
+</li>
+<li><p>}</p></li>
+<li></li>
+<li><p>port := os.Args[1]</p></li>
+<li></li>
+<li><p>lis, err := net.Listen(“tcp”, fmt.Sprintf(“:%s”, port))
+if err != nil {
+slog.Error(“Failed to listen”, “Error”, err.Error())
+return
+&#64;&#64; -20,7 +29,7 &#64;&#64; func main() {
+grpcServer := grpc.NewServer()
+pb.RegisterDaemonServiceServer(grpcServer, &amp;models.Server{})</p></li>
+</ul>
+<ul class="simple">
+<li><p>slog.Info(“gRPC server listening on :4444”)</p></li>
+</ul>
+<ul class="simple">
+<li><p>slog.Info(“gRPC server started”, “port”, port)
+if err := grpcServer.Serve(lis); err != nil {
+slog.Error(“Failed to serve”, “Error”, err.Error())
+}
+diff –git a/file-server-daemon/models/models.go b/file-server-daemon/models/models.go
+index f8e4900..3cb79c6 100644
+— a/file-server-daemon/models/models.go</p></li>
+</ul>
+<p>&#64;&#64; -12,6 +12,6 &#64;&#64; type Server struct {
+}</p>
+<p>func (s *Server) GetStatus(ctx context.Context, req *pb.StatusRequest) (*pb.StatusResponse, error) {</p>
+<ul class="simple">
+<li><p>slog.Info(“Received request for server: %s”, “Server ID”, req.ServerId)</p></li>
+</ul>
+<ul class="simple">
+<li><p>slog.Info(“Received request for server”, “Server ID”, req.ServerId)
+return &amp;pb.StatusResponse{Status: “Running”}, nil
+}</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="2025-03-20-0642d782.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Commit: Made progress with Session Manager</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="2025-03-19-6e062a15.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Commit: Added gRPC daemons and connected to the backend with yaml fikes</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Aditya Patil
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Commit: started JWT auth, implemented middleware</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#changes">Changes</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>

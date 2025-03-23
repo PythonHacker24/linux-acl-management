@@ -1,0 +1,1378 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Commit: Session Management Completed and Refined" href="2025-03-21-2a34697a.html" /><link rel="prev" title="Commit: LDAP Authentication successful" href="2025-03-19-0862674a.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>Commit: Added gRPC daemons and connected to the backend with yaml fikes - Linux ACL Management Progress documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Linux ACL Management Progress  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../prototype.html">Prototype</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-1e574981.html">Commit: initial commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-0862674a.html">Commit: LDAP Authentication successful</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Commit: Added gRPC daemons and connected to the backend with yaml fikes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-21-2a34697a.html">Commit: Session Management Completed and Refined</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-f4425d4c.html">Commit: Updated docs with prototype section and README.md with updated progress docs link</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/prototype-pages/2025-03-19-6e062a15.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="commit-added-grpc-daemons-and-connected-to-the-backend-with-yaml-fikes">
+<h1>Commit: Added gRPC daemons and connected to the backend with yaml fikes<a class="headerlink" href="#commit-added-grpc-daemons-and-connected-to-the-backend-with-yaml-fikes" title="Link to this heading">¶</a></h1>
+<section id="date-2025-03-19">
+<h2>Date: 2025-03-19<a class="headerlink" href="#date-2025-03-19" title="Link to this heading">¶</a></h2>
+</section>
+<section id="commit-hash-6e062a1586b763c6cebdc4c114925b884eb27d36">
+<h2>Commit Hash: 6e062a1586b763c6cebdc4c114925b884eb27d36<a class="headerlink" href="#commit-hash-6e062a1586b763c6cebdc4c114925b884eb27d36" title="Link to this heading">¶</a></h2>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>commit 6e062a1586b763c6cebdc4c114925b884eb27d36
+Author: PythonHacker24 &lt;adityapatil24680@gmail.com&gt;
+Date:   Wed Mar 19 12:48:34 2025 +0530
+
+<span class="w"> </span>   Added gRPC daemons and connected to the backend with yaml fikes
+
+<span class="gh">diff --git a/backend-server/backend.yaml b/backend-server/backend.yaml</span>
+new file mode 100644
+<span class="gh">index 0000000..55953e8</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/backend.yaml</span>
+<span class="gu">@@ -0,0 +1,3 @@</span>
+<span class="gi">+servers:</span>
+<span class="gi">+  - name: &quot;server1&quot;</span>
+<span class="gi">+    address: &quot;127.0.0.1:4444&quot;</span>
+<span class="gh">diff --git a/backend-server/go.mod b/backend-server/go.mod</span>
+<span class="gh">index e196101..70f4a1a 100644</span>
+<span class="gd">--- a/backend-server/go.mod</span>
+<span class="gi">+++ b/backend-server/go.mod</span>
+<span class="gu">@@ -1,3 +1,13 @@</span>
+<span class="w"> </span>module backend-server
+<span class="w"> </span>
+<span class="w"> </span>go 1.23.6
+<span class="gi">+</span>
+<span class="gi">+require (</span>
+<span class="gi">+	golang.org/x/net v0.34.0 // indirect</span>
+<span class="gi">+	golang.org/x/sys v0.29.0 // indirect</span>
+<span class="gi">+	golang.org/x/text v0.21.0 // indirect</span>
+<span class="gi">+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect</span>
+<span class="gi">+	google.golang.org/grpc v1.71.0 // indirect</span>
+<span class="gi">+	google.golang.org/protobuf v1.36.4 // indirect</span>
+<span class="gi">+	gopkg.in/yaml.v3 v3.0.1 // indirect</span>
+<span class="gi">+)</span>
+<span class="gh">diff --git a/backend-server/go.sum b/backend-server/go.sum</span>
+new file mode 100644
+<span class="gh">index 0000000..17ec3be</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/go.sum</span>
+<span class="gu">@@ -0,0 +1,15 @@</span>
+<span class="gi">+golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=</span>
+<span class="gi">+golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=</span>
+<span class="gi">+golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=</span>
+<span class="gi">+golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=</span>
+<span class="gi">+golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=</span>
+<span class="gi">+golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=</span>
+<span class="gi">+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=</span>
+<span class="gi">+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=</span>
+<span class="gi">+google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=</span>
+<span class="gi">+google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd/8Ec=</span>
+<span class="gi">+google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=</span>
+<span class="gi">+google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=</span>
+<span class="gi">+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=</span>
+<span class="gi">+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=</span>
+<span class="gi">+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=</span>
+<span class="gh">diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go</span>
+<span class="gh">index 60d1c85..96449d4 100644</span>
+<span class="gd">--- a/backend-server/handlers/hander.go</span>
+<span class="gi">+++ b/backend-server/handlers/hander.go</span>
+<span class="gu">@@ -1,8 +1,20 @@</span>
+<span class="w"> </span>package handlers
+<span class="w"> </span>
+<span class="w"> </span>import (
+<span class="gd">-    &quot;log&quot;</span>
+<span class="w"> </span>    &quot;net/http&quot;
+<span class="gi">+    &quot;log/slog&quot;</span>
+<span class="gi">+    &quot;encoding/json&quot;</span>
+<span class="gi">+    &quot;backend-server/models&quot;</span>
+<span class="w"> </span>)
+<span class="w"> </span>
+<span class="gi">+func HealthHandler(w http.ResponseWriter, r *http.Request) {</span>
+<span class="gi">+    var response models.HealthResponse</span>
+<span class="gi">+    </span>
+<span class="gi">+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)</span>
+<span class="gi">+    w.WriteHeader(http.StatusOK)</span>
+<span class="w"> </span>
+<span class="gi">+    response.Status = &quot;ok&quot;</span>
+<span class="gi">+    if err := json.NewEncoder(w).Encode(response); err != nil {</span>
+<span class="gi">+        slog.Error(&quot;Failed to send health response from the handler&quot;, err)</span>
+<span class="gi">+    }</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/backend-server/main.go b/backend-server/main.go</span>
+<span class="gh">index a202d35..8c13b91 100644</span>
+<span class="gd">--- a/backend-server/main.go</span>
+<span class="gi">+++ b/backend-server/main.go</span>
+<span class="gu">@@ -4,28 +4,39 @@ import (</span>
+<span class="w"> </span>	&quot;fmt&quot;
+<span class="w"> </span>	&quot;log/slog&quot;
+<span class="w"> </span>	&quot;net/http&quot;
+<span class="gd">-    &quot;os&quot;</span>
+<span class="w"> </span>
+<span class="gd">-    &quot;backend-server/config&quot;</span>
+<span class="gi">+	&quot;backend-server/config&quot;</span>
+<span class="gi">+	&quot;backend-server/handlers&quot;</span>
+<span class="gi">+	&quot;backend-server/middleware&quot;</span>
+<span class="gi">+	&quot;backend-server/services&quot;</span>
+<span class="gi">+	&quot;backend-server/utils&quot;</span>
+<span class="w"> </span>)
+<span class="w"> </span>
+<span class="gd">-func healthHandler(w http.ResponseWriter, r *http.Request) {</span>
+<span class="gd">-    fmt.Fprintf(w, &quot;Ok&quot;)</span>
+<span class="gd">-}</span>
+<span class="gd">-</span>
+<span class="w"> </span>func main() {
+<span class="gd">-    opts := &amp;slog.HandlerOptions{Level: slog.LevelWarn}</span>
+<span class="gd">-	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))</span>
+<span class="gi">+    backendConfig, err := utils.LoadConfig(&quot;./backend.yaml&quot;)</span>
+<span class="gi">+    if err != nil {</span>
+<span class="gi">+        slog.Error(&quot;Error loading config&quot;, &quot;Error&quot;, err.Error())</span>
+<span class="gi">+    }</span>
+<span class="gi">+</span>
+<span class="gi">+    for _, server := range backendConfig.Servers {</span>
+<span class="gi">+        fmt.Printf(&quot;Loaded gRPC server: %s at %s \n&quot;, server.Name, server.Address)</span>
+<span class="gi">+    }</span>
+<span class="gi">+</span>
+<span class="gi">+    for _, server := range backendConfig.Servers {</span>
+<span class="gi">+		go services.ConnectToServer(server)</span>
+<span class="gi">+	}</span>
+<span class="w"> </span>
+<span class="w"> </span>    mux := http.NewServeMux()
+<span class="w"> </span>
+<span class="gi">+    // Health Check Endpoint</span>
+<span class="gi">+    mux.Handle(&quot;/health&quot;, middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))</span>
+<span class="gi">+</span>
+<span class="w"> </span>    // Frontend Handlers 
+<span class="gd">-    mux.HandleFunc(&quot;/health&quot;, healthHandler)</span>
+<span class="w"> </span>
+<span class="gd">-    // Backend Handlers</span>
+<span class="gi">+    // Daemons Handlers</span>
+<span class="w"> </span>
+<span class="gd">-    logger.Info(&quot;Server Started Listening&quot;, &quot;Host&quot;, config.Host, &quot;Port&quot;, config.Port)</span>
+<span class="gi">+    slog.Info(&quot;Server Started Listening&quot;, &quot;Host&quot;, config.Host, &quot;Port&quot;, config.Port)</span>
+<span class="w"> </span>    if err := http.ListenAndServe(fmt.Sprintf(&quot;%s:%s&quot;, config.Host, config.Port), mux); err != nil {
+<span class="gd">-        slog.Error(&quot;Failed to start server at port 8080&quot;, err)</span>
+<span class="gi">+        slog.Error(&quot;Failed to start server at port 8080&quot;, &quot;Error&quot;, err.Error())</span>
+<span class="w"> </span>    }
+<span class="w"> </span>}
+<span class="gh">diff --git a/backend-server/middleware/middleware.go b/backend-server/middleware/middleware.go</span>
+new file mode 100644
+<span class="gh">index 0000000..759b4a1</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/middleware/middleware.go</span>
+<span class="gu">@@ -0,0 +1,16 @@</span>
+<span class="gi">+package middleware</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	&quot;log/slog&quot;</span>
+<span class="gi">+	&quot;net/http&quot;</span>
+<span class="gi">+	&quot;time&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func LoggingMiddleware(next http.Handler) http.Handler {</span>
+<span class="gi">+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {</span>
+<span class="gi">+        start := time.Now()</span>
+<span class="gi">+        slog.Info(&quot;Received request&quot;, slog.String(&quot;method&quot;, r.Method), slog.String(&quot;path&quot;, r.URL.Path))</span>
+<span class="gi">+        next.ServeHTTP(w, r)</span>
+<span class="gi">+        slog.Info(&quot;Request completed&quot;, slog.String(&quot;method&quot;, r.Method), slog.String(&quot;path&quot;, r.URL.Path), slog.Duration(&quot;duration&quot;, time.Since(start)))</span>
+<span class="gi">+    })</span>
+<span class="gi">+} </span>
+<span class="gh">diff --git a/backend-server/models/models.go b/backend-server/models/models.go</span>
+new file mode 100644
+<span class="gh">index 0000000..cab0a0d</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/models/models.go</span>
+<span class="gu">@@ -0,0 +1,18 @@</span>
+<span class="gi">+package models</span>
+<span class="gi">+</span>
+<span class="gi">+// Health Response Structure</span>
+<span class="gi">+type HealthResponse struct {</span>
+<span class="gi">+    Status string `json:&quot;status&quot;`</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// ServerConfig represents a single gRPC server in the YAML</span>
+<span class="gi">+type ServerConfig struct {</span>
+<span class="gi">+	Name    string `yaml:&quot;name&quot;`</span>
+<span class="gi">+	Address string `yaml:&quot;address&quot;`</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// Config represents the entire YAML structure</span>
+<span class="gi">+type Config struct {</span>
+<span class="gi">+	Servers []ServerConfig `yaml:&quot;servers&quot;`</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gh">diff --git a/backend-server/proto/daemon.pb.go b/backend-server/proto/daemon.pb.go</span>
+new file mode 100644
+<span class="gh">index 0000000..7a4a69d</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/proto/daemon.pb.go</span>
+<span class="gu">@@ -0,0 +1,180 @@</span>
+<span class="gi">+// Code generated by protoc-gen-go. DO NOT EDIT.</span>
+<span class="gi">+// versions:</span>
+<span class="gi">+// 	protoc-gen-go v1.36.5</span>
+<span class="gi">+// 	protoc        v5.28.3</span>
+<span class="gi">+// source: proto/daemon.proto</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	protoreflect &quot;google.golang.org/protobuf/reflect/protoreflect&quot;</span>
+<span class="gi">+	protoimpl &quot;google.golang.org/protobuf/runtime/protoimpl&quot;</span>
+<span class="gi">+	reflect &quot;reflect&quot;</span>
+<span class="gi">+	sync &quot;sync&quot;</span>
+<span class="gi">+	unsafe &quot;unsafe&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+const (</span>
+<span class="gi">+	// Verify that this generated code is sufficiently up-to-date.</span>
+<span class="gi">+	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)</span>
+<span class="gi">+	// Verify that runtime/protoimpl is sufficiently up-to-date.</span>
+<span class="gi">+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+type StatusRequest struct {</span>
+<span class="gi">+	state         protoimpl.MessageState `protogen:&quot;open.v1&quot;`</span>
+<span class="gi">+	ServerId      string                 `protobuf:&quot;bytes,1,opt,name=server_id,json=serverId,proto3&quot; json:&quot;server_id,omitempty&quot;`</span>
+<span class="gi">+	unknownFields protoimpl.UnknownFields</span>
+<span class="gi">+	sizeCache     protoimpl.SizeCache</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) Reset() {</span>
+<span class="gi">+	*x = StatusRequest{}</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[0]</span>
+<span class="gi">+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+	ms.StoreMessageInfo(mi)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) String() string {</span>
+<span class="gi">+	return protoimpl.X.MessageStringOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (*StatusRequest) ProtoMessage() {}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) ProtoReflect() protoreflect.Message {</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[0]</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+		if ms.LoadMessageInfo() == nil {</span>
+<span class="gi">+			ms.StoreMessageInfo(mi)</span>
+<span class="gi">+		}</span>
+<span class="gi">+		return ms</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return mi.MessageOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.</span>
+<span class="gi">+func (*StatusRequest) Descriptor() ([]byte, []int) {</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescGZIP(), []int{0}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) GetServerId() string {</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		return x.ServerId</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return &quot;&quot;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+type StatusResponse struct {</span>
+<span class="gi">+	state         protoimpl.MessageState `protogen:&quot;open.v1&quot;`</span>
+<span class="gi">+	Status        string                 `protobuf:&quot;bytes,1,opt,name=status,proto3&quot; json:&quot;status,omitempty&quot;`</span>
+<span class="gi">+	unknownFields protoimpl.UnknownFields</span>
+<span class="gi">+	sizeCache     protoimpl.SizeCache</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) Reset() {</span>
+<span class="gi">+	*x = StatusResponse{}</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[1]</span>
+<span class="gi">+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+	ms.StoreMessageInfo(mi)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) String() string {</span>
+<span class="gi">+	return protoimpl.X.MessageStringOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (*StatusResponse) ProtoMessage() {}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) ProtoReflect() protoreflect.Message {</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[1]</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+		if ms.LoadMessageInfo() == nil {</span>
+<span class="gi">+			ms.StoreMessageInfo(mi)</span>
+<span class="gi">+		}</span>
+<span class="gi">+		return ms</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return mi.MessageOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.</span>
+<span class="gi">+func (*StatusResponse) Descriptor() ([]byte, []int) {</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescGZIP(), []int{1}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) GetStatus() string {</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		return x.Status</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return &quot;&quot;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+var File_proto_daemon_proto protoreflect.FileDescriptor</span>
+<span class="gi">+</span>
+<span class="gi">+var file_proto_daemon_proto_rawDesc = string([]byte{</span>
+<span class="gi">+	0x0a, 0x12, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x70,</span>
+<span class="gi">+	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x0d,</span>
+<span class="gi">+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a,</span>
+<span class="gi">+	0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,</span>
+<span class="gi">+	0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x28, 0x0a, 0x0e, 0x53, 0x74,</span>
+<span class="gi">+	0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,</span>
+<span class="gi">+	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74,</span>
+<span class="gi">+	0x61, 0x74, 0x75, 0x73, 0x32, 0x4b, 0x0a, 0x0d, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x65,</span>
+<span class="gi">+	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74,</span>
+<span class="gi">+	0x75, 0x73, 0x12, 0x15, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74,</span>
+<span class="gi">+	0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x64, 0x61, 0x65, 0x6d,</span>
+<span class="gi">+	0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,</span>
+<span class="gi">+	0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f,</span>
+<span class="gi">+	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,</span>
+<span class="gi">+})</span>
+<span class="gi">+</span>
+<span class="gi">+var (</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescOnce sync.Once</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescData []byte</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func file_proto_daemon_proto_rawDescGZIP() []byte {</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescOnce.Do(func() {</span>
+<span class="gi">+		file_proto_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)))</span>
+<span class="gi">+	})</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescData</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+var file_proto_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 2)</span>
+<span class="gi">+var file_proto_daemon_proto_goTypes = []any{</span>
+<span class="gi">+	(*StatusRequest)(nil),  // 0: daemon.StatusRequest</span>
+<span class="gi">+	(*StatusResponse)(nil), // 1: daemon.StatusResponse</span>
+<span class="gi">+}</span>
+<span class="gi">+var file_proto_daemon_proto_depIdxs = []int32{</span>
+<span class="gi">+	0, // 0: daemon.DaemonService.GetStatus:input_type -&gt; daemon.StatusRequest</span>
+<span class="gi">+	1, // 1: daemon.DaemonService.GetStatus:output_type -&gt; daemon.StatusResponse</span>
+<span class="gi">+	1, // [1:2] is the sub-list for method output_type</span>
+<span class="gi">+	0, // [0:1] is the sub-list for method input_type</span>
+<span class="gi">+	0, // [0:0] is the sub-list for extension type_name</span>
+<span class="gi">+	0, // [0:0] is the sub-list for extension extendee</span>
+<span class="gi">+	0, // [0:0] is the sub-list for field type_name</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func init() { file_proto_daemon_proto_init() }</span>
+<span class="gi">+func file_proto_daemon_proto_init() {</span>
+<span class="gi">+	if File_proto_daemon_proto != nil {</span>
+<span class="gi">+		return</span>
+<span class="gi">+	}</span>
+<span class="gi">+	type x struct{}</span>
+<span class="gi">+	out := protoimpl.TypeBuilder{</span>
+<span class="gi">+		File: protoimpl.DescBuilder{</span>
+<span class="gi">+			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),</span>
+<span class="gi">+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)),</span>
+<span class="gi">+			NumEnums:      0,</span>
+<span class="gi">+			NumMessages:   2,</span>
+<span class="gi">+			NumExtensions: 0,</span>
+<span class="gi">+			NumServices:   1,</span>
+<span class="gi">+		},</span>
+<span class="gi">+		GoTypes:           file_proto_daemon_proto_goTypes,</span>
+<span class="gi">+		DependencyIndexes: file_proto_daemon_proto_depIdxs,</span>
+<span class="gi">+		MessageInfos:      file_proto_daemon_proto_msgTypes,</span>
+<span class="gi">+	}.Build()</span>
+<span class="gi">+	File_proto_daemon_proto = out.File</span>
+<span class="gi">+	file_proto_daemon_proto_goTypes = nil</span>
+<span class="gi">+	file_proto_daemon_proto_depIdxs = nil</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/backend-server/proto/daemon.proto b/backend-server/proto/daemon.proto</span>
+new file mode 100644
+<span class="gh">index 0000000..8d0fb9c</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/proto/daemon.proto</span>
+<span class="gu">@@ -0,0 +1,17 @@</span>
+<span class="gi">+syntax = &quot;proto3&quot;;</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon;</span>
+<span class="gi">+</span>
+<span class="gi">+option go_package = &quot;proto/daemon&quot;;</span>
+<span class="gi">+</span>
+<span class="gi">+service DaemonService {</span>
+<span class="gi">+    rpc GetStatus (StatusRequest) returns (StatusResponse);</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+message StatusRequest {</span>
+<span class="gi">+    string server_id = 1;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+message StatusResponse {</span>
+<span class="gi">+    string status = 1;</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/backend-server/proto/daemon_grpc.pb.go b/backend-server/proto/daemon_grpc.pb.go</span>
+new file mode 100644
+<span class="gh">index 0000000..1e5816c</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/proto/daemon_grpc.pb.go</span>
+<span class="gu">@@ -0,0 +1,121 @@</span>
+<span class="gi">+// Code generated by protoc-gen-go-grpc. DO NOT EDIT.</span>
+<span class="gi">+// versions:</span>
+<span class="gi">+// - protoc-gen-go-grpc v1.5.1</span>
+<span class="gi">+// - protoc             v5.28.3</span>
+<span class="gi">+// source: proto/daemon.proto</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	context &quot;context&quot;</span>
+<span class="gi">+	grpc &quot;google.golang.org/grpc&quot;</span>
+<span class="gi">+	codes &quot;google.golang.org/grpc/codes&quot;</span>
+<span class="gi">+	status &quot;google.golang.org/grpc/status&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+// This is a compile-time assertion to ensure that this generated file</span>
+<span class="gi">+// is compatible with the grpc package it is being compiled against.</span>
+<span class="gi">+// Requires gRPC-Go v1.64.0 or later.</span>
+<span class="gi">+const _ = grpc.SupportPackageIsVersion9</span>
+<span class="gi">+</span>
+<span class="gi">+const (</span>
+<span class="gi">+	DaemonService_GetStatus_FullMethodName = &quot;/daemon.DaemonService/GetStatus&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonServiceClient is the client API for DaemonService service.</span>
+<span class="gi">+//</span>
+<span class="gi">+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.</span>
+<span class="gi">+type DaemonServiceClient interface {</span>
+<span class="gi">+	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+type daemonServiceClient struct {</span>
+<span class="gi">+	cc grpc.ClientConnInterface</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func NewDaemonServiceClient(cc grpc.ClientConnInterface) DaemonServiceClient {</span>
+<span class="gi">+	return &amp;daemonServiceClient{cc}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (c *daemonServiceClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {</span>
+<span class="gi">+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)</span>
+<span class="gi">+	out := new(StatusResponse)</span>
+<span class="gi">+	err := c.cc.Invoke(ctx, DaemonService_GetStatus_FullMethodName, in, out, cOpts...)</span>
+<span class="gi">+	if err != nil {</span>
+<span class="gi">+		return nil, err</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return out, nil</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonServiceServer is the server API for DaemonService service.</span>
+<span class="gi">+// All implementations must embed UnimplementedDaemonServiceServer</span>
+<span class="gi">+// for forward compatibility.</span>
+<span class="gi">+type DaemonServiceServer interface {</span>
+<span class="gi">+	GetStatus(context.Context, *StatusRequest) (*StatusResponse, error)</span>
+<span class="gi">+	mustEmbedUnimplementedDaemonServiceServer()</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// UnimplementedDaemonServiceServer must be embedded to have</span>
+<span class="gi">+// forward compatible implementations.</span>
+<span class="gi">+//</span>
+<span class="gi">+// NOTE: this should be embedded by value instead of pointer to avoid a nil</span>
+<span class="gi">+// pointer dereference when methods are called.</span>
+<span class="gi">+type UnimplementedDaemonServiceServer struct{}</span>
+<span class="gi">+</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) GetStatus(context.Context, *StatusRequest) (*StatusResponse, error) {</span>
+<span class="gi">+	return nil, status.Errorf(codes.Unimplemented, &quot;method GetStatus not implemented&quot;)</span>
+<span class="gi">+}</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) mustEmbedUnimplementedDaemonServiceServer() {}</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) testEmbeddedByValue()                       {}</span>
+<span class="gi">+</span>
+<span class="gi">+// UnsafeDaemonServiceServer may be embedded to opt out of forward compatibility for this service.</span>
+<span class="gi">+// Use of this interface is not recommended, as added methods to DaemonServiceServer will</span>
+<span class="gi">+// result in compilation errors.</span>
+<span class="gi">+type UnsafeDaemonServiceServer interface {</span>
+<span class="gi">+	mustEmbedUnimplementedDaemonServiceServer()</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func RegisterDaemonServiceServer(s grpc.ServiceRegistrar, srv DaemonServiceServer) {</span>
+<span class="gi">+	// If the following call pancis, it indicates UnimplementedDaemonServiceServer was</span>
+<span class="gi">+	// embedded by pointer and is nil.  This will cause panics if an</span>
+<span class="gi">+	// unimplemented method is ever invoked, so we test this at initialization</span>
+<span class="gi">+	// time to prevent it from happening at runtime later due to I/O.</span>
+<span class="gi">+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {</span>
+<span class="gi">+		t.testEmbeddedByValue()</span>
+<span class="gi">+	}</span>
+<span class="gi">+	s.RegisterService(&amp;DaemonService_ServiceDesc, srv)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func _DaemonService_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {</span>
+<span class="gi">+	in := new(StatusRequest)</span>
+<span class="gi">+	if err := dec(in); err != nil {</span>
+<span class="gi">+		return nil, err</span>
+<span class="gi">+	}</span>
+<span class="gi">+	if interceptor == nil {</span>
+<span class="gi">+		return srv.(DaemonServiceServer).GetStatus(ctx, in)</span>
+<span class="gi">+	}</span>
+<span class="gi">+	info := &amp;grpc.UnaryServerInfo{</span>
+<span class="gi">+		Server:     srv,</span>
+<span class="gi">+		FullMethod: DaemonService_GetStatus_FullMethodName,</span>
+<span class="gi">+	}</span>
+<span class="gi">+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {</span>
+<span class="gi">+		return srv.(DaemonServiceServer).GetStatus(ctx, req.(*StatusRequest))</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return interceptor(ctx, in, info, handler)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonService_ServiceDesc is the grpc.ServiceDesc for DaemonService service.</span>
+<span class="gi">+// It&#39;s only intended for direct use with grpc.RegisterService,</span>
+<span class="gi">+// and not to be introspected or modified (even as a copy)</span>
+<span class="gi">+var DaemonService_ServiceDesc = grpc.ServiceDesc{</span>
+<span class="gi">+	ServiceName: &quot;daemon.DaemonService&quot;,</span>
+<span class="gi">+	HandlerType: (*DaemonServiceServer)(nil),</span>
+<span class="gi">+	Methods: []grpc.MethodDesc{</span>
+<span class="gi">+		{</span>
+<span class="gi">+			MethodName: &quot;GetStatus&quot;,</span>
+<span class="gi">+			Handler:    _DaemonService_GetStatus_Handler,</span>
+<span class="gi">+		},</span>
+<span class="gi">+	},</span>
+<span class="gi">+	Streams:  []grpc.StreamDesc{},</span>
+<span class="gi">+	Metadata: &quot;proto/daemon.proto&quot;,</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/backend-server/services/services.go b/backend-server/services/services.go</span>
+new file mode 100644
+<span class="gh">index 0000000..8f26904</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/services/services.go</span>
+<span class="gu">@@ -0,0 +1,37 @@</span>
+<span class="gi">+package services</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	&quot;context&quot;</span>
+<span class="gi">+	&quot;log/slog&quot;</span>
+<span class="gi">+	&quot;time&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+	&quot;backend-server/models&quot;</span>
+<span class="gi">+    pb &quot;backend-server/proto&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+	&quot;google.golang.org/grpc&quot;</span>
+<span class="gi">+	&quot;google.golang.org/grpc/credentials/insecure&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func ConnectToServer(server models.ServerConfig) {</span>
+<span class="gi">+	conn, err := grpc.Dial(server.Address, grpc.WithTransportCredentials(insecure.NewCredentials())) // Use WithTransportCredentials for TLS</span>
+<span class="gi">+	if err != nil {</span>
+<span class="gi">+		slog.Error(&quot;Failed to connect to daemon via gRPC)&quot;, server.Name, server.Address, &quot;Error&quot;, err.Error())</span>
+<span class="gi">+	}</span>
+<span class="gi">+	defer conn.Close()</span>
+<span class="gi">+</span>
+<span class="gi">+	client := pb.NewDaemonServiceClient(conn)</span>
+<span class="gi">+</span>
+<span class="gi">+	for {</span>
+<span class="gi">+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)</span>
+<span class="gi">+		response, err := client.GetStatus(ctx, &amp;pb.StatusRequest{ServerId: server.Name})</span>
+<span class="gi">+		cancel()</span>
+<span class="gi">+</span>
+<span class="gi">+		if err != nil {</span>
+<span class="gi">+			slog.Error(&quot;Error calling GetStatus&quot;, server.Name, server.Address, &quot;Error&quot;, err.Error())</span>
+<span class="gi">+		} else {</span>
+<span class="gi">+			slog.Info(&quot;Status&quot;, server.Name, response.Status)</span>
+<span class="gi">+		}</span>
+<span class="gi">+</span>
+<span class="gi">+		time.Sleep(10 * time.Second) // Poll every 10 seconds</span>
+<span class="gi">+	}</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/backend-server/utils/utils.go b/backend-server/utils/utils.go</span>
+new file mode 100644
+<span class="gh">index 0000000..65925c0</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/utils/utils.go</span>
+<span class="gu">@@ -0,0 +1,24 @@</span>
+<span class="gi">+package utils</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	&quot;os&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+	&quot;backend-server/models&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+	&quot;gopkg.in/yaml.v3&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func LoadConfig(filename string) (*models.Config, error) {</span>
+<span class="gi">+    data, err := os.ReadFile(filename)</span>
+<span class="gi">+    if err != nil {</span>
+<span class="gi">+        return nil, err</span>
+<span class="gi">+    }</span>
+<span class="gi">+</span>
+<span class="gi">+    var config models.Config</span>
+<span class="gi">+    err = yaml.Unmarshal(data, &amp;config)</span>
+<span class="gi">+    if err != nil {</span>
+<span class="gi">+        return nil, err</span>
+<span class="gi">+    }</span>
+<span class="gi">+</span>
+<span class="gi">+    return &amp;config, nil</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/file-server-daemon/go.mod b/file-server-daemon/go.mod</span>
+new file mode 100644
+<span class="gh">index 0000000..ce9effc</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/go.mod</span>
+<span class="gu">@@ -0,0 +1,12 @@</span>
+<span class="gi">+module file-server-daemon</span>
+<span class="gi">+</span>
+<span class="gi">+go 1.23.6</span>
+<span class="gi">+</span>
+<span class="gi">+require (</span>
+<span class="gi">+	golang.org/x/net v0.34.0 // indirect</span>
+<span class="gi">+	golang.org/x/sys v0.29.0 // indirect</span>
+<span class="gi">+	golang.org/x/text v0.21.0 // indirect</span>
+<span class="gi">+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect</span>
+<span class="gi">+	google.golang.org/grpc v1.71.0 // indirect</span>
+<span class="gi">+	google.golang.org/protobuf v1.36.4 // indirect</span>
+<span class="gi">+)</span>
+<span class="gh">diff --git a/file-server-daemon/go.sum b/file-server-daemon/go.sum</span>
+new file mode 100644
+<span class="gh">index 0000000..eefbbe0</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/go.sum</span>
+<span class="gu">@@ -0,0 +1,12 @@</span>
+<span class="gi">+golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=</span>
+<span class="gi">+golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=</span>
+<span class="gi">+golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=</span>
+<span class="gi">+golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=</span>
+<span class="gi">+golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=</span>
+<span class="gi">+golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=</span>
+<span class="gi">+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=</span>
+<span class="gi">+google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=</span>
+<span class="gi">+google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=</span>
+<span class="gi">+google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd/8Ec=</span>
+<span class="gi">+google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=</span>
+<span class="gi">+google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=</span>
+<span class="gh">diff --git a/file-server-daemon/grpcdef/grpcdef.go b/file-server-daemon/grpcdef/grpcdef.go</span>
+new file mode 100644
+<span class="gh">index 0000000..e69de29</span>
+<span class="gh">diff --git a/file-server-daemon/main.go b/file-server-daemon/main.go</span>
+new file mode 100644
+<span class="gh">index 0000000..ecf979f</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/main.go</span>
+<span class="gu">@@ -0,0 +1,27 @@</span>
+<span class="gi">+package main</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	&quot;log/slog&quot;</span>
+<span class="gi">+	&quot;net&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+    &quot;file-server-daemon/models&quot;</span>
+<span class="gi">+    pb &quot;file-server-daemon/proto&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+	&quot;google.golang.org/grpc&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func main() {</span>
+<span class="gi">+    lis, err := net.Listen(&quot;tcp&quot;, &quot;:4444&quot;)</span>
+<span class="gi">+    if err != nil {</span>
+<span class="gi">+        slog.Error(&quot;Failed to listen&quot;, &quot;Error&quot;, err.Error())</span>
+<span class="gi">+        return</span>
+<span class="gi">+    }</span>
+<span class="gi">+</span>
+<span class="gi">+    grpcServer := grpc.NewServer()</span>
+<span class="gi">+    pb.RegisterDaemonServiceServer(grpcServer, &amp;models.Server{})</span>
+<span class="gi">+</span>
+<span class="gi">+    slog.Info(&quot;gRPC server listening on :4444&quot;)</span>
+<span class="gi">+    if err := grpcServer.Serve(lis); err != nil {</span>
+<span class="gi">+        slog.Error(&quot;Failed to serve&quot;, &quot;Error&quot;, err.Error())</span>
+<span class="gi">+    }</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/file-server-daemon/models/models.go b/file-server-daemon/models/models.go</span>
+new file mode 100644
+<span class="gh">index 0000000..f8e4900</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/models/models.go</span>
+<span class="gu">@@ -0,0 +1,17 @@</span>
+<span class="gi">+package models</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+    &quot;context&quot;</span>
+<span class="gi">+    &quot;log/slog&quot;</span>
+<span class="gi">+    </span>
+<span class="gi">+    pb &quot;file-server-daemon/proto&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+type Server struct {</span>
+<span class="gi">+    pb.UnimplementedDaemonServiceServer</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (s *Server) GetStatus(ctx context.Context, req *pb.StatusRequest) (*pb.StatusResponse, error) {</span>
+<span class="gi">+    slog.Info(&quot;Received request for server: %s&quot;, &quot;Server ID&quot;, req.ServerId)</span>
+<span class="gi">+    return &amp;pb.StatusResponse{Status: &quot;Running&quot;}, nil</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/file-server-daemon/proto/daemon.pb.go b/file-server-daemon/proto/daemon.pb.go</span>
+new file mode 100644
+<span class="gh">index 0000000..7a4a69d</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/proto/daemon.pb.go</span>
+<span class="gu">@@ -0,0 +1,180 @@</span>
+<span class="gi">+// Code generated by protoc-gen-go. DO NOT EDIT.</span>
+<span class="gi">+// versions:</span>
+<span class="gi">+// 	protoc-gen-go v1.36.5</span>
+<span class="gi">+// 	protoc        v5.28.3</span>
+<span class="gi">+// source: proto/daemon.proto</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	protoreflect &quot;google.golang.org/protobuf/reflect/protoreflect&quot;</span>
+<span class="gi">+	protoimpl &quot;google.golang.org/protobuf/runtime/protoimpl&quot;</span>
+<span class="gi">+	reflect &quot;reflect&quot;</span>
+<span class="gi">+	sync &quot;sync&quot;</span>
+<span class="gi">+	unsafe &quot;unsafe&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+const (</span>
+<span class="gi">+	// Verify that this generated code is sufficiently up-to-date.</span>
+<span class="gi">+	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)</span>
+<span class="gi">+	// Verify that runtime/protoimpl is sufficiently up-to-date.</span>
+<span class="gi">+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+type StatusRequest struct {</span>
+<span class="gi">+	state         protoimpl.MessageState `protogen:&quot;open.v1&quot;`</span>
+<span class="gi">+	ServerId      string                 `protobuf:&quot;bytes,1,opt,name=server_id,json=serverId,proto3&quot; json:&quot;server_id,omitempty&quot;`</span>
+<span class="gi">+	unknownFields protoimpl.UnknownFields</span>
+<span class="gi">+	sizeCache     protoimpl.SizeCache</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) Reset() {</span>
+<span class="gi">+	*x = StatusRequest{}</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[0]</span>
+<span class="gi">+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+	ms.StoreMessageInfo(mi)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) String() string {</span>
+<span class="gi">+	return protoimpl.X.MessageStringOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (*StatusRequest) ProtoMessage() {}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) ProtoReflect() protoreflect.Message {</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[0]</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+		if ms.LoadMessageInfo() == nil {</span>
+<span class="gi">+			ms.StoreMessageInfo(mi)</span>
+<span class="gi">+		}</span>
+<span class="gi">+		return ms</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return mi.MessageOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.</span>
+<span class="gi">+func (*StatusRequest) Descriptor() ([]byte, []int) {</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescGZIP(), []int{0}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusRequest) GetServerId() string {</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		return x.ServerId</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return &quot;&quot;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+type StatusResponse struct {</span>
+<span class="gi">+	state         protoimpl.MessageState `protogen:&quot;open.v1&quot;`</span>
+<span class="gi">+	Status        string                 `protobuf:&quot;bytes,1,opt,name=status,proto3&quot; json:&quot;status,omitempty&quot;`</span>
+<span class="gi">+	unknownFields protoimpl.UnknownFields</span>
+<span class="gi">+	sizeCache     protoimpl.SizeCache</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) Reset() {</span>
+<span class="gi">+	*x = StatusResponse{}</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[1]</span>
+<span class="gi">+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+	ms.StoreMessageInfo(mi)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) String() string {</span>
+<span class="gi">+	return protoimpl.X.MessageStringOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (*StatusResponse) ProtoMessage() {}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) ProtoReflect() protoreflect.Message {</span>
+<span class="gi">+	mi := &amp;file_proto_daemon_proto_msgTypes[1]</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))</span>
+<span class="gi">+		if ms.LoadMessageInfo() == nil {</span>
+<span class="gi">+			ms.StoreMessageInfo(mi)</span>
+<span class="gi">+		}</span>
+<span class="gi">+		return ms</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return mi.MessageOf(x)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.</span>
+<span class="gi">+func (*StatusResponse) Descriptor() ([]byte, []int) {</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescGZIP(), []int{1}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (x *StatusResponse) GetStatus() string {</span>
+<span class="gi">+	if x != nil {</span>
+<span class="gi">+		return x.Status</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return &quot;&quot;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+var File_proto_daemon_proto protoreflect.FileDescriptor</span>
+<span class="gi">+</span>
+<span class="gi">+var file_proto_daemon_proto_rawDesc = string([]byte{</span>
+<span class="gi">+	0x0a, 0x12, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x70,</span>
+<span class="gi">+	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x0d,</span>
+<span class="gi">+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a,</span>
+<span class="gi">+	0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,</span>
+<span class="gi">+	0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x28, 0x0a, 0x0e, 0x53, 0x74,</span>
+<span class="gi">+	0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,</span>
+<span class="gi">+	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74,</span>
+<span class="gi">+	0x61, 0x74, 0x75, 0x73, 0x32, 0x4b, 0x0a, 0x0d, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x65,</span>
+<span class="gi">+	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74,</span>
+<span class="gi">+	0x75, 0x73, 0x12, 0x15, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74,</span>
+<span class="gi">+	0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x64, 0x61, 0x65, 0x6d,</span>
+<span class="gi">+	0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,</span>
+<span class="gi">+	0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f,</span>
+<span class="gi">+	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,</span>
+<span class="gi">+})</span>
+<span class="gi">+</span>
+<span class="gi">+var (</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescOnce sync.Once</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescData []byte</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+func file_proto_daemon_proto_rawDescGZIP() []byte {</span>
+<span class="gi">+	file_proto_daemon_proto_rawDescOnce.Do(func() {</span>
+<span class="gi">+		file_proto_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)))</span>
+<span class="gi">+	})</span>
+<span class="gi">+	return file_proto_daemon_proto_rawDescData</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+var file_proto_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 2)</span>
+<span class="gi">+var file_proto_daemon_proto_goTypes = []any{</span>
+<span class="gi">+	(*StatusRequest)(nil),  // 0: daemon.StatusRequest</span>
+<span class="gi">+	(*StatusResponse)(nil), // 1: daemon.StatusResponse</span>
+<span class="gi">+}</span>
+<span class="gi">+var file_proto_daemon_proto_depIdxs = []int32{</span>
+<span class="gi">+	0, // 0: daemon.DaemonService.GetStatus:input_type -&gt; daemon.StatusRequest</span>
+<span class="gi">+	1, // 1: daemon.DaemonService.GetStatus:output_type -&gt; daemon.StatusResponse</span>
+<span class="gi">+	1, // [1:2] is the sub-list for method output_type</span>
+<span class="gi">+	0, // [0:1] is the sub-list for method input_type</span>
+<span class="gi">+	0, // [0:0] is the sub-list for extension type_name</span>
+<span class="gi">+	0, // [0:0] is the sub-list for extension extendee</span>
+<span class="gi">+	0, // [0:0] is the sub-list for field type_name</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func init() { file_proto_daemon_proto_init() }</span>
+<span class="gi">+func file_proto_daemon_proto_init() {</span>
+<span class="gi">+	if File_proto_daemon_proto != nil {</span>
+<span class="gi">+		return</span>
+<span class="gi">+	}</span>
+<span class="gi">+	type x struct{}</span>
+<span class="gi">+	out := protoimpl.TypeBuilder{</span>
+<span class="gi">+		File: protoimpl.DescBuilder{</span>
+<span class="gi">+			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),</span>
+<span class="gi">+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)),</span>
+<span class="gi">+			NumEnums:      0,</span>
+<span class="gi">+			NumMessages:   2,</span>
+<span class="gi">+			NumExtensions: 0,</span>
+<span class="gi">+			NumServices:   1,</span>
+<span class="gi">+		},</span>
+<span class="gi">+		GoTypes:           file_proto_daemon_proto_goTypes,</span>
+<span class="gi">+		DependencyIndexes: file_proto_daemon_proto_depIdxs,</span>
+<span class="gi">+		MessageInfos:      file_proto_daemon_proto_msgTypes,</span>
+<span class="gi">+	}.Build()</span>
+<span class="gi">+	File_proto_daemon_proto = out.File</span>
+<span class="gi">+	file_proto_daemon_proto_goTypes = nil</span>
+<span class="gi">+	file_proto_daemon_proto_depIdxs = nil</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/file-server-daemon/proto/daemon.proto b/file-server-daemon/proto/daemon.proto</span>
+new file mode 100644
+<span class="gh">index 0000000..8d0fb9c</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/proto/daemon.proto</span>
+<span class="gu">@@ -0,0 +1,17 @@</span>
+<span class="gi">+syntax = &quot;proto3&quot;;</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon;</span>
+<span class="gi">+</span>
+<span class="gi">+option go_package = &quot;proto/daemon&quot;;</span>
+<span class="gi">+</span>
+<span class="gi">+service DaemonService {</span>
+<span class="gi">+    rpc GetStatus (StatusRequest) returns (StatusResponse);</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+message StatusRequest {</span>
+<span class="gi">+    string server_id = 1;</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+message StatusResponse {</span>
+<span class="gi">+    string status = 1;</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/file-server-daemon/proto/daemon_grpc.pb.go b/file-server-daemon/proto/daemon_grpc.pb.go</span>
+new file mode 100644
+<span class="gh">index 0000000..1e5816c</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/file-server-daemon/proto/daemon_grpc.pb.go</span>
+<span class="gu">@@ -0,0 +1,121 @@</span>
+<span class="gi">+// Code generated by protoc-gen-go-grpc. DO NOT EDIT.</span>
+<span class="gi">+// versions:</span>
+<span class="gi">+// - protoc-gen-go-grpc v1.5.1</span>
+<span class="gi">+// - protoc             v5.28.3</span>
+<span class="gi">+// source: proto/daemon.proto</span>
+<span class="gi">+</span>
+<span class="gi">+package daemon</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+	context &quot;context&quot;</span>
+<span class="gi">+	grpc &quot;google.golang.org/grpc&quot;</span>
+<span class="gi">+	codes &quot;google.golang.org/grpc/codes&quot;</span>
+<span class="gi">+	status &quot;google.golang.org/grpc/status&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+// This is a compile-time assertion to ensure that this generated file</span>
+<span class="gi">+// is compatible with the grpc package it is being compiled against.</span>
+<span class="gi">+// Requires gRPC-Go v1.64.0 or later.</span>
+<span class="gi">+const _ = grpc.SupportPackageIsVersion9</span>
+<span class="gi">+</span>
+<span class="gi">+const (</span>
+<span class="gi">+	DaemonService_GetStatus_FullMethodName = &quot;/daemon.DaemonService/GetStatus&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonServiceClient is the client API for DaemonService service.</span>
+<span class="gi">+//</span>
+<span class="gi">+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.</span>
+<span class="gi">+type DaemonServiceClient interface {</span>
+<span class="gi">+	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+type daemonServiceClient struct {</span>
+<span class="gi">+	cc grpc.ClientConnInterface</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func NewDaemonServiceClient(cc grpc.ClientConnInterface) DaemonServiceClient {</span>
+<span class="gi">+	return &amp;daemonServiceClient{cc}</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func (c *daemonServiceClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {</span>
+<span class="gi">+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)</span>
+<span class="gi">+	out := new(StatusResponse)</span>
+<span class="gi">+	err := c.cc.Invoke(ctx, DaemonService_GetStatus_FullMethodName, in, out, cOpts...)</span>
+<span class="gi">+	if err != nil {</span>
+<span class="gi">+		return nil, err</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return out, nil</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonServiceServer is the server API for DaemonService service.</span>
+<span class="gi">+// All implementations must embed UnimplementedDaemonServiceServer</span>
+<span class="gi">+// for forward compatibility.</span>
+<span class="gi">+type DaemonServiceServer interface {</span>
+<span class="gi">+	GetStatus(context.Context, *StatusRequest) (*StatusResponse, error)</span>
+<span class="gi">+	mustEmbedUnimplementedDaemonServiceServer()</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// UnimplementedDaemonServiceServer must be embedded to have</span>
+<span class="gi">+// forward compatible implementations.</span>
+<span class="gi">+//</span>
+<span class="gi">+// NOTE: this should be embedded by value instead of pointer to avoid a nil</span>
+<span class="gi">+// pointer dereference when methods are called.</span>
+<span class="gi">+type UnimplementedDaemonServiceServer struct{}</span>
+<span class="gi">+</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) GetStatus(context.Context, *StatusRequest) (*StatusResponse, error) {</span>
+<span class="gi">+	return nil, status.Errorf(codes.Unimplemented, &quot;method GetStatus not implemented&quot;)</span>
+<span class="gi">+}</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) mustEmbedUnimplementedDaemonServiceServer() {}</span>
+<span class="gi">+func (UnimplementedDaemonServiceServer) testEmbeddedByValue()                       {}</span>
+<span class="gi">+</span>
+<span class="gi">+// UnsafeDaemonServiceServer may be embedded to opt out of forward compatibility for this service.</span>
+<span class="gi">+// Use of this interface is not recommended, as added methods to DaemonServiceServer will</span>
+<span class="gi">+// result in compilation errors.</span>
+<span class="gi">+type UnsafeDaemonServiceServer interface {</span>
+<span class="gi">+	mustEmbedUnimplementedDaemonServiceServer()</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func RegisterDaemonServiceServer(s grpc.ServiceRegistrar, srv DaemonServiceServer) {</span>
+<span class="gi">+	// If the following call pancis, it indicates UnimplementedDaemonServiceServer was</span>
+<span class="gi">+	// embedded by pointer and is nil.  This will cause panics if an</span>
+<span class="gi">+	// unimplemented method is ever invoked, so we test this at initialization</span>
+<span class="gi">+	// time to prevent it from happening at runtime later due to I/O.</span>
+<span class="gi">+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {</span>
+<span class="gi">+		t.testEmbeddedByValue()</span>
+<span class="gi">+	}</span>
+<span class="gi">+	s.RegisterService(&amp;DaemonService_ServiceDesc, srv)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+func _DaemonService_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {</span>
+<span class="gi">+	in := new(StatusRequest)</span>
+<span class="gi">+	if err := dec(in); err != nil {</span>
+<span class="gi">+		return nil, err</span>
+<span class="gi">+	}</span>
+<span class="gi">+	if interceptor == nil {</span>
+<span class="gi">+		return srv.(DaemonServiceServer).GetStatus(ctx, in)</span>
+<span class="gi">+	}</span>
+<span class="gi">+	info := &amp;grpc.UnaryServerInfo{</span>
+<span class="gi">+		Server:     srv,</span>
+<span class="gi">+		FullMethod: DaemonService_GetStatus_FullMethodName,</span>
+<span class="gi">+	}</span>
+<span class="gi">+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {</span>
+<span class="gi">+		return srv.(DaemonServiceServer).GetStatus(ctx, req.(*StatusRequest))</span>
+<span class="gi">+	}</span>
+<span class="gi">+	return interceptor(ctx, in, info, handler)</span>
+<span class="gi">+}</span>
+<span class="gi">+</span>
+<span class="gi">+// DaemonService_ServiceDesc is the grpc.ServiceDesc for DaemonService service.</span>
+<span class="gi">+// It&#39;s only intended for direct use with grpc.RegisterService,</span>
+<span class="gi">+// and not to be introspected or modified (even as a copy)</span>
+<span class="gi">+var DaemonService_ServiceDesc = grpc.ServiceDesc{</span>
+<span class="gi">+	ServiceName: &quot;daemon.DaemonService&quot;,</span>
+<span class="gi">+	HandlerType: (*DaemonServiceServer)(nil),</span>
+<span class="gi">+	Methods: []grpc.MethodDesc{</span>
+<span class="gi">+		{</span>
+<span class="gi">+			MethodName: &quot;GetStatus&quot;,</span>
+<span class="gi">+			Handler:    _DaemonService_GetStatus_Handler,</span>
+<span class="gi">+		},</span>
+<span class="gi">+	},</span>
+<span class="gi">+	Streams:  []grpc.StreamDesc{},</span>
+<span class="gi">+	Metadata: &quot;proto/daemon.proto&quot;,</span>
+<span class="gi">+}</span>
+<span class="gh">diff --git a/user.ldif b/user.ldif</span>
+new file mode 100644
+<span class="gh">index 0000000..86fa30c</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/user.ldif</span>
+<span class="gu">@@ -0,0 +1,13 @@</span>
+<span class="gi">+dn: dc=example,dc=org</span>
+<span class="gi">+objectClass: top</span>
+<span class="gi">+objectClass: dcObject</span>
+<span class="gi">+objectClass: organization</span>
+<span class="gi">+o: Example Corp</span>
+<span class="gi">+dc: example</span>
+<span class="gi">+</span>
+<span class="gi">+dn: cn=admin,dc=example,dc=org</span>
+<span class="gi">+objectClass: simpleSecurityObject</span>
+<span class="gi">+objectClass: organizationalRole</span>
+<span class="gi">+cn: admin</span>
+<span class="gi">+description: LDAP administrator</span>
+<span class="gi">+userPassword: {SSHA}your-hashed-password</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="2025-03-21-2a34697a.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Commit: Session Management Completed and Refined</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="2025-03-19-0862674a.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Commit: LDAP Authentication successful</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Aditya Patil
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Commit: Added gRPC daemons and connected to the backend with yaml fikes</a><ul>
+<li><a class="reference internal" href="#date-2025-03-19">Date: 2025-03-19</a></li>
+<li><a class="reference internal" href="#commit-hash-6e062a1586b763c6cebdc4c114925b884eb27d36">Commit Hash: 6e062a1586b763c6cebdc4c114925b884eb27d36</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>

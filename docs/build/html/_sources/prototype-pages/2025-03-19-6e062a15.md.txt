@@ -1,0 +1,1046 @@
+# Commit: Added gRPC daemons and connected to the backend with yaml fikes
+## Date: 2025-03-19
+## Commit Hash: 6e062a1586b763c6cebdc4c114925b884eb27d36
+```diff
+commit 6e062a1586b763c6cebdc4c114925b884eb27d36
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Wed Mar 19 12:48:34 2025 +0530
+
+    Added gRPC daemons and connected to the backend with yaml fikes
+
+diff --git a/backend-server/backend.yaml b/backend-server/backend.yaml
+new file mode 100644
+index 0000000..55953e8
+--- /dev/null
++++ b/backend-server/backend.yaml
+@@ -0,0 +1,3 @@
++servers:
++  - name: "server1"
++    address: "127.0.0.1:4444"
+diff --git a/backend-server/go.mod b/backend-server/go.mod
+index e196101..70f4a1a 100644
+--- a/backend-server/go.mod
++++ b/backend-server/go.mod
+@@ -1,3 +1,13 @@
+ module backend-server
+ 
+ go 1.23.6
++
++require (
++	golang.org/x/net v0.34.0 // indirect
++	golang.org/x/sys v0.29.0 // indirect
++	golang.org/x/text v0.21.0 // indirect
++	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
++	google.golang.org/grpc v1.71.0 // indirect
++	google.golang.org/protobuf v1.36.4 // indirect
++	gopkg.in/yaml.v3 v3.0.1 // indirect
++)
+diff --git a/backend-server/go.sum b/backend-server/go.sum
+new file mode 100644
+index 0000000..17ec3be
+--- /dev/null
++++ b/backend-server/go.sum
+@@ -0,0 +1,15 @@
++golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=
++golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=
++golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=
++golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=
++golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
++google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=
++google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=
++google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=
++google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd/8Ec=
++google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=
++google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
++gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
++gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
++gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+index 60d1c85..96449d4 100644
+--- a/backend-server/handlers/hander.go
++++ b/backend-server/handlers/hander.go
+@@ -1,8 +1,20 @@
+ package handlers
+ 
+ import (
+-    "log"
+     "net/http"
++    "log/slog"
++    "encoding/json"
++    "backend-server/models"
+ )
+ 
++func HealthHandler(w http.ResponseWriter, r *http.Request) {
++    var response models.HealthResponse
++    
++    w.Header().Set("Content-Type", "application/json")
++    w.WriteHeader(http.StatusOK)
+ 
++    response.Status = "ok"
++    if err := json.NewEncoder(w).Encode(response); err != nil {
++        slog.Error("Failed to send health response from the handler", err)
++    }
++}
+diff --git a/backend-server/main.go b/backend-server/main.go
+index a202d35..8c13b91 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -4,28 +4,39 @@ import (
+ 	"fmt"
+ 	"log/slog"
+ 	"net/http"
+-    "os"
+ 
+-    "backend-server/config"
++	"backend-server/config"
++	"backend-server/handlers"
++	"backend-server/middleware"
++	"backend-server/services"
++	"backend-server/utils"
+ )
+ 
+-func healthHandler(w http.ResponseWriter, r *http.Request) {
+-    fmt.Fprintf(w, "Ok")
+-}
+-
+ func main() {
+-    opts := &slog.HandlerOptions{Level: slog.LevelWarn}
+-	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
++    backendConfig, err := utils.LoadConfig("./backend.yaml")
++    if err != nil {
++        slog.Error("Error loading config", "Error", err.Error())
++    }
++
++    for _, server := range backendConfig.Servers {
++        fmt.Printf("Loaded gRPC server: %s at %s \n", server.Name, server.Address)
++    }
++
++    for _, server := range backendConfig.Servers {
++		go services.ConnectToServer(server)
++	}
+ 
+     mux := http.NewServeMux()
+ 
++    // Health Check Endpoint
++    mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
++
+     // Frontend Handlers 
+-    mux.HandleFunc("/health", healthHandler)
+ 
+-    // Backend Handlers
++    // Daemons Handlers
+ 
+-    logger.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
++    slog.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
+     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Host, config.Port), mux); err != nil {
+-        slog.Error("Failed to start server at port 8080", err)
++        slog.Error("Failed to start server at port 8080", "Error", err.Error())
+     }
+ }
+diff --git a/backend-server/middleware/middleware.go b/backend-server/middleware/middleware.go
+new file mode 100644
+index 0000000..759b4a1
+--- /dev/null
++++ b/backend-server/middleware/middleware.go
+@@ -0,0 +1,16 @@
++package middleware
++
++import (
++	"log/slog"
++	"net/http"
++	"time"
++)
++
++func LoggingMiddleware(next http.Handler) http.Handler {
++    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++        start := time.Now()
++        slog.Info("Received request", slog.String("method", r.Method), slog.String("path", r.URL.Path))
++        next.ServeHTTP(w, r)
++        slog.Info("Request completed", slog.String("method", r.Method), slog.String("path", r.URL.Path), slog.Duration("duration", time.Since(start)))
++    })
++} 
+diff --git a/backend-server/models/models.go b/backend-server/models/models.go
+new file mode 100644
+index 0000000..cab0a0d
+--- /dev/null
++++ b/backend-server/models/models.go
+@@ -0,0 +1,18 @@
++package models
++
++// Health Response Structure
++type HealthResponse struct {
++    Status string `json:"status"`
++}
++
++// ServerConfig represents a single gRPC server in the YAML
++type ServerConfig struct {
++	Name    string `yaml:"name"`
++	Address string `yaml:"address"`
++}
++
++// Config represents the entire YAML structure
++type Config struct {
++	Servers []ServerConfig `yaml:"servers"`
++}
++
+diff --git a/backend-server/proto/daemon.pb.go b/backend-server/proto/daemon.pb.go
+new file mode 100644
+index 0000000..7a4a69d
+--- /dev/null
++++ b/backend-server/proto/daemon.pb.go
+@@ -0,0 +1,180 @@
++// Code generated by protoc-gen-go. DO NOT EDIT.
++// versions:
++// 	protoc-gen-go v1.36.5
++// 	protoc        v5.28.3
++// source: proto/daemon.proto
++
++package daemon
++
++import (
++	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
++	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
++	reflect "reflect"
++	sync "sync"
++	unsafe "unsafe"
++)
++
++const (
++	// Verify that this generated code is sufficiently up-to-date.
++	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)
++	// Verify that runtime/protoimpl is sufficiently up-to-date.
++	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
++)
++
++type StatusRequest struct {
++	state         protoimpl.MessageState `protogen:"open.v1"`
++	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
++	unknownFields protoimpl.UnknownFields
++	sizeCache     protoimpl.SizeCache
++}
++
++func (x *StatusRequest) Reset() {
++	*x = StatusRequest{}
++	mi := &file_proto_daemon_proto_msgTypes[0]
++	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++	ms.StoreMessageInfo(mi)
++}
++
++func (x *StatusRequest) String() string {
++	return protoimpl.X.MessageStringOf(x)
++}
++
++func (*StatusRequest) ProtoMessage() {}
++
++func (x *StatusRequest) ProtoReflect() protoreflect.Message {
++	mi := &file_proto_daemon_proto_msgTypes[0]
++	if x != nil {
++		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++		if ms.LoadMessageInfo() == nil {
++			ms.StoreMessageInfo(mi)
++		}
++		return ms
++	}
++	return mi.MessageOf(x)
++}
++
++// Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
++func (*StatusRequest) Descriptor() ([]byte, []int) {
++	return file_proto_daemon_proto_rawDescGZIP(), []int{0}
++}
++
++func (x *StatusRequest) GetServerId() string {
++	if x != nil {
++		return x.ServerId
++	}
++	return ""
++}
++
++type StatusResponse struct {
++	state         protoimpl.MessageState `protogen:"open.v1"`
++	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
++	unknownFields protoimpl.UnknownFields
++	sizeCache     protoimpl.SizeCache
++}
++
++func (x *StatusResponse) Reset() {
++	*x = StatusResponse{}
++	mi := &file_proto_daemon_proto_msgTypes[1]
++	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++	ms.StoreMessageInfo(mi)
++}
++
++func (x *StatusResponse) String() string {
++	return protoimpl.X.MessageStringOf(x)
++}
++
++func (*StatusResponse) ProtoMessage() {}
++
++func (x *StatusResponse) ProtoReflect() protoreflect.Message {
++	mi := &file_proto_daemon_proto_msgTypes[1]
++	if x != nil {
++		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++		if ms.LoadMessageInfo() == nil {
++			ms.StoreMessageInfo(mi)
++		}
++		return ms
++	}
++	return mi.MessageOf(x)
++}
++
++// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
++func (*StatusResponse) Descriptor() ([]byte, []int) {
++	return file_proto_daemon_proto_rawDescGZIP(), []int{1}
++}
++
++func (x *StatusResponse) GetStatus() string {
++	if x != nil {
++		return x.Status
++	}
++	return ""
++}
++
++var File_proto_daemon_proto protoreflect.FileDescriptor
++
++var file_proto_daemon_proto_rawDesc = string([]byte{
++	0x0a, 0x12, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x70,
++	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x0d,
++	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a,
++	0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
++	0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x28, 0x0a, 0x0e, 0x53, 0x74,
++	0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,
++	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74,
++	0x61, 0x74, 0x75, 0x73, 0x32, 0x4b, 0x0a, 0x0d, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x65,
++	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74,
++	0x75, 0x73, 0x12, 0x15, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74,
++	0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x64, 0x61, 0x65, 0x6d,
++	0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
++	0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f,
++	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
++})
++
++var (
++	file_proto_daemon_proto_rawDescOnce sync.Once
++	file_proto_daemon_proto_rawDescData []byte
++)
++
++func file_proto_daemon_proto_rawDescGZIP() []byte {
++	file_proto_daemon_proto_rawDescOnce.Do(func() {
++		file_proto_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)))
++	})
++	return file_proto_daemon_proto_rawDescData
++}
++
++var file_proto_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
++var file_proto_daemon_proto_goTypes = []any{
++	(*StatusRequest)(nil),  // 0: daemon.StatusRequest
++	(*StatusResponse)(nil), // 1: daemon.StatusResponse
++}
++var file_proto_daemon_proto_depIdxs = []int32{
++	0, // 0: daemon.DaemonService.GetStatus:input_type -> daemon.StatusRequest
++	1, // 1: daemon.DaemonService.GetStatus:output_type -> daemon.StatusResponse
++	1, // [1:2] is the sub-list for method output_type
++	0, // [0:1] is the sub-list for method input_type
++	0, // [0:0] is the sub-list for extension type_name
++	0, // [0:0] is the sub-list for extension extendee
++	0, // [0:0] is the sub-list for field type_name
++}
++
++func init() { file_proto_daemon_proto_init() }
++func file_proto_daemon_proto_init() {
++	if File_proto_daemon_proto != nil {
++		return
++	}
++	type x struct{}
++	out := protoimpl.TypeBuilder{
++		File: protoimpl.DescBuilder{
++			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
++			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)),
++			NumEnums:      0,
++			NumMessages:   2,
++			NumExtensions: 0,
++			NumServices:   1,
++		},
++		GoTypes:           file_proto_daemon_proto_goTypes,
++		DependencyIndexes: file_proto_daemon_proto_depIdxs,
++		MessageInfos:      file_proto_daemon_proto_msgTypes,
++	}.Build()
++	File_proto_daemon_proto = out.File
++	file_proto_daemon_proto_goTypes = nil
++	file_proto_daemon_proto_depIdxs = nil
++}
+diff --git a/backend-server/proto/daemon.proto b/backend-server/proto/daemon.proto
+new file mode 100644
+index 0000000..8d0fb9c
+--- /dev/null
++++ b/backend-server/proto/daemon.proto
+@@ -0,0 +1,17 @@
++syntax = "proto3";
++
++package daemon;
++
++option go_package = "proto/daemon";
++
++service DaemonService {
++    rpc GetStatus (StatusRequest) returns (StatusResponse);
++}
++
++message StatusRequest {
++    string server_id = 1;
++}
++
++message StatusResponse {
++    string status = 1;
++}
+diff --git a/backend-server/proto/daemon_grpc.pb.go b/backend-server/proto/daemon_grpc.pb.go
+new file mode 100644
+index 0000000..1e5816c
+--- /dev/null
++++ b/backend-server/proto/daemon_grpc.pb.go
+@@ -0,0 +1,121 @@
++// Code generated by protoc-gen-go-grpc. DO NOT EDIT.
++// versions:
++// - protoc-gen-go-grpc v1.5.1
++// - protoc             v5.28.3
++// source: proto/daemon.proto
++
++package daemon
++
++import (
++	context "context"
++	grpc "google.golang.org/grpc"
++	codes "google.golang.org/grpc/codes"
++	status "google.golang.org/grpc/status"
++)
++
++// This is a compile-time assertion to ensure that this generated file
++// is compatible with the grpc package it is being compiled against.
++// Requires gRPC-Go v1.64.0 or later.
++const _ = grpc.SupportPackageIsVersion9
++
++const (
++	DaemonService_GetStatus_FullMethodName = "/daemon.DaemonService/GetStatus"
++)
++
++// DaemonServiceClient is the client API for DaemonService service.
++//
++// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
++type DaemonServiceClient interface {
++	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
++}
++
++type daemonServiceClient struct {
++	cc grpc.ClientConnInterface
++}
++
++func NewDaemonServiceClient(cc grpc.ClientConnInterface) DaemonServiceClient {
++	return &daemonServiceClient{cc}
++}
++
++func (c *daemonServiceClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
++	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
++	out := new(StatusResponse)
++	err := c.cc.Invoke(ctx, DaemonService_GetStatus_FullMethodName, in, out, cOpts...)
++	if err != nil {
++		return nil, err
++	}
++	return out, nil
++}
++
++// DaemonServiceServer is the server API for DaemonService service.
++// All implementations must embed UnimplementedDaemonServiceServer
++// for forward compatibility.
++type DaemonServiceServer interface {
++	GetStatus(context.Context, *StatusRequest) (*StatusResponse, error)
++	mustEmbedUnimplementedDaemonServiceServer()
++}
++
++// UnimplementedDaemonServiceServer must be embedded to have
++// forward compatible implementations.
++//
++// NOTE: this should be embedded by value instead of pointer to avoid a nil
++// pointer dereference when methods are called.
++type UnimplementedDaemonServiceServer struct{}
++
++func (UnimplementedDaemonServiceServer) GetStatus(context.Context, *StatusRequest) (*StatusResponse, error) {
++	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
++}
++func (UnimplementedDaemonServiceServer) mustEmbedUnimplementedDaemonServiceServer() {}
++func (UnimplementedDaemonServiceServer) testEmbeddedByValue()                       {}
++
++// UnsafeDaemonServiceServer may be embedded to opt out of forward compatibility for this service.
++// Use of this interface is not recommended, as added methods to DaemonServiceServer will
++// result in compilation errors.
++type UnsafeDaemonServiceServer interface {
++	mustEmbedUnimplementedDaemonServiceServer()
++}
++
++func RegisterDaemonServiceServer(s grpc.ServiceRegistrar, srv DaemonServiceServer) {
++	// If the following call pancis, it indicates UnimplementedDaemonServiceServer was
++	// embedded by pointer and is nil.  This will cause panics if an
++	// unimplemented method is ever invoked, so we test this at initialization
++	// time to prevent it from happening at runtime later due to I/O.
++	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
++		t.testEmbeddedByValue()
++	}
++	s.RegisterService(&DaemonService_ServiceDesc, srv)
++}
++
++func _DaemonService_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
++	in := new(StatusRequest)
++	if err := dec(in); err != nil {
++		return nil, err
++	}
++	if interceptor == nil {
++		return srv.(DaemonServiceServer).GetStatus(ctx, in)
++	}
++	info := &grpc.UnaryServerInfo{
++		Server:     srv,
++		FullMethod: DaemonService_GetStatus_FullMethodName,
++	}
++	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
++		return srv.(DaemonServiceServer).GetStatus(ctx, req.(*StatusRequest))
++	}
++	return interceptor(ctx, in, info, handler)
++}
++
++// DaemonService_ServiceDesc is the grpc.ServiceDesc for DaemonService service.
++// It's only intended for direct use with grpc.RegisterService,
++// and not to be introspected or modified (even as a copy)
++var DaemonService_ServiceDesc = grpc.ServiceDesc{
++	ServiceName: "daemon.DaemonService",
++	HandlerType: (*DaemonServiceServer)(nil),
++	Methods: []grpc.MethodDesc{
++		{
++			MethodName: "GetStatus",
++			Handler:    _DaemonService_GetStatus_Handler,
++		},
++	},
++	Streams:  []grpc.StreamDesc{},
++	Metadata: "proto/daemon.proto",
++}
+diff --git a/backend-server/services/services.go b/backend-server/services/services.go
+new file mode 100644
+index 0000000..8f26904
+--- /dev/null
++++ b/backend-server/services/services.go
+@@ -0,0 +1,37 @@
++package services
++
++import (
++	"context"
++	"log/slog"
++	"time"
++
++	"backend-server/models"
++    pb "backend-server/proto"
++
++	"google.golang.org/grpc"
++	"google.golang.org/grpc/credentials/insecure"
++)
++
++func ConnectToServer(server models.ServerConfig) {
++	conn, err := grpc.Dial(server.Address, grpc.WithTransportCredentials(insecure.NewCredentials())) // Use WithTransportCredentials for TLS
++	if err != nil {
++		slog.Error("Failed to connect to daemon via gRPC)", server.Name, server.Address, "Error", err.Error())
++	}
++	defer conn.Close()
++
++	client := pb.NewDaemonServiceClient(conn)
++
++	for {
++		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
++		response, err := client.GetStatus(ctx, &pb.StatusRequest{ServerId: server.Name})
++		cancel()
++
++		if err != nil {
++			slog.Error("Error calling GetStatus", server.Name, server.Address, "Error", err.Error())
++		} else {
++			slog.Info("Status", server.Name, response.Status)
++		}
++
++		time.Sleep(10 * time.Second) // Poll every 10 seconds
++	}
++}
+diff --git a/backend-server/utils/utils.go b/backend-server/utils/utils.go
+new file mode 100644
+index 0000000..65925c0
+--- /dev/null
++++ b/backend-server/utils/utils.go
+@@ -0,0 +1,24 @@
++package utils
++
++import (
++	"os"
++
++	"backend-server/models"
++
++	"gopkg.in/yaml.v3"
++)
++
++func LoadConfig(filename string) (*models.Config, error) {
++    data, err := os.ReadFile(filename)
++    if err != nil {
++        return nil, err
++    }
++
++    var config models.Config
++    err = yaml.Unmarshal(data, &config)
++    if err != nil {
++        return nil, err
++    }
++
++    return &config, nil
++}
+diff --git a/file-server-daemon/go.mod b/file-server-daemon/go.mod
+new file mode 100644
+index 0000000..ce9effc
+--- /dev/null
++++ b/file-server-daemon/go.mod
+@@ -0,0 +1,12 @@
++module file-server-daemon
++
++go 1.23.6
++
++require (
++	golang.org/x/net v0.34.0 // indirect
++	golang.org/x/sys v0.29.0 // indirect
++	golang.org/x/text v0.21.0 // indirect
++	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
++	google.golang.org/grpc v1.71.0 // indirect
++	google.golang.org/protobuf v1.36.4 // indirect
++)
+diff --git a/file-server-daemon/go.sum b/file-server-daemon/go.sum
+new file mode 100644
+index 0000000..eefbbe0
+--- /dev/null
++++ b/file-server-daemon/go.sum
+@@ -0,0 +1,12 @@
++golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=
++golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=
++golang.org/x/sys v0.29.0 h1:TPYlXGxvx1MGTn2GiZDhnjPA9wZzZeGKHHmKhHYvgaU=
++golang.org/x/sys v0.29.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=
++golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
++google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:OxYkA3wjPsZyBylwymxSHa7ViiW1Sml4ToBrncvFehI=
++google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=
++google.golang.org/grpc v1.71.0 h1:kF77BGdPTQ4/JZWMlb9VpJ5pa25aqvVqogsxNHHdeBg=
++google.golang.org/grpc v1.71.0/go.mod h1:H0GRtasmQOh9LkFoCPDu3ZrwUtD1YGE+b2vYBYd/8Ec=
++google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=
++google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+diff --git a/file-server-daemon/grpcdef/grpcdef.go b/file-server-daemon/grpcdef/grpcdef.go
+new file mode 100644
+index 0000000..e69de29
+diff --git a/file-server-daemon/main.go b/file-server-daemon/main.go
+new file mode 100644
+index 0000000..ecf979f
+--- /dev/null
++++ b/file-server-daemon/main.go
+@@ -0,0 +1,27 @@
++package main
++
++import (
++	"log/slog"
++	"net"
++
++    "file-server-daemon/models"
++    pb "file-server-daemon/proto"
++
++	"google.golang.org/grpc"
++)
++
++func main() {
++    lis, err := net.Listen("tcp", ":4444")
++    if err != nil {
++        slog.Error("Failed to listen", "Error", err.Error())
++        return
++    }
++
++    grpcServer := grpc.NewServer()
++    pb.RegisterDaemonServiceServer(grpcServer, &models.Server{})
++
++    slog.Info("gRPC server listening on :4444")
++    if err := grpcServer.Serve(lis); err != nil {
++        slog.Error("Failed to serve", "Error", err.Error())
++    }
++}
+diff --git a/file-server-daemon/models/models.go b/file-server-daemon/models/models.go
+new file mode 100644
+index 0000000..f8e4900
+--- /dev/null
++++ b/file-server-daemon/models/models.go
+@@ -0,0 +1,17 @@
++package models
++
++import (
++    "context"
++    "log/slog"
++    
++    pb "file-server-daemon/proto"
++)
++
++type Server struct {
++    pb.UnimplementedDaemonServiceServer
++}
++
++func (s *Server) GetStatus(ctx context.Context, req *pb.StatusRequest) (*pb.StatusResponse, error) {
++    slog.Info("Received request for server: %s", "Server ID", req.ServerId)
++    return &pb.StatusResponse{Status: "Running"}, nil
++}
+diff --git a/file-server-daemon/proto/daemon.pb.go b/file-server-daemon/proto/daemon.pb.go
+new file mode 100644
+index 0000000..7a4a69d
+--- /dev/null
++++ b/file-server-daemon/proto/daemon.pb.go
+@@ -0,0 +1,180 @@
++// Code generated by protoc-gen-go. DO NOT EDIT.
++// versions:
++// 	protoc-gen-go v1.36.5
++// 	protoc        v5.28.3
++// source: proto/daemon.proto
++
++package daemon
++
++import (
++	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
++	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
++	reflect "reflect"
++	sync "sync"
++	unsafe "unsafe"
++)
++
++const (
++	// Verify that this generated code is sufficiently up-to-date.
++	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)
++	// Verify that runtime/protoimpl is sufficiently up-to-date.
++	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
++)
++
++type StatusRequest struct {
++	state         protoimpl.MessageState `protogen:"open.v1"`
++	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
++	unknownFields protoimpl.UnknownFields
++	sizeCache     protoimpl.SizeCache
++}
++
++func (x *StatusRequest) Reset() {
++	*x = StatusRequest{}
++	mi := &file_proto_daemon_proto_msgTypes[0]
++	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++	ms.StoreMessageInfo(mi)
++}
++
++func (x *StatusRequest) String() string {
++	return protoimpl.X.MessageStringOf(x)
++}
++
++func (*StatusRequest) ProtoMessage() {}
++
++func (x *StatusRequest) ProtoReflect() protoreflect.Message {
++	mi := &file_proto_daemon_proto_msgTypes[0]
++	if x != nil {
++		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++		if ms.LoadMessageInfo() == nil {
++			ms.StoreMessageInfo(mi)
++		}
++		return ms
++	}
++	return mi.MessageOf(x)
++}
++
++// Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
++func (*StatusRequest) Descriptor() ([]byte, []int) {
++	return file_proto_daemon_proto_rawDescGZIP(), []int{0}
++}
++
++func (x *StatusRequest) GetServerId() string {
++	if x != nil {
++		return x.ServerId
++	}
++	return ""
++}
++
++type StatusResponse struct {
++	state         protoimpl.MessageState `protogen:"open.v1"`
++	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
++	unknownFields protoimpl.UnknownFields
++	sizeCache     protoimpl.SizeCache
++}
++
++func (x *StatusResponse) Reset() {
++	*x = StatusResponse{}
++	mi := &file_proto_daemon_proto_msgTypes[1]
++	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++	ms.StoreMessageInfo(mi)
++}
++
++func (x *StatusResponse) String() string {
++	return protoimpl.X.MessageStringOf(x)
++}
++
++func (*StatusResponse) ProtoMessage() {}
++
++func (x *StatusResponse) ProtoReflect() protoreflect.Message {
++	mi := &file_proto_daemon_proto_msgTypes[1]
++	if x != nil {
++		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
++		if ms.LoadMessageInfo() == nil {
++			ms.StoreMessageInfo(mi)
++		}
++		return ms
++	}
++	return mi.MessageOf(x)
++}
++
++// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
++func (*StatusResponse) Descriptor() ([]byte, []int) {
++	return file_proto_daemon_proto_rawDescGZIP(), []int{1}
++}
++
++func (x *StatusResponse) GetStatus() string {
++	if x != nil {
++		return x.Status
++	}
++	return ""
++}
++
++var File_proto_daemon_proto protoreflect.FileDescriptor
++
++var file_proto_daemon_proto_rawDesc = string([]byte{
++	0x0a, 0x12, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x70,
++	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x0d,
++	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a,
++	0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
++	0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x28, 0x0a, 0x0e, 0x53, 0x74,
++	0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,
++	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74,
++	0x61, 0x74, 0x75, 0x73, 0x32, 0x4b, 0x0a, 0x0d, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x65,
++	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74,
++	0x75, 0x73, 0x12, 0x15, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74,
++	0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x64, 0x61, 0x65, 0x6d,
++	0x6f, 0x6e, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
++	0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f,
++	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
++})
++
++var (
++	file_proto_daemon_proto_rawDescOnce sync.Once
++	file_proto_daemon_proto_rawDescData []byte
++)
++
++func file_proto_daemon_proto_rawDescGZIP() []byte {
++	file_proto_daemon_proto_rawDescOnce.Do(func() {
++		file_proto_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)))
++	})
++	return file_proto_daemon_proto_rawDescData
++}
++
++var file_proto_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
++var file_proto_daemon_proto_goTypes = []any{
++	(*StatusRequest)(nil),  // 0: daemon.StatusRequest
++	(*StatusResponse)(nil), // 1: daemon.StatusResponse
++}
++var file_proto_daemon_proto_depIdxs = []int32{
++	0, // 0: daemon.DaemonService.GetStatus:input_type -> daemon.StatusRequest
++	1, // 1: daemon.DaemonService.GetStatus:output_type -> daemon.StatusResponse
++	1, // [1:2] is the sub-list for method output_type
++	0, // [0:1] is the sub-list for method input_type
++	0, // [0:0] is the sub-list for extension type_name
++	0, // [0:0] is the sub-list for extension extendee
++	0, // [0:0] is the sub-list for field type_name
++}
++
++func init() { file_proto_daemon_proto_init() }
++func file_proto_daemon_proto_init() {
++	if File_proto_daemon_proto != nil {
++		return
++	}
++	type x struct{}
++	out := protoimpl.TypeBuilder{
++		File: protoimpl.DescBuilder{
++			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
++			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_daemon_proto_rawDesc), len(file_proto_daemon_proto_rawDesc)),
++			NumEnums:      0,
++			NumMessages:   2,
++			NumExtensions: 0,
++			NumServices:   1,
++		},
++		GoTypes:           file_proto_daemon_proto_goTypes,
++		DependencyIndexes: file_proto_daemon_proto_depIdxs,
++		MessageInfos:      file_proto_daemon_proto_msgTypes,
++	}.Build()
++	File_proto_daemon_proto = out.File
++	file_proto_daemon_proto_goTypes = nil
++	file_proto_daemon_proto_depIdxs = nil
++}
+diff --git a/file-server-daemon/proto/daemon.proto b/file-server-daemon/proto/daemon.proto
+new file mode 100644
+index 0000000..8d0fb9c
+--- /dev/null
++++ b/file-server-daemon/proto/daemon.proto
+@@ -0,0 +1,17 @@
++syntax = "proto3";
++
++package daemon;
++
++option go_package = "proto/daemon";
++
++service DaemonService {
++    rpc GetStatus (StatusRequest) returns (StatusResponse);
++}
++
++message StatusRequest {
++    string server_id = 1;
++}
++
++message StatusResponse {
++    string status = 1;
++}
+diff --git a/file-server-daemon/proto/daemon_grpc.pb.go b/file-server-daemon/proto/daemon_grpc.pb.go
+new file mode 100644
+index 0000000..1e5816c
+--- /dev/null
++++ b/file-server-daemon/proto/daemon_grpc.pb.go
+@@ -0,0 +1,121 @@
++// Code generated by protoc-gen-go-grpc. DO NOT EDIT.
++// versions:
++// - protoc-gen-go-grpc v1.5.1
++// - protoc             v5.28.3
++// source: proto/daemon.proto
++
++package daemon
++
++import (
++	context "context"
++	grpc "google.golang.org/grpc"
++	codes "google.golang.org/grpc/codes"
++	status "google.golang.org/grpc/status"
++)
++
++// This is a compile-time assertion to ensure that this generated file
++// is compatible with the grpc package it is being compiled against.
++// Requires gRPC-Go v1.64.0 or later.
++const _ = grpc.SupportPackageIsVersion9
++
++const (
++	DaemonService_GetStatus_FullMethodName = "/daemon.DaemonService/GetStatus"
++)
++
++// DaemonServiceClient is the client API for DaemonService service.
++//
++// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
++type DaemonServiceClient interface {
++	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
++}
++
++type daemonServiceClient struct {
++	cc grpc.ClientConnInterface
++}
++
++func NewDaemonServiceClient(cc grpc.ClientConnInterface) DaemonServiceClient {
++	return &daemonServiceClient{cc}
++}
++
++func (c *daemonServiceClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
++	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
++	out := new(StatusResponse)
++	err := c.cc.Invoke(ctx, DaemonService_GetStatus_FullMethodName, in, out, cOpts...)
++	if err != nil {
++		return nil, err
++	}
++	return out, nil
++}
++
++// DaemonServiceServer is the server API for DaemonService service.
++// All implementations must embed UnimplementedDaemonServiceServer
++// for forward compatibility.
++type DaemonServiceServer interface {
++	GetStatus(context.Context, *StatusRequest) (*StatusResponse, error)
++	mustEmbedUnimplementedDaemonServiceServer()
++}
++
++// UnimplementedDaemonServiceServer must be embedded to have
++// forward compatible implementations.
++//
++// NOTE: this should be embedded by value instead of pointer to avoid a nil
++// pointer dereference when methods are called.
++type UnimplementedDaemonServiceServer struct{}
++
++func (UnimplementedDaemonServiceServer) GetStatus(context.Context, *StatusRequest) (*StatusResponse, error) {
++	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
++}
++func (UnimplementedDaemonServiceServer) mustEmbedUnimplementedDaemonServiceServer() {}
++func (UnimplementedDaemonServiceServer) testEmbeddedByValue()                       {}
++
++// UnsafeDaemonServiceServer may be embedded to opt out of forward compatibility for this service.
++// Use of this interface is not recommended, as added methods to DaemonServiceServer will
++// result in compilation errors.
++type UnsafeDaemonServiceServer interface {
++	mustEmbedUnimplementedDaemonServiceServer()
++}
++
++func RegisterDaemonServiceServer(s grpc.ServiceRegistrar, srv DaemonServiceServer) {
++	// If the following call pancis, it indicates UnimplementedDaemonServiceServer was
++	// embedded by pointer and is nil.  This will cause panics if an
++	// unimplemented method is ever invoked, so we test this at initialization
++	// time to prevent it from happening at runtime later due to I/O.
++	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
++		t.testEmbeddedByValue()
++	}
++	s.RegisterService(&DaemonService_ServiceDesc, srv)
++}
++
++func _DaemonService_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
++	in := new(StatusRequest)
++	if err := dec(in); err != nil {
++		return nil, err
++	}
++	if interceptor == nil {
++		return srv.(DaemonServiceServer).GetStatus(ctx, in)
++	}
++	info := &grpc.UnaryServerInfo{
++		Server:     srv,
++		FullMethod: DaemonService_GetStatus_FullMethodName,
++	}
++	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
++		return srv.(DaemonServiceServer).GetStatus(ctx, req.(*StatusRequest))
++	}
++	return interceptor(ctx, in, info, handler)
++}
++
++// DaemonService_ServiceDesc is the grpc.ServiceDesc for DaemonService service.
++// It's only intended for direct use with grpc.RegisterService,
++// and not to be introspected or modified (even as a copy)
++var DaemonService_ServiceDesc = grpc.ServiceDesc{
++	ServiceName: "daemon.DaemonService",
++	HandlerType: (*DaemonServiceServer)(nil),
++	Methods: []grpc.MethodDesc{
++		{
++			MethodName: "GetStatus",
++			Handler:    _DaemonService_GetStatus_Handler,
++		},
++	},
++	Streams:  []grpc.StreamDesc{},
++	Metadata: "proto/daemon.proto",
++}
+diff --git a/user.ldif b/user.ldif
+new file mode 100644
+index 0000000..86fa30c
+--- /dev/null
++++ b/user.ldif
+@@ -0,0 +1,13 @@
++dn: dc=example,dc=org
++objectClass: top
++objectClass: dcObject
++objectClass: organization
++o: Example Corp
++dc: example
++
++dn: cn=admin,dc=example,dc=org
++objectClass: simpleSecurityObject
++objectClass: organizationalRole
++cn: admin
++description: LDAP administrator
++userPassword: {SSHA}your-hashed-password
+```

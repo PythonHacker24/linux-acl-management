@@ -1,0 +1,263 @@
+# Commit: Completed Session Management and successfully tested
+## Date: 2025-03-20
+## Commit Hash: 99f0083ed2b9e3dad2421272d25a7aaec4cae39b
+```diff
+commit 99f0083ed2b9e3dad2421272d25a7aaec4cae39b
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Thu Mar 20 22:57:16 2025 +0530
+
+    Completed Session Management and successfully tested
+
+diff --git a/backend-server/authentication/authentication.go b/backend-server/authentication/authentication.go
+index 0fd6331..4cc74a3 100644
+--- a/backend-server/authentication/authentication.go
++++ b/backend-server/authentication/authentication.go
+@@ -3,6 +3,8 @@ package authentication
+ import (
+     "time"
+     "fmt"
++    "net/http"
++    "strings"
+ 
+     "github.com/golang-jwt/jwt/v5"
+ )
+@@ -37,3 +39,37 @@ func ValidateJWT(tokenString string) (jwt.MapClaims, error) {
+ 
+ 	return nil, fmt.Errorf("invalid token")
+ }
++
++func GetUsernameFromJWT(r *http.Request) (string, error) {
++	authHeader := r.Header.Get("Authorization")
++	if authHeader == "" {
++		return "", fmt.Errorf("missing authorization header")
++	}
++
++	tokenParts := strings.Split(authHeader, " ")
++	if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
++		return "", fmt.Errorf("invalid authorization header format")
++	}
++
++	tokenString := tokenParts[1]
++
++	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
++		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
++			return nil, fmt.Errorf("unexpected signing method")
++		}
++		return jwtSecret, nil
++	})
++
++	if err != nil {
++		return "", fmt.Errorf("invalid token: %v", err)
++	}
++
++	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
++		if username, ok := claims["username"].(string); ok {
++			return username, nil
++		}
++		return "", fmt.Errorf("username not found in token")
++	}
++
++	return "", fmt.Errorf("invalid token claims")
++}
+diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go
+index cd4b2ab..b0f1558 100644
+--- a/backend-server/handlers/hander.go
++++ b/backend-server/handlers/hander.go
+@@ -5,7 +5,9 @@ import (
+ 	"backend-server/config"
+ 	"backend-server/ldap"
+ 	"backend-server/models"
++	"backend-server/sessionmanager"
+ 	"encoding/json"
++	"fmt"
+ 	"log/slog"
+ 	"net/http"
+ )
+@@ -47,6 +49,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
+         return
+     }
+ 
++    sessionmanager.CreateSession(user.Username)
++
+     token, err := authentication.GenerateJWT(user.Username)
+     if err != nil {
+         slog.Error("Error generating token", "error", err.Error())
+@@ -62,3 +66,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
+         return
+     }
+ }
++
++func TransactionHandler(w http.ResponseWriter, r *http.Request) {
++	username, err := authentication.GetUsernameFromJWT(r)
++	if err != nil {
++		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
++		return
++	}
++
++	var txnReq models.TransactionRequest
++	if err := json.NewDecoder(r.Body).Decode(&txnReq); err != nil {
++		http.Error(w, "Invalid request", http.StatusBadRequest)
++		return
++	}
++
++	err = sessionmanager.AddTransaction(username, txnReq.Transaction)
++    if err != nil {
++        fmt.Fprintf(w, "Failed to add transaction")
++        return
++    }
++
++	fmt.Fprintf(w, "Transaction added")
++}
+diff --git a/backend-server/main.go b/backend-server/main.go
+index 2be5f2a..88888f9 100644
+--- a/backend-server/main.go
++++ b/backend-server/main.go
+@@ -9,6 +9,7 @@ import (
+ 	"backend-server/handlers"
+ 	"backend-server/middleware"
+ 	"backend-server/services"
++	"backend-server/sessionmanager"
+ 	"backend-server/utils"
+ )
+ 
+@@ -28,6 +29,9 @@ func main() {
+ 		go services.ConnectToServer(server)
+ 	}
+ 
++	// Start Transaction Worker in background
++	go sessionmanager.TransactionWorker()
++
+     // Setting up endpoints for interactions
+     mux := http.NewServeMux()
+ 
+@@ -37,6 +41,7 @@ func main() {
+     // Frontend Handlers 
+     // For all the handlers for the frontend exposure, use the authentication middleware
+     mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
++    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(handlers.TransactionHandler))
+     
+     // list files handler -> GET METHOD
+ 
+diff --git a/backend-server/models/models.go b/backend-server/models/models.go
+index ab4238c..100f469 100644
+--- a/backend-server/models/models.go
++++ b/backend-server/models/models.go
+@@ -36,3 +36,8 @@ type Session struct {
+     TransactionQueue    *list.List
+     Mutex               sync.Mutex
+ }
++
++// Transaction request body
++type TransactionRequest struct {
++	Transaction string `json:"transaction"`
++}
+diff --git a/backend-server/sessionmanager/sessionmanager.go b/backend-server/sessionmanager/sessionmanager.go
+index cdcb1f7..22b7ec7 100644
+--- a/backend-server/sessionmanager/sessionmanager.go
++++ b/backend-server/sessionmanager/sessionmanager.go
+@@ -3,6 +3,7 @@ package sessionmanager
+ import (
+ 	"backend-server/models"
+ 	"container/list"
++	"fmt"
+ 	"log/slog"
+ 	"sync"
+ 	"time"
+@@ -43,7 +44,7 @@ func ExpireSession(username string) {
+     }
+ }
+ 
+-func AddTransaction(username string, txn string) {
++func AddTransaction(username string, txn string) error {
+     sessionMutex.Lock()
+     defer sessionMutex.Unlock()
+ 
+@@ -51,49 +52,71 @@ func AddTransaction(username string, txn string) {
+     session, exists := sessions[username]
+     if !exists {
+         slog.Info("Session Not Found, Transaction Rejected", "User", username, "Transaction", txn)
+-        return
++        return fmt.Errorf("Session Not Found Transaction Rejected")
+     }
+ 
+     session.Mutex.Lock()
+     defer session.Mutex.Unlock()
+ 
+-    err := session.TransactionQueue.PushBack(txn)
+-    if err != nil {
+-        slog.Info("Failed to add transaction to the queue", "User", username, "Transaction", txn)
+-        return
+-    }
++    session.TransactionQueue.PushBack(txn)
+ 
+     if session.Timer != nil {
+         session.Timer.Stop()
+     }
+ 
+     slog.Info("Transaction added successfully", "User", username, "Transaction", txn)
++    return nil
+ }
+ 
+ // This function starts processing all the transactions in the queue one by one
+-func ProcessTransactions(username string) {
+-    sessionMutex.Lock()
+-    defer sessionMutex.Unlock()
+-
+-    session, exists := sessions[username]
+-    if !exists {
+-        return 
+-    }
+-    
++func ProcessTransactions(username string, session *models.Session) {
+     session.Mutex.Lock()
+     defer session.Mutex.Unlock()
+ 
++    counter := 0
+     for session.TransactionQueue.Len() > 0 {
+         element := session.TransactionQueue.Front()
+         session.TransactionQueue.Remove(element)
+         
+         // TRANSACTION SHOULD BE PROCESSED HERE
++        dummyFunc(counter)
++        counter++
+         
+         slog.Info("Processed transaction", "User", username, "Element", element)
+     }
+ 
+     // At this point, all the transactions must be process in the queue
+-
++    if session.Timer != nil {
++        session.Timer.Stop()
++    }
+     session.Timer = time.AfterFunc(sesstionTimeout, func() { ExpireSession(username) })
+     slog.Info("Session timeout restarted", "User", username)
+ }
++
++func dummyFunc(counter int) {
++    slog.Info(fmt.Sprintf("Transaction Started %d", counter))
++    time.Sleep(2 * time.Second)
++}
++
++func TransactionWorker() {
++    slog.Info("Transaction worker started")
++    for {
++        sessionMutex.Lock()
++        // Create a local copy of sessions to process
++        sessionsToProcess := make(map[string]*models.Session)
++        for username, session := range sessions {
++            if session.TransactionQueue.Len() > 0 {
++                sessionsToProcess[username] = session
++            }
++        }
++        sessionMutex.Unlock()
++
++        // Process transactions for each session without holding the global lock
++        for username, session := range sessionsToProcess {
++            ProcessTransactions(username, session)
++        }
++
++        slog.Info("Transaction worker finished all the transactions")
++        time.Sleep(2 * time.Second) // Adjust based on processing needs
++    }
++}
+```

@@ -10,3 +10,5 @@ Note that since we haven't came up with coding practices, styles and rules, I am
 .. toctree::
    :maxdepth: 2
    :caption: Prototype
+
+   prototype-pages/CHANGELOG.md

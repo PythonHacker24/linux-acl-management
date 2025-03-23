@@ -1,0 +1,179 @@
+Commit: Made progress with Session Manager
+=====================
+
+**Date**: 2025-03-20
+**Commit Hash**: 0642d7823dd7eb77d8ee5bf879267168b03e63c0
+
+Description
+-----------
+This commit implements a significant portion of the Session Manager functionality, adding user session handling capabilities to the system. Key features include:
+- Creation of a robust Session struct with transaction queue support
+- Implementation of session lifecycle management (create, expire)
+- Transaction handling with queue-based processing
+- Thread-safe session operations with mutex locking
+- Automatic session timeout mechanism
+- Removal of LDIF template file in favor of programmatic configuration
+
+Changes
+-------
+.. code-block:: diff
+commit 0642d7823dd7eb77d8ee5bf879267168b03e63c0
+Author: PythonHacker24 <adityapatil24680@gmail.com>
+Date:   Thu Mar 20 12:23:23 2025 +0530
+
+    Made progress with Session Manager
+
+diff --git a/backend-server/models/models.go b/backend-server/models/models.go
+index 8436927..ab4238c 100644
+--- a/backend-server/models/models.go
++++ b/backend-server/models/models.go
+@@ -1,5 +1,11 @@
+ package models
+ 
++import (
++	"container/list"
++	"sync"
++	"time"
++)
++
+ // Health Response Structure
+ type HealthResponse struct {
+     Status string `json:"status"`
+@@ -21,3 +27,12 @@ type User struct {
+     Username string `json:"username"`
+     Password string `json:"password"`
+ }
++
++// Session Struct for Session Manager
++type Session struct {
++    Username            string 
++    Expiry              time.Time
++    Timer               *time.Timer
++    TransactionQueue    *list.List
++    Mutex               sync.Mutex
++}
+diff --git a/backend-server/sessionmanager/sessionmanager.go b/backend-server/sessionmanager/sessionmanager.go
+new file mode 100644
+index 0000000..cdcb1f7
+--- /dev/null
++++ b/backend-server/sessionmanager/sessionmanager.go
+@@ -0,0 +1,99 @@
++package sessionmanager
++
++import (
++	"backend-server/models"
++	"container/list"
++	"log/slog"
++	"sync"
++	"time"
++)
++
++var sessions = make(map[string]*models.Session)
++var sessionMutex = sync.Mutex{}
++
++const sesstionTimeout = 5 * time.Minute
++
++func CreateSession(username string) {
++    sessionMutex.Lock()
++    defer sessionMutex.Unlock()
++
++    // Check if the session already exists
++    if _, exists := sessions[username]; exists {
++        return 
++    }
++
++    session := &models.Session{
++        Username:           username,
++        Expiry:             time.Now().Add(sesstionTimeout),
++        Timer:              time.AfterFunc(sesstionTimeout, func() { ExpireSession(username) }),
++        TransactionQueue:   list.New(),
++    }
++
++    sessions[username] = session 
++}
++
++func ExpireSession(username string) {
++    sessionMutex.Lock()
++    defer sessionMutex.Unlock()
++
++    // Delete session if it exists
++    if _, exists := sessions[username]; exists {
++        slog.Info("Session Expired", "User", username)
++        delete(sessions, username)
++    }
++}
++
++func AddTransaction(username string, txn string) {
++    sessionMutex.Lock()
++    defer sessionMutex.Unlock()
++
++    // First check if the session exists
++    session, exists := sessions[username]
++    if !exists {
++        slog.Info("Session Not Found, Transaction Rejected", "User", username, "Transaction", txn)
++        return
++    }
++
++    session.Mutex.Lock()
++    defer session.Mutex.Unlock()
++
++    err := session.TransactionQueue.PushBack(txn)
++    if err != nil {
++        slog.Info("Failed to add transaction to the queue", "User", username, "Transaction", txn)
++        return
++    }
++
++    if session.Timer != nil {
++        session.Timer.Stop()
++    }
++
++    slog.Info("Transaction added successfully", "User", username, "Transaction", txn)
++}
++
++// This function starts processing all the transactions in the queue one by one
++func ProcessTransactions(username string) {
++    sessionMutex.Lock()
++    defer sessionMutex.Unlock()
++
++    session, exists := sessions[username]
++    if !exists {
++        return 
++    }
++    
++    session.Mutex.Lock()
++    defer session.Mutex.Unlock()
++
++    for session.TransactionQueue.Len() > 0 {
++        element := session.TransactionQueue.Front()
++        session.TransactionQueue.Remove(element)
++        
++        // TRANSACTION SHOULD BE PROCESSED HERE
++        
++        slog.Info("Processed transaction", "User", username, "Element", element)
++    }
++
++    // At this point, all the transactions must be process in the queue
++
++    session.Timer = time.AfterFunc(sesstionTimeout, func() { ExpireSession(username) })
++    slog.Info("Session timeout restarted", "User", username)
++}
+diff --git a/user.ldif b/user.ldif
+deleted file mode 100644
+index 86fa30c..0000000
+--- a/user.ldif
++++ /dev/null
+@@ -1,13 +0,0 @@
+-dn: dc=example,dc=org
+-objectClass: top
+-objectClass: dcObject
+-objectClass: organization
+-o: Example Corp
+-dc: example
+-
+-dn: cn=admin,dc=example,dc=org
+-objectClass: simpleSecurityObject
+-objectClass: organizationalRole
+-cn: admin
+-description: LDAP administrator
+-userPassword: {SSHA}your-hashed-password
+```

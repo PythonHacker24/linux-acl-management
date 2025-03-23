@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
-  <head>
-<meta charset="utf-8"/>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="#" />
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-<meta name="robots" content="noindex" />
-<title>Search - Linux ACL Management Progress  documentation</title><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+        <title>Commit: added slog for better logging - Linux ACL Management Progress documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
     
 
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
+      <a href="../index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -187,12 +187,12 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
   <span class="sidebar-brand-text">Linux ACL Management Progress  documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="#" role="search">
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
@@ -200,8 +200,12 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="prototype.html">Prototype</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="prototype-pages/CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../prototype.html">Prototype</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-10-1e574981.html">Commit: initial commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-0862674a.html">Commit: LDAP Authentication successful</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-19-6e062a15.html">Commit: Added gRPC daemons and connected to the backend with yaml fikes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-21-2a34697a.html">Commit: Session Management Completed and Refined</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2025-03-23-f4425d4c.html">Commit: Updated docs with prototype section and README.md with updated progress docs link</a></li>
 </ul>
 </li>
 </ul>
@@ -223,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/prototype-pages/2025-03-10-42322c25.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
@@ -232,23 +242,94 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<noscript>
-<div class="admonition error">
-  <p class="admonition-title">Error</p>
-  <p>
-    Please activate JavaScript to enable the search functionality.
-  </p>
-</div>
-</noscript>
+          <section id="commit-added-slog-for-better-logging">
+<h1>Commit: added slog for better logging<a class="headerlink" href="#commit-added-slog-for-better-logging" title="Link to this heading">¶</a></h1>
+<section id="date-2025-03-10">
+<h2>Date: 2025-03-10<a class="headerlink" href="#date-2025-03-10" title="Link to this heading">¶</a></h2>
+</section>
+<section id="commit-hash-42322c251b655f67d8ed4c914210b5fb9fdca92f">
+<h2>Commit Hash: 42322c251b655f67d8ed4c914210b5fb9fdca92f<a class="headerlink" href="#commit-hash-42322c251b655f67d8ed4c914210b5fb9fdca92f" title="Link to this heading">¶</a></h2>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>commit 42322c251b655f67d8ed4c914210b5fb9fdca92f
+Author: PythonHacker24 &lt;adityapatil24680@gmail.com&gt;
+Date:   Mon Mar 10 22:58:50 2025 +0530
 
-<div id="search-results"></div>
+<span class="w"> </span>   added slog for better logging
+
+<span class="gh">diff --git a/backend-server/config/config.go b/backend-server/config/config.go</span>
+new file mode 100644
+<span class="gh">index 0000000..14c0425</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/config/config.go</span>
+<span class="gu">@@ -0,0 +1,6 @@</span>
+<span class="gi">+package config </span>
+<span class="gi">+</span>
+<span class="gi">+const(</span>
+<span class="gi">+    Host = &quot;localhost&quot;</span>
+<span class="gi">+    Port = &quot;8080&quot;</span>
+<span class="gi">+)</span>
+<span class="gh">diff --git a/backend-server/handlers/hander.go b/backend-server/handlers/hander.go</span>
+new file mode 100644
+<span class="gh">index 0000000..60d1c85</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/backend-server/handlers/hander.go</span>
+<span class="gu">@@ -0,0 +1,8 @@</span>
+<span class="gi">+package handlers</span>
+<span class="gi">+</span>
+<span class="gi">+import (</span>
+<span class="gi">+    &quot;log&quot;</span>
+<span class="gi">+    &quot;net/http&quot;</span>
+<span class="gi">+)</span>
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gh">diff --git a/backend-server/main.go b/backend-server/main.go</span>
+<span class="gh">index 5046b0d..a202d35 100644</span>
+<span class="gd">--- a/backend-server/main.go</span>
+<span class="gi">+++ b/backend-server/main.go</span>
+<span class="gu">@@ -1,11 +1,31 @@</span>
+<span class="w"> </span>package main
+<span class="w"> </span>
+<span class="w"> </span>import (
+<span class="gd">-    &quot;fmt&quot;</span>
+<span class="gd">-//     &quot;net/http&quot;</span>
+<span class="gi">+	&quot;fmt&quot;</span>
+<span class="gi">+	&quot;log/slog&quot;</span>
+<span class="gi">+	&quot;net/http&quot;</span>
+<span class="gi">+    &quot;os&quot;</span>
+<span class="gi">+</span>
+<span class="gi">+    &quot;backend-server/config&quot;</span>
+<span class="w"> </span>)
+<span class="w"> </span>
+<span class="gi">+func healthHandler(w http.ResponseWriter, r *http.Request) {</span>
+<span class="gi">+    fmt.Fprintf(w, &quot;Ok&quot;)</span>
+<span class="gi">+}</span>
+<span class="w"> </span>
+<span class="w"> </span>func main() {
+<span class="gd">-   fmt.Println(&quot;Hello World!&quot;) </span>
+<span class="gi">+    opts := &amp;slog.HandlerOptions{Level: slog.LevelWarn}</span>
+<span class="gi">+	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))</span>
+<span class="gi">+</span>
+<span class="gi">+    mux := http.NewServeMux()</span>
+<span class="gi">+</span>
+<span class="gi">+    // Frontend Handlers </span>
+<span class="gi">+    mux.HandleFunc(&quot;/health&quot;, healthHandler)</span>
+<span class="gi">+</span>
+<span class="gi">+    // Backend Handlers</span>
+<span class="gi">+</span>
+<span class="gi">+    logger.Info(&quot;Server Started Listening&quot;, &quot;Host&quot;, config.Host, &quot;Port&quot;, config.Port)</span>
+<span class="gi">+    if err := http.ListenAndServe(fmt.Sprintf(&quot;%s:%s&quot;, config.Host, config.Port), mux); err != nil {</span>
+<span class="gi">+        slog.Error(&quot;Failed to start server at port 8080&quot;, err)</span>
+<span class="gi">+    }</span>
+<span class="w"> </span>}
+</pre></div>
+</div>
+</section>
+</section>
 
         </article>
       </div>
@@ -275,18 +356,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Commit: added slog for better logging</a><ul>
+<li><a class="reference internal" href="#date-2025-03-10">Date: 2025-03-10</a></li>
+<li><a class="reference internal" href="#commit-hash-42322c251b655f67d8ed4c914210b5fb9fdca92f">Commit Hash: 42322c251b655f67d8ed4c914210b5fb9fdca92f</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
-    
-<script src="_static/searchtools.js"></script>
-<script src="_static/language_data.js"></script>
-<script src="searchindex.js"></script></body>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
 </html>
