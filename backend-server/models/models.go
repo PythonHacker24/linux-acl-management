@@ -52,3 +52,14 @@ type TransactionRequest struct {
 type SetWorkingDirRequest struct {
 	SetWorkingDir string `json:"setWorkingDir"`
 }
+
+// File Information Structure
+type FileInfo struct {
+	Name        string    `json:"name"`
+	Size        int64     `json:"size"`
+	Permissions string    `json:"permissions"`
+	User        string    `json:"user"`
+	Group       string    `json:"group"`
+	ModTime     time.Time `json:"mod_time"`
+	IsDirectory bool      `json:"is_directory"`
+}

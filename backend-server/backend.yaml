@@ -1,5 +1,5 @@
 mount:
-  - mount-point: "/mnt" 
+  - mount-point: "mnt/" 
 
 servers:
   - name: "server1"

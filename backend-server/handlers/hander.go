@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-    "path/filepath"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
+	"path/filepath"
+    "os/user"
+	"syscall"
 
 	"backend-server/authentication"
 	"backend-server/config"
@@ -128,6 +131,11 @@ func SetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    if string(req.SetWorkingDir[len(req.SetWorkingDir) - 1]) != "/" {
+        http.Error(w, "Need / at the end of the directory name", http.StatusBadRequest)
+        return
+    }
+
     config.Sessions[username].Mutex.Lock()
     defer config.Sessions[username].Mutex.Unlock()
 
@@ -141,7 +149,62 @@ func SetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetFile(w http.ResponseWriter, r *http.Request) {
-     
+	username, err := authentication.GetUsernameFromJWT(r)
+	if err != nil {
+		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
+		return
+	}
+
+    files, err := os.ReadDir(config.Sessions[username].CurrentWorkingDir)
+	if err != nil {
+		http.Error(w, "Failed to read directory", http.StatusInternalServerError)
+		return
+	}
+
+	var fileList []models.FileInfo
+
+	for _, file := range files {
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+
+		// Get file owner and group
+		sys := info.Sys().(*syscall.Stat_t)
+		uid := fmt.Sprint(sys.Uid)
+		gid := fmt.Sprint(sys.Gid)
+
+		// Convert UID and GID to user and group names
+		usr, err := user.LookupId(uid)
+		if err != nil {
+			usr = &user.User{Username: uid} // Fallback to UID
+		}
+
+		grp, err := user.LookupGroupId(gid)
+		if err != nil {
+			grp = &user.Group{Name: gid} // Fallback to GID
+		}
+
+		// Append file info to list
+		fileList = append(fileList, models.FileInfo{
+			Name:        file.Name(),
+			Size:        info.Size(),
+			Permissions: info.Mode().String(),
+			User:        usr.Username,
+			Group:       grp.Name,
+			ModTime:     info.ModTime(),
+			IsDirectory: file.IsDir(),
+		})
+	}
+
+	// Set response headers
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// Encode response as JSON
+	if err := json.NewEncoder(w).Encode(fileList); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func UploadFile(w http.ResponseWriter, r *http.Request) {
