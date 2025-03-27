@@ -161,4 +161,165 @@ If this application is using PostgreSQL/Redis/etc. for its own internal purposes
 
 If you want to start writing the GSoC proposal I think that's fine, but I need to defer to Mahmoud to confirm as he has more familiarity with the GSoC program than I do & is more familiar with the overall GSoC process. I would definitely recommend making sure the scope of the project is understood before writing the final proposal, as from our recent emails I worry that there's more potential for scope-creep with this project than had been anticipated & it could inadvertently lead to development time spent focused on things that are actually out of scope of the main goal.
 
+## [4 March 2025]
 
+**My response on Robert's Email: **
+
+Okay, that clears it up: I don't need to jump around computation nodes and consider it part of our product. Our users can have them if they want (and Emory has one), but it's not a requirement in the project. The final question here is, are we going to make use of computational nodes when we deploy it inside the BMI network? I am unsure if I understand the use of computational nodes in your existing infrastructure, but I guess it's for doing heavy computation tasks related to data operations. For example, a permission change of 1 Million files has been requested, so the computational nodes schedule the job, which updates the permissions in the data storage unit. 
+
+However, as mentioned, I would not consider keeping computational nodes as part of the GSoC project. Also, it's clear to me that you need a monolith server (running as a VM) that can handle all operations. This approach works for me, and I will follow it. 
+
+What's going around my mind is using goroutines to do processes that take a long time. 
+
+For the reverse proxy, Nginx would be sufficient. 
+
+The second question is, what does the LDAP server do in the current Emory infrastructure? If I knew its current use, I would be able to adapt it for this GSoC project.
+
+If we use getfacl and setfacl, we will manage permissions on the storage servers themselves, which would create users on the servers. Since we have multiple storage servers, the design for managing permissions across all would differ from what we can do with databases like PostgreSQL. 
+
+To sum everything up till now, if we follow the getfacl and setfacl method, the design would look like this: 
+1. The backend server would do the job of serving the front end, exposing the standard interaction APIs, basic authentications like whether the user exists or not, etc., and communicating with the storage nodes. 
+2. The storage nodes would run a daemon that exposes follow endpoints: create-users, delete-users, get-acls, set-acls, etc. If a user needs to be created, it would be created on the server itself. Deleting would go the same way. Getting user permissions would use getfacl, and modifying users would use setfacl. We are going to have the owner of the directories, users, and groups in it/ 
+3. The daemon responds to the backend server and is served to the front end. 
+
+After clearing this up, things like the process bar with EDA can be discussed. 
+
+If I am still getting out of scope, let me know the portions I should cut out completely. 
+
+**Second Email:**
+
+Currently, I can imagine the LDAP being used just for basic authentication and user sign-in and sign-up. I went through different uses of LDAP (like file permissions), so I was wondering if BMI is using it that way. If it's a basic user auth, then I would be using it as it is in the project. 
+
+## [5 March 2025]
+
+**More questions from me:**
+
+After working through the day, I have circled back on this: How much computational power do we have, or does it even matter for the GSoC project? 
+
+The reason why I stuck around the computational nodes is due to edge cases where millions of files are updated at once. If we consider only the backend server and Linux storage servers to do so, then handling millions of file updates would be resource-intensive and time-consuming. Are we assuming they both are sufficient to carry out the process in the expected time? 
+
+If yes, I would consider a single master-slave architecture (backend as the master and storage nodes as slaves running daemons). All the lookups and updates will go through this pipeline (frontend -> backend -> daemon -> underlying storage).
+
+**Robert's reponse on these questions:**
+
+For the GSoC project the computational power doesn't necessarily matter & it's safe to assume that the application's back-end processes would be running on a sufficiently powered system, and it's good to profile the application to get an understanding of what it spends time on when processing (to try and find ways to improve efficiency) but there's no hard time-limits that we're expecting to be met at the moment as long as the app is responsive to end-user input within a reasonable amount of time (completion of back-end tasks can take as long as needed & shouldn't be blockers on the front-end if at all possible); currently I can dedicate a system with at least 8 cores & 64GB of RAM upon deployment here in BMI (other sites might deploy on lower-specced hardware, but overall this shouldn't be a concern to the GSoC project as it should be generally understood by the end-user that there would be a performance impact depending on the resources available to the application).
+
+The computational nodes are being used for research computational jobs & can frequently be occupied to the point that there are jobs pending in the queue that are waiting for resources to be available; as such, I'd advise against using an architecture for the GSoC application that expects to offload its processing to the nodes (but there's nothing preventing this from being one of the application's many back-end plugins available when the application grows as there may be another research team that is interested in using it like that; just don't make it a focus during this initial development period).
+
+Regarding LDAP: This is being used for basic authentication & user sign-in, along with identifying the Linux/POSIX groups that user accounts are members of, but nothing related to actual file permissions since this is a filesystem-level function. I'd advise not requiring that specific changes be made to the LDAP instance in order for this application to function (ie. no mandatory need to make user groups specific for the app's functions to identify users) and instead leave it up to the IT teams deploying the app to configure things in a way that best suits their environment by providing options in the app to designate one or more (if appropriate) groups to use for things like granting additional admin privileges in the app.
+
+The use of getfacl and setfacl don't involve the creation of users on the servers, they work with the existing users already known to the servers (or UIDs if a user doesn't exist; this type of situation can occur for one reason or another & should be something that the GSoC application can modify/support just in case). Since our servers are connected with our internal LDAP infrastructure, they know the details of all our users as well & there won't be an issue.
+
+## [6 March 2025]
+
+![LDAP](../_static/ldap_6_march.png)
+
+The upper diagram is the high-level system design and below is a transaction scheduler I am working on. 
+
+I took all your emails and compiled each requirement and constraints; and came up with this which fits closest to that list. Let me know what you think. I think this one is much closer to what you are looking for (since I understood the LDAP purpose and ACLs in Linux Servers in better detail). 
+
+The scheduler part is under design right now; but I would love your opinions on this. This design is aimed to improve consistency and resource utilization of the backend server. 
+
+So explain it a bit in here; as soon as the user logs in - they create a session in the backend which is responsible to handle everything the frontend has to do with (this makes our backend server stateful). Each session has its own queue of processes. Processes contain 1 transaction. Here, a transaction is a consistent operation which is true if the operation succeeds and false if it leaves midway (and reverts things back). When a user does some clicks on the frontend and attempts some operations; the frontend shows that they are scheduled (like the upload bar in google drive which uploads in the background and shows the process bar). The session appends the process in a queue. The first in process gets first out and is executed by the transaction executer. If a user quits midway (due to any reason; like an emergency power off on desktop); the backend keeps executing the process as it's scheduled. It executes all of it and when the queue is empty; exits and the session is successfully closed. 
+
+Moving more advanced; if we have a local database that keeps a copy of the queue; it would provide more redundancy in case the backend application crashes midway or server goes offline. This will allow us to keep track of the queue and not end up messing up the permissions in these edge cases. I know that it will not be able to recover 100% but this small integration will improve the consistency drastically.
+
+## [7 March 2025]
+
+**Robert's comments on latest architecture:**
+
+This latest diagram looks like it's nearly there, but I do have the following comments about it:
+
+* The backend server shouldn't be modifying the LDAP server (unless this is an optional plugin for future development, used by smaller-scale deployments that may not already have an existing LDAP infrastructure); it would only be binding to/reading from it so that it can recognize network users & groups (& other details that may be present in LDAP, as appropriate) but shouldn't be making its own changes.
+
+* Your design may already handle this, but I wanted to make sure this was accounted for just in case - The daemon/API running on the file storage server should be capable of binding to a Unix socket too rather than explicitly requiring a TCP/IP socket (or, it should at least tolerate a localhost-only connection); there's a possibility that some sites may want to deploy the GSoC backend on the same system as the storage server depending on the resources they have available & wouldn't want to open multiple firewall ports (one for the backend server's daemon & another one for the storage server daemon).
+
+* Regarding the example you fleshed out in the email: it might be a good idea to make the "revert changes if a transaction fails" functionality an option that the end-user can toggle (on, off, or on up to a certain limit of files/tasks & off above that limit) rather than always being enabled; some users may be fine with leaving a partial transaction completed as-is (since technically they could use the GSoC app to fix any issues/create a new request to complete the rest of the original transaction after fixing the underlying issue) due to the amount of time it would take for the changes to be reverted. There's also the aspect of having to keep track of the original & changed state for each file while a transaction's underway, which could be very memory/storage intensive for large transactions.
+
+Other than those few observations, everything else you've mentioned in this latest email sounds good; the session scheduling mechanism definitely sounds like a good thing to have since it will allow users to not need to leave their systems actively open & watching a large transaction complete, and I'm glad you're excited about working on that aspect of it since it'll be of significant value to the overall GSoC application.
+
+**On the same day, I proposed the following idea:**
+
+Greetings of the day, 
+
+Okay, now I am only short of one thing here: understanding the LDAP server's purpose. I understand that it stores basic user and group data that Emory already has and is used for basic authentication and checks. 
+
+My understanding is that the setfacl and getfacl commands would use the LDAP server to manage users and groups since they are not created on the Linux File Storage Servers. Please correct me if I am wrong. 
+
+Are we allowing the creation of new users or new groups from the front end?
+
+I am imagining a scenario here. A new user can visit https://gsoc-app.emory.edu/signup and create a new account. This info will go on the LDAP server, and the new user will be allocated no privileges to access any files. This user now goes to work with Prof. X. Prof. X has access to lab/MRI-scan data, which he wants the new user to access. He can then give permission to the new user from his logged-in portal. 
+
+This allows new users to create an account on the app with no privileges; others with their own files and permissions can assign the user their permission. So there is no security issue or unauthorized access due to the least privilege but the ability to create new user accounts. As far as I can understand, this information would be stored on the LDAP server. 
+
+Also, users would be allowed to change their passwords, delete accounts, forget passwords, etc., on their own, and there would be no need to contact the IT team for these operations. 
+
+If we do not allow user creation, we are assuming that we are not creating new accounts and are only managing existing users listed on the LDAP server. In this case, the IT team would be responsible for adding new users, changing account passwords, deleting users, etc. 
+
+Let me know about this, as it will clear up the authentication part, and we will almost reach a consensus. 
+
+Regarding daemon connectivity, it sounds good, and I will design the daemon to handle Unix Sockets. I agree that a few sites would consider deploying everything in the same server (Linux File Storage Server) and I would make sure we make provisions for that. In this case, I would call it a monolith deployment where a single server does everything - frontend handling, backend operations, authentication, and storage services. When a site has an infrastructure pictured in the last email's diagram, it can be called an orchestrated deployment where multiple Linux Storage Servers are orchestrated simultaneously. We can provide docs for both kinds of deployment. 
+
+Returning to the process queue and transaction mechanism, I am glad you liked it. I completely agree that the transaction rollback feature can be kept optional since it would require an additional database running with the backend server. Three options seem fine: ON (where when a transaction takes place, during the execution time, it's logged and mirrored in the database no matter how big it is), OFF (where there is no transaction process state saved and would be prone to partial transactions if something wrong happens) and Partial (where a limit would be set on how big a transaction can be eligible for rollback and beyond that if a user initiates a transaction, they would be prompted with the warning of no rollback before confirming). 
+
+This log can be either deleted after the end of the transaction or stored in the database if configured to be. In the prior case, this will allow us to revert back if the transactions fail in the execution period and be true only if the full operation is completed. In the later ones, a transaction can be reverted back anytime (like git). Again, limits can be implemented here (in case we need to skip big transactions). 
+
+Let me know what you think. After the LDAP part is clear, I would like to finalize the design and then work on the lower levels of software implementation, which I would use in the GSoC proposal to sum it up.
+
+## [8 March 2025]
+
+**Robert's comments on my reponse:**
+
+I highly recommend that you check the Manual pages for the setfacl & getfacl commands to get an understanding of what they do, as they only manage extended file permissions & aren't user-management commands; an online version of them is available here, but it should also be available from any Linux system with the appropriate acl package installed via the man command (the package name differs depending on distribution):
+https://linux.die.net/man/1/setfacl
+https://linux.die.net/man/1/getfacl
+
+As far as we're concerned in our department here at Emory, we will not allow user creation through this GSoC application; other deployment sites might have a use for this so it could certainly be a plugin for the application, but I'd rank this as low priority for now & shouldn't be focused on if there's other tasks to still complete for the application's main development.
+
+Our LDAP server is just used for centralized management of user accounts instead of using local-only files like /etc/[passwd|shadow|group]; worrying about its specifics is out of scope for the GSoC project. All the GSoC project needs to be concerned with is that:
+LDAP exists & that it's able to query the LDAP server given the appropriate info provided by the administrator setting up the application (LDAP server address(es), bind user/dn, bind password, base search DN, object filter, attribute mapping, etc.) to validate whether a user account exists & is authorized to log in to the application.
+The underlying servers (backend/frontend/storage servers/other servers on the network that are outside of the scope of this project) are already configured to use the central LDAP servers to look-up user names/account UIDs/group membership/etc. and match them together for system-level purposes, so the GSoC application does not need to worry about this. Put another way, all the accounts in LDAP "exist" on all the servers, so a command like id aditya or getent passwd account_uid could be run on any server & would return the same result regardless of the server it was executed on, even though the account doesn't exist in the server's /etc/passwd file.
+
+There should be pre-existing open-source projects that can provide the basic features of this functionality within the GSoC application, so I'd recommend just reviewing those & selecting the one that you feel is the best fit for inclusion with the application (make sure to review their OSS licenses & ensure that they're compatible with the ones required as part of the GSoC!) rather than trying to code an LDAP client implementation from scratch.
+
+## [9 March 2025]
+
+**My updated design:**
+
+I went through the getfacl and setfacl docs, went around and tested it on my Arch Linux system, and read about it in depth. 
+
+Based upon that, I have modified my system design as shown below:
+
+![ldap_updated](../_static/updated_ldap-9-march.png)
+
+There are no provisions for updating anything on the LDAP server for the backend (unless we build a plugin for the GSoC application for this purpose, which I am leaving as a low-priority task, as mentioned). It's clear to me now that the LDAP server should be used in BMI's network, and I will make sure the GSoC application doesn't disturb it. This will also be explained in detail in the documents. 
+
+Let me know if there are any more improvements; I will add them, too. After this, I would be working on designing the lower levels and testing them out by starting to write code, so let me know about this, too. 
+
+Also, since our backend is written in Golang, we can use https://github.com/go-ldap/ldap (MIT Licensed) for LDAP integration. I will also be testing it out soon. 
+
+In addition, I have been working on deciding the interaction protocol between the daemon and the backend server. gRPC catches my attention for remote connections since our endpoints will be well-defined. As mentioned, Unix domain sockets seem to be ideal for local connections.
+
+***After this point, I started working on my GSoC Proposal and interacted with my mentors for feedbacks and updated it as per their recommendations.***
+
+## [21 March 2025]
+
+**I continued with my questions which came during proposal writing and prototyping:**
+
+Sure, no worries. I am writing a new chapter in the proposal for the prototype, which I am working on. The good news is that the proposed session management algorithm is working well, and we can proceed. GSoC proposal submission starts tomorrow and ends on 8 April, so I would like to work more on the proposal and the prototype and get your feedback before submitting it. 
+
+Also, I have one more question: We have multiple Linux File Storage Servers in orchestrated deployments. All those different servers have filesystems where users have permission and access assigned. Should the portal show the user that all the files are in the same server space and hide the orchestration (like virtual machines), or should I provide options about which server to store the file in?
+
+In the prior case, when users open the portal and log in, they would see the files and directories listed (no matter which server they are from). When they do to /test-result and say it was in server-3, the backend would automatically move to the server-3 /test-result content and list it. The session-management module would store all this information. 
+
+In the latter case, the user would select a server like "server-1", "server-2", "server-3", etc., and then the backend would only list those files and work with that server. 
+
+This is important to me since I am now starting to build the prototype of the transaction executor and will be connecting it to the session management module I have built. 
+
+I am looking forward to progressing on the prototype while finalizing the proposal. Even after the submission, I can keep working on it since the modules in the final project will take some of these prototype components and build upon them. It would speed up the final project and allow me to work on more features.
+
+**Robert's response:**
+
+In the case where there's multiple different servers in an orchestrated deployment serving their own unique filesystem, it's possible that all of their filesystems may be mounted on the backend server such that they're accessible simply by navigating to a specific directory (ie. /mnt/server-1, /mnt/server-2, etc.) and I would hope that the end-user administrator deploying the software would configure it to match how their users expect to see the filesystems on their network. As such, I don't think any special options need to be added to the application to explicitly choose a server, as this should be implicit based on the path of the file that the user's navigating to.
+
+I do see where this may be of use for a site that's aiming to have a single deployment of this software which supports multiple different departments at once as opposed to each individual department having their own deployment, but I wouldn't worry about that too much for this initial phase & it can always be a future improvement that's made if needed.
