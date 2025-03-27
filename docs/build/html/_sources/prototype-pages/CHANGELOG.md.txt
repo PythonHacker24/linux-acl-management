@@ -3,6 +3,42 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [dae2eaf] - 2025-03-23
+**Author:** PythonHacker24
+
+### Changes:
+- Implemented Set and Get Current Working Directory Handlers and Fixed Auth Middleware
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/dae2eaf390a0d6a3426afa86f373442264b7a0e4)
+
+
+## [8b858f8] - 2025-03-23
+**Author:** PythonHacker24
+
+### Changes:
+- Handler Implemented for Setting Current Working Directory
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/8b858f8191e60d3a5af6228721065a586e92300f)
+
+
+## [019d3fb] - 2025-03-23
+**Author:** Aditya Patil
+
+### Changes:
+- Update main.yml
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/019d3fb86181698826fd21c6a1c5f47585f57406)
+
+
+## [aea906b] - 2025-03-23
+**Author:** PythonHacker24
+
+### Changes:
+- Added Changelog to the Docs with all commit messages and links to it + automated the process with a Python Script
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/aea906b9aacb520fd8c9473502c6fb1429d2f9c3)
+
+
 ## [f4425d4] - 2025-03-23
 **Author:** PythonHacker24
 

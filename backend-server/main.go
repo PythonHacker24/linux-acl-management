@@ -51,14 +51,29 @@ func main() {
     mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetCurrentWorkingDir)))
     mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
 
+    mux.Handle("GET /list-files", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.ListFilesInDir)))
+
     // This works on files only and not directories. These hanlders allow you to get download the file, delete the file from the servers, upload a new file or update the file. These files must be in the current directory - which is tracked in the session itself.
-    mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetFile)))
-    mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.DeleteFile)))
-    mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UploadFile)))
-    mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UpdateFile)))
+
+    /* NOT THE PART OF PROTOTYPE - WOULD BE DONE AT THE END */ 
+    if backendConfig.Operations[0].Read {
+        mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetFile)))
+    }
+
+    if backendConfig.Operations[0].Delete {
+        mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.DeleteFile)))
+    }
+
+    if backendConfig.Operations[0].Write {
+        mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UploadFile)))
+    }
+
+    if backendConfig.Operations[0].Update {
+        mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UpdateFile)))
+    }
 
     // Permission Management Endpoints
-
+    
     // User Settings APIs (For the future) 
 
     slog.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)

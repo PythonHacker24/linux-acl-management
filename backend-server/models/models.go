@@ -21,10 +21,18 @@ type Mount struct {
     MountPoint string `yaml:"mount-point"`
 }
 
+type Operation struct {
+    Read    bool    `yaml:"read"` 
+    Write   bool    `yaml:"write"`
+    Delete  bool    `yaml:"delete"`
+    Update  bool    `yaml:"update"`
+}
+
 // Config represents the entire YAML structure
 type Config struct {
-    MountPath   []Mount           `yaml:"mount"` 
+    MountPath   []Mount         `yaml:"mount"` 
 	Servers     []ServerConfig  `yaml:"servers"`
+    Operations  []Operation     `yaml:"operations"`
 }
 
 // User struct for login request

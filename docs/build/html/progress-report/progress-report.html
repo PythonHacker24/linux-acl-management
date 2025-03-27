@@ -1,0 +1,446 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Progress Report" href="../progress-report.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>Progress Report for ACL Management GSoC Project - Linux ACL Management Progress documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Linux ACL Management Progress  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Linux ACL Management Progress  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../prototype.html">Prototype</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Prototype</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prototype-pages/CHANGELOG.html">Changelog</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../progress-report.html">Progress Report</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Progress Report</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Progress Report for ACL Management GSoC Project</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/progress-report/progress-report.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="progress-report-for-acl-management-gsoc-project">
+<h1>Progress Report for ACL Management GSoC Project<a class="headerlink" href="#progress-report-for-acl-management-gsoc-project" title="Link to this heading">¶</a></h1>
+<section id="february-2025">
+<h2>[9 February 2025]<a class="headerlink" href="#february-2025" title="Link to this heading">¶</a></h2>
+<p>The conversation was initiated with Mahmoud Zeydabadinezhad on an Email thread introducing myself and providng compherensive detials about me. This includes all my Social handles relevant to GSoC project, motivation, and a CV for detailed informatiom about my work.</p>
+<p>On the same day, Mahmoud responded with an offer to have a quick call after some discussion about the relevant project.</p>
+<p>I asked about selecting projects given my the organization and Mahmoud suggested me with Project #1 (Securing Linux Storage with ACLs: An Open-Source Web Management Interface for Enhanced Data Protection).</p>
+</section>
+<section id="id1">
+<h2>[10 February 2025]<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>I started researching about the topic and proposed my first designs to Mahmoud. I had primarly 3 questions:</p>
+<ol class="arabic simple">
+<li><p>I created this diagram to visualize what I think current researchers use in their network storage. Is this something that you are expecting?
+<img alt="first" src="../_images/first-10-feb.png" /></p></li>
+<li><p>As much as I understand, the permissions and access provisions on a high level look like this:
+<img alt="second" src="../_images/second-10-feb.png" />
+Am I right in this case, or are there some additional components to these?</p></li>
+<li><p>If I consider the above designs to be true, this is the top-level system design I am imagining:
+<img alt="third" src="../_images/third-10-feb.png" />
+Is this something you would consider to be in the right direction? (the primary storage server is actually)</p></li>
+</ol>
+<p>Mahmoud invited me for a Zoom call on Tuesday. We had a successful first meeting and I got introducted to the GSoC organization.</p>
+</section>
+<section id="id2">
+<h2>[12 February 2025]<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Comments from Robert Tweedy arrived on the proposed designs. Here are the comments by Robert Tweedy:</p>
+<ol class="arabic simple">
+<li><p>This architecture seems like a reasonable layout; it’s not specifically what BMI has (in our case nearly all of our access would be through what’s listed as “Remote Access” on that diagram, &amp; we don’t have an on-site backup server; we also have some separate storage systems too which aren’t directly connected to the main “central” storage &amp; we weren’t concerned about these for the purposes of this project as they’re not intended for mass-user sharing of data) but is a reasonable architecture to work from and a good testing architecture for the project’s application (which shouldn’t care too much about the actual network architecture - it’s the access to the underlying filesystem with the data that matters, &amp; it can be assumed the server the application’s running on will have access to it).</p></li>
+<li><p>This is an ideal way to organize a project directory &amp; looks fine from a purely high-level overview, however it shouldn’t be assumed the underlying file organization will match this structure in a real-world scenario where a lab’s been around for a long time &amp; might have different/various ways of (dis)organization of their data. The ability of the application to support applying a solution to the following type of request is necessary (as we certainly see this in BMI a lot &amp; presumably other institutions that would benefit from this GSoC project face similar situations in data management): “Hello IT team, this is Dr. Bob from Boblab. I need you to grant Alice (a student in Charleslab) read-only access to this specific directory in my lab space: ‘/labs/boblab/data_directory_only_boblab_POSIX_group_has_rx_access_to/another_directory/dataForProject/’ and read/write access to this different directory: ‘/labs/boblab/output_directory_only_boblab_POSIX_group_has_w_access_to/another_directory/resultsFromCharleslab/’, without changing anyone else’s access to these directories &amp; without giving Alice access to directories other than those I listed (and no ability to list the contents of parent directories she has to traverse through to get here); I should also be able to read/write/delete any data Alice uses/creates in these directories because it’s my lab space &amp; we can’t put it into our institution’s shared collaboratory space ‘/labs/collab/’ because &lt;insert_reason_here&gt;. Oh, and Dr. Charles and his Post-doc Danielle should have access to these locations too but have read-write access to everything since they’ll be adding data to my ‘dataForProject’ directory from a collaborator”.</p></li>
+<li><p>End-users may not have direct SSH/SFTP access to the underlying storage server nor the ability to establish NFS/SMB mounts depending on security architecture from the IT team &amp; might only be able to interact with the storage through an IT-managed mountpoint on a computational server/node (this is definitely the case in BMI; all access to our /labs volume is done by interacting with the IT-managed mountpoints on the systems, mounted either as NFS or via the BeeGFS client we’re using). The ACL Management Application box on the diagram looks fine to me, as long as the “ACL Service” is in fact applying the ACLs to the underlying filesystem &amp; can tolerate changes if made outside of the application directly on the storage servers (likely by the IT team).</p></li>
+</ol>
+</section>
+<section id="id3">
+<h2>[13 February 2025]<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>An updated architecture was proposed:</p>
+<p><img alt="updated" src="../_images/updated-13-feb.png" /></p>
+<p><strong>Here is my response with the attached email:</strong></p>
+<p>Clearing out the network architecture would be very helpful in defining the lower-level requirements and designing it.</p>
+<p>I am currently designing the file structure according to the requirements, and so far, I am very happy to say that it’s going smoothly. I have come up with a solution but am focusing on optimizing it further to the lowest Linux levels to provide optimal performance. I will let you know soon. I am super excited to take feedback on that one.</p>
+<p>Here are some of my thought processes for your reference:</p>
+<ol class="arabic simple">
+<li><p>Due to the project’s background, More focus must be given to the security portion, and features must be selected carefully.</p></li>
+<li><p>The project must be highly configurable since it will be used beyond BMI. So, I am thinking of making the configuration as replicable as possible to make it easy for similar architectures to adapt. Since most of this work is done by IT teams, YAML-based configurations make a lot of sense to me.</p></li>
+<li><p>I would focus on keeping the backend and frontends loosely coupled and developing developer documentation for easily building custom frontends for other users. This loose coupling would allow the development of Android and iOS apps in the future (it’s good to be future-proof in this project). As per my experience, developer docs help a lot. The front end that we will be building will be the default one.</p></li>
+<li><p>The deployment should be simple and highly configurable, making use of tools like Docker to create images of updated versions for different architectures (actually, it might happen that we might use Kubernetes in the future designs, in which case Dockerization would help use a lot).</p></li>
+</ol>
+<p>Apart from this, I want to ask: Can we use Golang for the backend and writing daemons? The selection of Golang is due to its simplicity, performance, concurrency model, powerful, well-maintained standard libraries (by Google themselves), ease of deployment and distribution, etc. It’s specifically built for servers; honestly, I can write a whole proposal on why Golang can be a good choice for this project. Although Go has huge accessibility to lower-level features we need, in case we are somewhere limited, I would use C or Rust as per the requirements.</p>
+<p>On the same day, a meeting was scheduled where I, Mahmound and Robert discussed about the project in detail.</p>
+</section>
+<section id="id4">
+<h2>[18 February 2025]<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>The meeting was held on this day and 3 of us got together in a meeting for the first time and discussed in-depth about the project architecture. I presented slides containing my proposal of solution and sent an email with the updated slides.</p>
+<p>Link to the slides: <a class="reference download internal" download="" href="../_downloads/46b5722156b5150c679e7c44a0eac056/Introduction-meeting-revised-slides.pdf"><span class="xref download myst">Download the PDF</span></a></p>
+<p><em><strong>After this meeting, a lot of emails where exchanged. Each response given by me was based on research done on previous emails by Robert. I considered it to be best if I added email contents here since they contain everything I came upto during the discussion phase. During this time, mentors suggested me not to rush with writing ode and first finalize all the requirements, which I did through these conversations.</strong></em></p>
+</section>
+<section id="id5">
+<h2>[22 February 2025]<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p><strong>Robert Tweedy provided with the follow feedbacks after reviewing the slides:</strong></p>
+<ol class="arabic simple">
+<li><p>Regarding “Proposed System Design for 1st Approach” (slide 6): There’s a mention of using Hash Tables for tracking changes to the underlying filesystem to notify the application’s backend &amp; frontend processes as part of a responsive change-detection mechanism. I’d highly recommend weighing the benefits of setting this up (&amp; the additional storage required to store said hash tables) vs. just having the application read the current state of the filesystem when it loads the particular branch of the directory tree it’s currently working with. Our storage volume is ~3.1PB in size (with many thousands/millions of small files in some directory tree branches) and the separate storage of entire filesystem state in a Hash Table could take up multiple Gigabytes (not to mention the very long initial scan of the filesystem to initialize this hash table). Please let me know if I’ve misunderstood the intention here.</p></li>
+<li><p>Using Golang for the backend/APIs/daemons/etc. is acceptable, along with Python as needed. Using “C” for lower level operations should be fine as well, but it’s also perfectly acceptable to have the application make a call to the getfacl and setfacl commands in the background as needed rather than trying to mess with super low-level filesystem APIs. Javascript for the frontend development is acceptable, and any major JS libraries (jQuery, React.js, Angular, etc.) can be used as well as long as they can be packaged with the application (ie. no calls to external CDNs to load Jquery; it needs to be self-hosted within the application itself).</p></li>
+</ol>
+</section>
+<section id="id6">
+<h2>[23 February 2025]<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p><strong>I responded to the above email with the following respose:</strong></p>
+<p>I think proceeding with the second approach would be preferable. It nearly fits with the current implementation and would be more productive.</p>
+<p>In answering the first question, I would need to weigh the comparison between the hashes approach and reading the current state while working on the lower-level system design. I understand the constraints now about our massive amount of storage, and I will address it in the next deck. One of my ideas for this purpose is Event-Driven Architecture, where all the changes would be pushed into the messaging queue for the backend to read and note. Here, RabbitMQ or Apache Kafka can be used. Let me know what you think about this.</p>
+<p>For the second point, I will surely keep those things in mind. I will ensure that we avoid the lower levels of the file system API as much as possible. Also, since the front end will be shipped with the application, I will ensure that we don’t use CDNs.</p>
+<p>In summary, I will develop an updated mid-level combined with a lower-level system design now and send the deck, and then I can start writing the code.</p>
+</section>
+<section id="id7">
+<h2>[26 February 2025]<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p><strong>Robert had the following comments on my response:</strong></p>
+<p>Regarding all of the details about the hash tables vs. Event-Driven Architecture, I can see benefit for having EDA set up monitoring the status of requests made by an end user (lets say a user submits a cascading permissions change request that will take hours to complete due to the number of files that need to be changed; this would allow for the application to provide some sort of status/progress update regarding the request until it completes), but I’m not sure that it should be used as an attempt to see all changes taking place on the filesystem in general since these could occur in large quantities for multiple reasons (computational jobs on the research cluster creating new files and immediately adjusting permissions as part of the job’s process, for example) and would be very costly to track vs. just reading the current state as-is when a query about a directory/file is made through the application.</p>
+<p>If you do feel that including EDA is still worthwhile for the project, then either RabbitMQ or Apache Kafka sound fine to me &amp; you’re free to use whichever one you’d prefer to work with.</p>
+</section>
+<section id="id8">
+<h2>[27 February 2025]<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p><strong>Here is my response to Robert’s comments:</strong></p>
+<p>I have realized that I need to do some calculations from my side. The reflection through reading the current state would work fine and be simple enough, but it depends on the volume size. If we have a million files with us, then reading the whole state after a change is challenging and time-consuming. Even if we manage to update the user only with the updates, it would be hard if the user has access to a lot of files and a big permission change has been made.</p>
+<p>I liked the concept of giving a status update to the user if there is a big update from their side. It would definitely improve the user experience and can be done with EDAs. RabbitMQ would be preferable since it’s lightweight and simpler in design than the more heavy, advanced capabilities of Kafka, which we would not need.</p>
+<p>One mechanism I am currently working on is mirroring the file structure and permissions into a memory-based cache like Redis. Here, all the changes made on the primary file servers would be reflected in the permissions and structures. I am aware of the drawbacks: more storage is required for this, but since it has a very high write and read speed, the user can access the structure faster. (In case the user is reloading repeatedly, it must not put load on the file server.)</p>
+<p>More precisely, when the user triggers a huge permission change affecting 10,000 files, the file server updates it, provides status through EDA, and serves the user. Once the big change is made, the file server updates Redis through notification, and the user dashboard updates with Redis content. Now, the user can log in and reload any amount of time; the file server is not affected.</p>
+<p>I am currently working extensively on these calculations since we will not be able to make many changes in the advanced stages of the project.</p>
+</section>
+<section id="march-2025">
+<h2>[1 March 2025]<a class="headerlink" href="#march-2025" title="Link to this heading">¶</a></h2>
+<p>Robert’s response on my last email:</p>
+<p>By “If we have a million files with us, then reading the whole state after a change is challenging and time-consuming” are you referring to reading the state of the entire filesystem, only the directories/files that were updated during that particular transaction, or just the active working directory currently being viewed by the end-user in the application (regardless of whether there were changes in its subdirectories being performed as part of the latest transaction)? I personally think that if a user gets so many files into a single directory (no subdirectories) that it’s causing an issue for the underlying filesystem to read the state of that directory then it’s a data-management/organization issue on the end-user’s side of things &amp; they should interpret the overall slowness as a reason to better organize their data for faster performance (which is out of scope for this GSoC application to rectify).</p>
+<p>Additionally, while it is definitely important to make sure that the application makes only reasonable calls to the underlying research filesystem for information when needed so that it doesn’t bog it down with unnecessary requests, it shouldn’t be left to the application to always assume that it must handle its own filesystem state caching process as opposed to just making requests from the filesystem directly when necessary. In our particular case, our underlying storage system is already making use of dedicated metadata servers so that the actual data storage node is only being accessed when the research data itself needs to be retrieved/written; running commands like ls,chmod,getfacl,etc. are fine &amp; usually do not take that much time to complete for simple non-recursive lookups (though they can take at least a few hours if working recursively to apply changes on a large set of data, like if a researcher decides to recursively make a change to their entire /labs/mylab/ directory, but this is anticipated due to the sheer quantity of changes that would need to be made), and it would be acceptable to us to just have the application perform direct queries from the filesystem using standard APIs or commands like ls and getfacl since we have already tuned our underlying storage infrastructure to handle this at reasonable speeds in most circumstances; the GSoC application doesn’t need to be aware of our metadata servers specifically, because any interaction with the filesystem that requires their use is transparently passed along to the metadata servers when needed.</p>
+<p>This may be one of the parts of the overall application that you’d consider modularizing, having modules available that could interact with the managed filesystem in different ways (ie. a module that just does direct access via common filesystem commands/APIs as previously mentioned, another module that can perform the type of filesystem tree caching/internal tracking as you’ve proposed and mentioned you are looking into, and any future modules that might be written by other institutions to better integrate with their specific set-ups) but provides a standardized API that is used by the application so that deployment sites can select the module that best fits their needs. Some sites may have smaller sets of standalone file servers where having the GSoC application store metadata makes sense &amp; would be beneficial to reduce strain on their systems, while others like us already have this resolved in our general storage system structure &amp; would prefer to not need to dedicate additional storage just for the app’s own internal cache.</p>
+</section>
+<section id="id9">
+<h2>[3 March 2025]<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<p><strong>My response on Robert’s comments:</strong></p>
+<p>Okay, all the above instructions and requirements are clear to me. It seems reasonable, and the Redis idea can be added as a module and developed in later stages.</p>
+<p>As Robert sent in the last emails, I have reviewed the current BMI architecture in detail. The big question is: How much is BMI’s current implementation willing to change?</p>
+<p>I know that the fewer the changes, the better the would be for installation on BMI infrastructure, so I want to make sure I work hand in hand with the current implementation.</p>
+<p>Currently, we have an OOD web GUI hosting server and computational job nodes physically connected to storage clusters. We also have LDAP for authentication and management. Since I was told about the current functionality, I can visualize how the configurations may look at a high level.</p>
+<p>I am planning to replace the current OOD server with our backend server, which will serve the GSoC Project frontend to the user, provide computing access/permissions, schedule jobs for the computational nodes, and more.</p>
+<p>We would consider computational nodes and storage clusters hidden and packaged together like a single interface. The storage operations can be performed with Slurm Jobs in the computational nodes, which would be an abstraction.</p>
+<p>Now, we need a mechanism for the access controls that can handle millions of file permissions and 100s of users with fast read and write performance. For this, I am thinking about using LDAP and PostgreSQL in parallel. I want to give a scenario here:</p>
+<p>Think we have Bob as a user. Bob is an intern working with Alice (senior project manager). Alice has access to /lab/alice/biomechanics/confidential/secret.txt, and Bob has his own /lab/bob directory. Suppose Bob is provided access to /lab/alice/biomechanics/confidential/secret.txt. The mechanism I am considering looks like this: First check if Bob has access to /lab: No. Then check if Bob has access to /lab/alice: No. Go on and on; Bob has no access to /lab/alice/biomechanics/confidential. Finally, check for  /lab/alice/biomechanics/confidential/secret.txt, and yes! Bob has the access, and he can work with it.</p>
+<p>Now, this algorithm allows us for nested permissions: if Bob beforehand had access to  /lab/alice/biomechanics, then he must have access to  /lab/alice/biomechanics/confidential/secret.txt and can continue with even reaching check for /lab/alice/biomechanics/confidential/secret.txt</p>
+<p>As per my analysis and comparison with PostgreSQL, LDAP has merits and demerits. It boils down to the performance, so we will use LDAP for higher-level permissions like directories/lab/alice/biomechanics|r (so it has read permission). Hence, if  /lab/alice/biomechanics has 100K files, we don’t care; Bob will have access to each of them (all the access requests would be pushed to computational nodes for processing). But for fine-grained permissions like /lab/alice/biomechanics/confidential/secret.txt, we would check PostgreSQL since there might be 10K of such files in them and PostgreSQL is good for this (additionally, Redis can be used here to cache frequently access files for faster performance).</p>
+<p>So now the process becomes simple for LDAP to just check for directories and subdirectories: they would be sure less than the number of files by a huge number and will provide optimal performance here. Also, the updating process becomes simpler. If Bob has access to /lab/alice/biomechanics/confidential/secret.txt and has been told to give access to Aditya, the backend will verify the permission and then update the database.</p>
+<p>LDAP would also be used to check various parameters, from basic stuff like whether the user exists to advanced roles like “Is the user allowed to provide his access to other users?”</p>
+<p>Now, this architecture allows us to have centralized permission and ACL in one place, computational and storage jobs in one place (so we can name them two major packages). Frontend would also be one package (optional for big clients since they have standard APIs, but we would be building a default one) and create optional modules that other developers can build in the community, which would be plug-and-play.</p>
+<p>I am not going into the details of the actions that computational nodes would take—they are pretty straightforward and just need designs and approvals.</p>
+<p>Let me know what you think about this.</p>
+<p>After this, I will provide a lower-level system design. Should I start writing the GSoC proposal, where I can propose the updated ideas one by one and adapt them to your requirements and instructions? This will allow me to write the proposal simultaneously, have a standard format for proposing updates rather than writing long emails, and version documents.</p>
+<p><strong>On the same day, I got response from Robert:</strong></p>
+<p>BMI’s current cluster infrastructure architecture will not change; what we would do is set up a new server (very likely a VM) for the GSoC application to run on &amp; would expose the front-end via appropriate methods (likely via an existing reverse-proxy system) to make it accessible to end users (which could be a sub-url on an existing domain, so it’s important that the application supports running from a reverse-proxy address like “https://cluster.example.edu/datamanager/” or similar, since the base “https://cluster.example.edu/” page may be a landing page with links to various things like the job submission system, a help/documentation system, and now the permissions management system).</p>
+<p>Attempting to have this GSoC data permissions management application also handle cluster job submissions is out of scope, as there are already applications for this (Slurm, SGE, PBS/Torque, Moab, etc. for the job queueing, and Open OnDemand for the job front-end interaction via GUI). It’s also not desirable for the application to require an underlying system like Slurm/Torque/etc. since there’s a possibility this application may be deployed at a smaller scale depending on an end-user’s needs (we’re planning a central deployment within our department, but a small independent team may have just a single server or two without full job scheduling systems &amp; want to deploy this application directly on them to help manage their local filesystems - this should still be supported by the GSoC application).</p>
+<p>If this application is using PostgreSQL/Redis/etc. for its own internal purposes (caching, state management, etc.) then that’s fine, however note that when deployed it will be adjacent to and not part of the data-access pipeline for the underlying filesystem; the computational nodes will access the filesystem &amp; its data via standard existing methods, with the node/filesystem validating access permissions using the combination of standard POSIX &amp; extended Linux ACLs applied to the directory path being accessed. They will not be making separate calls out to a PostgreSQL database to do a custom permissions lookup, as that would imply they’re accessing the filesystem/data via some sort of middleware layer that controls access to the filesystem &amp; is performing those lookups.</p>
+<p>If you want to start writing the GSoC proposal I think that’s fine, but I need to defer to Mahmoud to confirm as he has more familiarity with the GSoC program than I do &amp; is more familiar with the overall GSoC process. I would definitely recommend making sure the scope of the project is understood before writing the final proposal, as from our recent emails I worry that there’s more potential for scope-creep with this project than had been anticipated &amp; it could inadvertently lead to development time spent focused on things that are actually out of scope of the main goal.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="../progress-report.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Progress Report</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Aditya Patil
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Progress Report for ACL Management GSoC Project</a><ul>
+<li><a class="reference internal" href="#february-2025">[9 February 2025]</a></li>
+<li><a class="reference internal" href="#id1">[10 February 2025]</a></li>
+<li><a class="reference internal" href="#id2">[12 February 2025]</a></li>
+<li><a class="reference internal" href="#id3">[13 February 2025]</a></li>
+<li><a class="reference internal" href="#id4">[18 February 2025]</a></li>
+<li><a class="reference internal" href="#id5">[22 February 2025]</a></li>
+<li><a class="reference internal" href="#id6">[23 February 2025]</a></li>
+<li><a class="reference internal" href="#id7">[26 February 2025]</a></li>
+<li><a class="reference internal" href="#id8">[27 February 2025]</a></li>
+<li><a class="reference internal" href="#march-2025">[1 March 2025]</a></li>
+<li><a class="reference internal" href="#id9">[3 March 2025]</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>

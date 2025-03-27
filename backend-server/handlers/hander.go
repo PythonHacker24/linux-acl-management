@@ -148,7 +148,7 @@ func SetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "{'currentDir': %s}", newDir)
 }
 
-func GetFile(w http.ResponseWriter, r *http.Request) {
+func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
 	username, err := authentication.GetUsernameFromJWT(r)
 	if err != nil {
 		http.Error(w, "Failed to get username from JWT Token", http.StatusUnauthorized)
@@ -205,6 +205,10 @@ func GetFile(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(fileList); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func GetFile(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func UploadFile(w http.ResponseWriter, r *http.Request) {

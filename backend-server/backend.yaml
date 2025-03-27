@@ -8,3 +8,9 @@ servers:
     address: "127.0.0.1:5555"
   - name: "server3"
     address: "127.0.0.1:6666"
+
+operations:
+  - read: false
+  - write: false
+  - delete: false
+  - update: false
