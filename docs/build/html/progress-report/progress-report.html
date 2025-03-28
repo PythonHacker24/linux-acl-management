@@ -469,6 +469,161 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>In the case where there’s multiple different servers in an orchestrated deployment serving their own unique filesystem, it’s possible that all of their filesystems may be mounted on the backend server such that they’re accessible simply by navigating to a specific directory (ie. /mnt/server-1, /mnt/server-2, etc.) and I would hope that the end-user administrator deploying the software would configure it to match how their users expect to see the filesystems on their network. As such, I don’t think any special options need to be added to the application to explicitly choose a server, as this should be implicit based on the path of the file that the user’s navigating to.</p>
 <p>I do see where this may be of use for a site that’s aiming to have a single deployment of this software which supports multiple different departments at once as opposed to each individual department having their own deployment, but I wouldn’t worry about that too much for this initial phase &amp; it can always be a future improvement that’s made if needed.</p>
 </section>
+<section id="id17">
+<h2>[22 March 2025]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<p><strong>I started a new thread as per Mahmoud’s instructions and started with the following question:</strong></p>
+<p>Initially, I thought I would retrieve the files and data through the daemons themselves through a network connection (precisely, through gRPC calls). Although the last email by Robert mentions that there would be mounted filesystems from the Linux File Storage Servers like /mnt/server-1, /mnt/server-2, etc. Since this is something we expect the user to set up and is out of the scope of the application, I will specify this in the documentation of the project.</p>
+<p>Coming back to the displaying of the file system, since we would be using locally mounted volumes of those Linux File Storage Servers, I would list all of the files recursively in /mnt/server-1, /mnt/server-2, etc. (this would be configured by the user in config.YAML file for us). The user will see all the content listed on the portal and can navigate to any file.</p>
+<p>For example,  /mnt/server-1 has test-1/ test-2/ and test-3/ directories, and /mnt/server-2 has test-4/ test-5/ and test-6/. The user will see:</p>
+<p>test-1/
+test-2/
+test-3/
+test-4/
+test-5/
+test-6/</p>
+<p>listed on the front-end. If they select test-4/, the backend session would automatically consider it to be in /mnt/server-2 and list the contents to the user. This will abstract the /mnt file system from the users. Abstracting files /mnt that exists in backend servers also allow us to cease access to /mnt as whole from the user to lay the base for preventing Unauthorized Access Attacks, like user’s using the APIs from the fronted to list files with directory path: “../../root/*” and listing files.</p>
+<p><strong>More questions by me:</strong></p>
+<p>I also have one more question that came to me while I was writing the code for the file interaction handlers in the prototype: What file operations are users allowed to perform? Currently, I am thinking about 4: Get File, Upload File, DeleteFile, and UpdateFile. Does that sound good, or do we need more? also, are we providing a feature in the frontend to edit some files (like text files) on the frontend itself with an inbuilt text editor? in that case, the update file would do the updates with a .diff file send to the backend to patch the old files - where the mechanism will look like git.</p>
+<p><strong>I had questions about the proposal:</strong></p>
+<p>Here is the updated proposal for the project. It has been updated until yesterday’s work on the prototype repository.</p>
+<p>Since the prototype codebase is growing daily, it’s hard for me to keep track of everything in the proposal, which will eventually slow down the process. So, I need a point to finalize the proposal and submit it on the GSoC portal before 8 April (the final day of submission).</p>
+<p>The prototype would be worked on even after the proposal submission, and I would work on getting the components ready for the final project to speed up the development during the official project (which means more time for those extra features during the GSoC period).</p>
+<p><strong>On the same day, Mahmoud instructed to get started with documenting the process and thus, this site was deployed with Sphinx Docs:</strong></p>
+<p>From an administrative perspective, daily updates to your project proposal are not required. However, I strongly recommend maintaining continuous communication regarding any modifications or developments to the codebase. Please notify us promptly whenever changes are implemented, as this will enable Robert to provide timely feedback and ensure alignment with project objectives prior to potential deviations.</p>
+<p>You should send us your finalized proposal by April 5th to allow sufficient time for review before final submission.</p>
+<p>Documentation Notice:
+Thorough documentation (this is separate from the proposal) carries equal priority to functional code. I advise implementing the following protocol:</p>
+<ul class="simple">
+<li><p>Maintain daily documentation of all development activities and code changes (Would also be nice to include your mistakes and lessons learned for other students)</p></li>
+<li><p>While routine sharing is unnecessary, full documentation must be submitted to me directly prior to each evaluation milestone.</p></li>
+</ul>
+<p>Please note that Robert will conduct separate technical evaluations of the codebase. This documentation will serve as critical supporting material during assessments.</p>
+<p><em><strong>Upon this email, I started building the docs for changelogs and kept working on the prototype and proposal</strong></em></p>
+</section>
+<section id="id18">
+<h2>[24 March 2025]<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<p><strong>Robert’s response on my earlier queires about CRUD operations:</strong></p>
+<p>Sorry for the delay in my response; I want to quickly circle back to a question you had earlier in this email thread:</p>
+<p>I also have one more question that came to me while I was writing the code for the file interaction handlers in the prototype: What file operations are users allowed to perform? Currently, I am thinking about 4: Get File, Upload File, DeleteFile, and UpdateFile. Does that sound good, or do we need more? also, are we providing a feature in the frontend to edit some files (like text files) on the frontend itself with an inbuilt text editor? in that case, the update file would do the updates with a .diff file send to the backend to patch the old files - where the mechanism will look like git.</p>
+<p>For the base aspects of this project, direct file operations to view/edit/modify the file’s contents (including uploading files &amp; deleting files) rather than the ACL permissions metadata are out of scope but can certainly be available either as a plug-in or built-in but with a toggle to enable/disable these features in the application; at this time I’d prefer to not allow for file uploads/downloads through the application when deployed in our infrastructure (we have a dedicated file transfer system to alleviate congestion on the standard network links, &amp; I’d not planned to deploy the GSoC app on this as the backend server) but it’s always a future possibility so having the option to enable/disable those features would be nice.</p>
+<p><strong>The cleared a lot for me and I started to focus on ACL rather than CRUD at this stage:</strong></p>
+<p>That clears a lot, Robert. I would like to keep the CRUD operations as a built-in feature but disable them by default. I will work on this after the base implementation of ACL management is completed.</p>
+<p>To sum up, we need an ACL system rather than a file management system for the base project. I will just remove the /mnt part since we needed it for CRUD operations only, and permissions are completely managed by the daemons.</p>
+<p><strong>At this point, I was working on session management code and had following concerns about the working directory:</strong></p>
+<p>Robert, I have a question. If I don’t consider mnt/ now and have “n” number of file servers running file server daemons, how would the user select which server to fetch and navigate files to? How should I list the files in this case (now we are rolling back to the question I had earlier in the other thread where I asked about listing servers (the email where I your response had mnt/ mentioned)).</p>
+<p>So for example, I have this structure defined:</p>
+<p>type Session struct {
+Username            string
+CurrentWorkingDir   string
+Expiry              time.Time
+Timer               *time.Timer
+TransactionQueue    *list.List
+Mutex               sync.Mutex
+}</p>
+<p>I call this a session. So CurrentWorkingDir contains the directory of the user (also the page the user will see on the frontend with the files listed). Now, since I have an “n” number of servers with names like “server-n,” should I list the servers and then start with following the CurrentWorkingDir (as configured, for example, /lib/)? or is there any other way?</p>
+<p>According to this structure, when the user calls the GET /list-files, the “ls” equivalent of the function is run on the Session.CurrentWorkingDir and content are returned to the backend (and then to frontend for listing).</p>
+<p>In the earlier assumption of /mnt and doing CRUD, I used to initialize /mnt/ (as configured in backend.yaml) as default and then when user would call , would call GET /list-files, contents of /mnt/ would be listed i.e. server-1/ server-2/ … etc.</p>
+</section>
+<section id="id19">
+<h2>[25 March 2025]<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<p><strong>Robert’s response on my questions:</strong></p>
+<p>I’d recommend going ahead and keeping the previous functionality where it can access /mnt (or any other base directory as specified by the system administrator) even if the other aspects like file-content manipulation isn’t taking place/enabled within the application.</p>
+<p>Essentially, consider that the following scenario will be present on the server running the GSoC application’s backend process: the system administrator will have a parent directory (ie. /mnt or similar, like /labs) where all the filesystems/file servers being managed by the instance of the GSoC application are mounted and accessible to present the view of it all being a single filesystem tree, which should mirror how the filesystems are seen on the computational nodes (and other systems) within the network so the end-user should already be familiar with it. If they know that the file they’re trying to set permissions on is at /labs/alab/mystuff/file.txt, then it doesn’t matter which physical server it’s on because they’d just be accessing it via that common path structure.</p>
+<p><strong>Here, a turning point discussion started related to /mnt and different filesystems:</strong></p>
+<p>So this means that /mnt should be present whether CRUD is enabled or not. The /mnt would have /server-1, /server-2, etc., which are mounted, and each of them has our daemon ready. The structure of files inside /server-1, /server-2, etc. will just be used for getting the file tree and listing those files on the frontend portal. When the user selects a file and attempts to update the permissions, it goes through the backend server and into the daemon. The daemon updates the permissions and is done.</p>
+<p>But I have a few concerns and thoughts: if a user wants to use only to deploy this with ACL management and not CRUD operations, mounting the volume of Linux File Servers would be a lot of work. If they had a lot of rules in their internal network, it would have been more challenging for them. Also, mounting would be overkill since they are only concerned about ACL. If the user needs CRUD enabled, then I can understand we can expect users to go through the mounting process.</p>
+<p>What I am thinking is that the daemon can list files and modify permissions, and the user wouldn’t need to set up /mnt. Users can select server-1, server-2, etc., and then choose one and list its files and directories.</p>
+<p>Also, if we need to mask the server names, we can list them in this way:</p>
+<p>content of server-1
+content of server-2
+… etc.</p>
+<p>for example, server-1 has /lab which contains test-1.txt, test-2.txt, test-3.txt, etc. and server-2 has /lab which contains test-4.txt, test-5.txt, test-6.txt, etc. So users on the frontend would see:</p>
+<p>/lab/test-1.txt
+/lab/test-2.txt
+/lab/test-3.txt
+/lab/test-4.txt
+/lab/test-5.txt
+/lab/test-6.txt</p>
+<p>All are listed one by one, and users can select any of them. This list of files would be fetched from the daemons with no /mnt required. In the case of CRUD being enabled, the download button will request the backend to get the file, which the backend will fetch from /mnt. So, we can mention this in the documentation.</p>
+<p><strong>Robert addressed my concerns:</strong></p>
+<p>I think the source of confusion might be that we both have slightly different ideas about the underlying storage filesystem’s layout, and I’ve been approaching this from the perspective of BMI: while we have multiple storage servers, the end users don’t need to know/care about this because the filesystem’s already acting as an abstraction layer &amp; users just see a file at /lab/test1.txt, without needing to know that particular file resides on server Storage1.bmi.emory.edu while /lab/test2.txt resides on server Storage2.bmi.emory.edu. In short, it’s many file servers but only one file system. I can definitely see where institutions that have multiple servers each with their own unique filesystem might need a way to distinguish between servers in the GSoC application, so I leave it to you to determine how you’d like to manage this in the application; I have no particular preference as long as it’s intuitive to the end-user.</p>
+<p>If the daemon can list files and modify permissions, I would presume that it too has access to the filesystem which is why I’d mentioned having /mnt present on the backend server even if not doing CRUD operations.</p>
+<p><strong>At this point, I studied the BMI’s infrastructure once again and circled BeeGFS:</strong></p>
+<p>So I thought about this for a while, and I am the following interpretation: The BMI’s network is running BeeGFS, so we have a unified filesystem which is managing all the data. /lab/text1.txt and /lab/text2.txt can be on any server (server-1 or server-2) and is completely abstracted from the user. Now I will consider that the backend server has /mnt/file-system mounted from which I can access all the data. I will still see /mnt/file-system/lab/text1.txt and /mnt/file-system/lab/text2.txt in them. The users will also see it in this way. But now Prof. X want to change the permissions for /mnt/file-system/lab/text1.txt so they interact with the frontend to initiate the changes, which goes to the backend, which resolves the place where /mnt/file-system/lab/text1.txt resides on physical servers and contacts it’s daemons to modify the file permissions.</p>
+</section>
+<section id="id20">
+<h2>[26 March 2025]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<p><strong>At this point of time, the discussion about various filesystems was started. I considered BeeGFS to be the point of interest at this point. I did extensive research on BeeGFS and it’s structure. Robert had following comments:</strong></p>
+<p>This looks very close, and I believe we’re thinking along the same path but just want to make sure; the below workflow is what I know would be needed for BMI’s storage network, assuming all the separate modular daemons discussed previously are incorporated into the application design:
+Prof. X wants to change permissions on /labs/xlab/project1.txt
+Prof. X accesses frontend to initiate changes.
+Frontend sends request to backend orchestration/management daemon.
+Backend daemon sends the request to the ACL modification daemon.
+Server running ACL modification daemon has access to /labs/xlab/project1.txt mounted path.
+ACL modification daemons apply requested changes &amp; return result to backend daemon.
+Backend daemon reports request status to fronend for display to end-user.</p>
+<p>I’d not considered it relevant at the time since this project shouldn’t depend on the underlying filesystem, but I’m now realizing that it may be important to mention to aid in understanding BMI’s structure: due to our use of BeeGFS for the top-level filesystem accessed by our systems, we <em>can’t</em> just modify data directly on the physical storage server that it resides on; it must be accessed through the BeeGFS client (or a NFS share that’s just sharing out a mountpoint from the BeeGFS client, in cases where it’s not desirable to install the full client on the system) so that the overall filesystem structure is intact. While there are ways to identify the specific server a file’s on in cases of low-level troubleshooting, it’s not necessary in normal circumstances &amp; definitely dangerous to modify the file outside of the virtual mountpoint presented by the BeeGFS client; for example, the file “/labs/project1.txt” may physically exist on the server “Storage2” at the following path (which I should mention does not contain any file metadata; BeeGFS stores that on a separate metadata server with an equally obtuse path): /zfspools/tank10/beegfs_storage/chunks/u3DBB8A4E/67C5/C/2F3-67C5C821-2/68-67C5D14C-2</p>
+<p>In short, all filesystem access/modification will eventually be performed through the mounted BeeGFS filesystem, so from the perspective of the server running the ACL modification daemon this filesystem will need to be mounted &amp; available for changes to take place.</p>
+<p>**So I went deeper into BeeGFS and starting building the testbench around it in a docker environment for testing purposes. So I had the following follow ups for the last email: **</p>
+<p>I did some research on BeeGFS structure and how our GSoC application could be made compatible with it. I am listing my interpretations here and some of my takes:</p>
+<p>First is the front-end listing of the files. The backend server would have /mnt/beegfs, which is connected to the whole BeeGFS file system (as a client) and can list all the files from it.</p>
+<p>The users see files via our front-end portal and select the file path from it, such as project3/fileC.txt.</p>
+<p>The data: project3/fileC.txt arrives at the backend. The backend will query the BeeGFS metadata server about /mnt/beegfs/project3/fileC.txt (i.e. prepended “/mnt/beegfs” to the file path) to find which server has this file. The metadata server returns server-2.</p>
+<p>So we contact the server-2 daemon and ask it to change the permissions for /mnt/beegfs/project3/fileC.txt, which it can do. Since it’s going via the mount path, BeeGFS shouldn’t have any issues with it; it will just have a successful file permission change.</p>
+<p>Here is the visual representation of the algorithm:</p>
+<p><img alt="algorithm" src="../_images/algorithm_26-march.png" /></p>
+<p>I am writing a test bench for simulating BeeGFS on docker-compose, which deploys a BeeGFS management server, a metadata server, three storage servers, and one client-server (which has the whole BeeGFS mounted to its/mnt) (all Ubuntu docker containers). This testbench would be useful to me while testing the application on my local system. [I will add this to the proposal, too.]</p>
+<p>This GSoC application would start as a permission management toolkit for BeeGFS-based systems (we can provide more compatibility in the future).</p>
+<p>Now, since this requirement changes a lot about daemon and backend interaction (and also the file listing), I would have to include this in the earlier sections of the GSoC proposal and then document the prototype progress. So now I will temporarily hold the prototype development and will focus on getting the proposal ready before 5 April. After that, I can continue developing and preparing these modules before the final project.</p>
+<p><strong>This is the turning point where I realized that building this project specifically for BeeGFS is out of the scope, even if BeeGFS is an intergal part of BMI’s infrastructure. BMI has multiple filesystems and they want to keep the application independent of the filesystems. This was the moment where major changes in the proposal was initiated:</strong></p>
+<p>Focusing specifically on BeeGFS is going off-track &amp; out of scope for the project. This GSoC application should be independent of whichever underlying filesystem is in use for the data storage, with the only requirement being that it supports Linux ACLs (as the goal of this project is to be a GUI for managing those ACL permissions, so it wouldn’t make sense to deploy on a filesystem that doesn’t support that; otherwise, the app should work on any filesystem regardless of if it’s ext4, XFS, ZFS, btrfs, BeeGFS, Lustre, GlusterFS, etc.).</p>
+<p>Trusting that the filesystem(s) mounted on the GSoC backend server (or other servers running the GSoC daemons that will actually modify the ACLs) will handle the appropriate steps necessary for their particular structure when issued a request to update the ACLs is all that matters; in the case of BeeGFS for example, the GSoC app shouldn’t need to directly interact with the metadata servers because just taking an action on the file at /mnt/beegfs/labs/testfile.txt will already handle the necessary communication with the metadata &amp; storage servers behind-the-scenes. There’s no need to specifically code the app for BeeGFS compatibility, because it appears as any other filesystem to the backend server &amp; will support the necessary system calls like those used by getfacl/setfacl.</p>
+<p>In short, the BeeGFS servers running beegfs-meta.service/beegfs-server.service are to be considered as black boxes and out-of-scope since they can’t even access the data they’re storing safely without beegfs-client.service running on them; for all intents &amp; purposes the GSoC backend server (or the server running the ACL modification daemons, if we choose to have that separate from the orchestration/management backend server) should be considered the “storage server” because it will have access to the filesystem since we intend to configure &amp; set up the beegfs-client.service SystemD service on it.</p>
+</section>
+<section id="id21">
+<h2>[27 March 2025]<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<p><strong>Here, I needed to rise abobe BeeGFS and study filesystems like NFS which differ in ACL managements. So I proposed the following in context to BeeGFS:</strong></p>
+<p>Okay, so I need to revert from the previous assumptions of BeeGFS. I went through its path since I remembered BMI is using BeeGFS and the /mnt was mentioned, which led me to that path. I am trying to be as close to BMI’s requirements as possible and will try not to divert from that.</p>
+<p>As I can interpret, modifying permissions for /mnt/beegfs/labs/testfile.txt will automatically update the ACL permissions all over the filesystem, and we shouldn’t worry about how it happens since BeeGFS is already handling it (or any other filesystem would have the provision to handle it). I am assuming that  /mnt/beegfs/labs/testfile.txt is mounted to the backend server (please correct me if I am wrong here).</p>
+<p>But if this can be done by just modifying ACLs (with commands like getfacl and setfacl) on a path like  /mnt/beegfs/labs/testfile.txt and we can achieve control over permissions, what would be the purpose of the file server daemons?</p>
+<p>Here is the diagram of the design I am imagining:</p>
+<p><img alt="updated_algorithm" src="../_images/algorithm_27-march.png" /></p>
+<p>**Robert had the following comments: **</p>
+<p>“As I can interpret, modifying permissions for /mnt/beegfs/labs/testfile.txt will automatically update the ACL permissions all over the filesystem, and we shouldn’t worry about how it happens since BeeGFS is already handling it (or any other filesystem would have the provision to handle it). I am assuming that  /mnt/beegfs/labs/testfile.txt is mounted to the backend server (please correct me if I am wrong here).”</p>
+<p>For our particular implementation, the above statement’s correct. For all intents and purposes, the backend server would be the same as the fileserver because of how BeeGFS works &amp; the capability of a BeeGFS-client-based mount to fully manage ACLs.</p>
+<p>“But if this can be done by just modifying ACLs (with commands like getfacl and setfacl) on a path like  /mnt/beegfs/labs/testfile.txt and we can achieve control over permissions, what would be the purpose of the file server daemons?”</p>
+<p>Deployments that rely heavily on NFS or make use of it in some way would need to have daemons on the file server itself to manipulate ACLs; a mounted NFS share is one of those filesystems that <em>can’t</em> handle ACLs directly (so even if mounted to the backend system, it wouldn’t work properly for ACL management), though in our experience as long as the ACLs are set directly on the NFS server it will still respond with the proper access response to a remote client that’s mounted the NFS volume.</p>
+<p>Basically, a mountpoint that requires NFS (so, likely any server that’s using a standard ext4 or XFS filesystem) would need the daemons on the storage system directly &amp; it likely wouldn’t be ideal to have that also be the backend server of the GSoC application unless a deployment site had only the single storage server.</p>
+<p>In typing out this response, I’ve realized that I may have accidentally led you slightly astray in prior emails because I’d forgotten about NFS’s lack of true Linux ACL support &amp; hadn’t considered it during the previous discussions about having the remote volumes mounted. A potential solution, which I think is in-line with what you had asked about previously regarding differentiating multiple storage servers, would be to consider having a configuration .yaml file that contains the base paths of all filesystems being managed by the GSoC application as seen from the backend server (assume that the backend server will have all mountpoints mounted in the same way a user would see them from a shell session on one of the computational cluster nodes, so you’d have things like “/labs” or “/home” or “/opt/special” or similar depending on the filesystems available) and indicates which module/daemon should be used for completing the ACL requests for that base path.</p>
+<p>For example, you might have a “local” daemon that can take direct actions just by calling setfacl on the backend server, and a set of “remote” daemons where you’d configure the address of the server in a daemon-specific nested configuration value per base directory using that daemon in the configuration file &amp; communicate with them via authenticated RPC calls or similar (at which point, the daemon on the remote system would basically act like the “local” daemon and just run setfacl or whatever command’s necessary to complete the request). This could probably also just be a single daemon, defining “localhost” as the address in the configuration file if necessary to use the backend server rather than contacting a separate storage server. There could be more styles than just these 2 needed in various situations (so ideally an administrator could develop their own module as a plugin if they need it to do some extra stuff), but this set of 2 is all I foresee being needed for a deployment within BMI.</p>
+<p>**Upon extensive research and going through Robert’s comments, I went ahead and proposed the following: **</p>
+<p>So now I am considering that the GSoC application, which will be deployed in the BMIs infrastructure, needs to be independent of the underlying filesystem (basically, it must be compatible with BeeGFS and NFS simultaneously at the basic level).</p>
+<p>Here are my interpretations:</p>
+<p>BeeGFS is intelligent when working with ACL permissions, and any changes made with setfacl can be made simply by executing the command in /mnt/beegfs of the backend server. The changes would be propagated through the whole BeeGFS network.</p>
+<p>In the case of NFS, modifying permissions on /mnt/nfs-mount doesn’t change the permissions throughout the filesystem, and we need to update the permissions on the file server itself. For this, the daemon should be used. The daemon on the corresponding file server would edit the ACL permissions locally with setfacl.</p>
+<p>So now we have a hybrid approach here. Whenever a user selects a file and attempts to change its permissions, we first check which filesystem this file belongs to. If it’s BeeGFS, we do it from the backend server without calling any daemon. If it’s an NFS file system, we must contact the daemon to make appropriate changes.</p>
+<p>The diagram for this approach looks like this:</p>
+<p><img alt="updated_algorithm" src="../_images/updated_algorithm-27-march.png" /></p>
+<p><strong>On the same day, we started getting on the same track with the following comments from Robert:</strong></p>
+<p>This looks to be the right track, though I <em>highly</em> recommend that instead of having the application try to autodetect the filesystem type it instead uses a configuration file set by the administrator to know what method it should use for updates to that filesystem; this structure would solve a few things at once:
+Allows the administrator to identify “which” filesystems/top-level directories should be visible/modifiable from the GSoC application (the entirety of the backend server’s filesystem shouldn’t be visible for example, because no one would have a reason to modify things like /etc/… or /usr/local/lib/… on the backend server, so there must be a way to configure which paths are visible in the application to keep the frontend interface as clean-looking as possible without unnecessary system paths).
+Allows the administrator to specify “how” filesystems should be modified (local direct write, local daemon, remote daemon, etc. along with any configuration options needed for those choices like the remote daemon’s hostname/IP address, listening port, and any other relevant options that are necessary).</p>
+<p><strong>So I proposed the following diagram:</strong></p>
+<p><img alt="final_algorithm" src="../_images/final_algorithm-27-march.png" /></p>
+<p>So now, there is a config.yaml file, which looks like (example):</p>
+<p>filesystems:</p>
+<ul class="simple">
+<li><p>path: “/mnt/beegfs/labs”
+method: “local”</p></li>
+<li><p>path: “/mnt/data”
+method: “remote-daemon”
+remote:
+host: “192.168.1.100”
+port: 5001</p></li>
+</ul>
+<p><strong>Robert approved it:</strong></p>
+<p>That diagram looks correct to me, and you can start updating the proposal.</p>
+</section>
 </section>
 
         </article>
@@ -537,6 +692,11 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <li><a class="reference internal" href="#id14">[8 March 2025]</a></li>
 <li><a class="reference internal" href="#id15">[9 March 2025]</a></li>
 <li><a class="reference internal" href="#id16">[21 March 2025]</a></li>
+<li><a class="reference internal" href="#id17">[22 March 2025]</a></li>
+<li><a class="reference internal" href="#id18">[24 March 2025]</a></li>
+<li><a class="reference internal" href="#id19">[25 March 2025]</a></li>
+<li><a class="reference internal" href="#id20">[26 March 2025]</a></li>
+<li><a class="reference internal" href="#id21">[27 March 2025]</a></li>
 </ul>
 </li>
 </ul>
