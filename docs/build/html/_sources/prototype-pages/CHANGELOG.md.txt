@@ -3,6 +3,42 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [dc38cbe] - 2025-03-27
+**Author:** PythonHacker24
+
+### Changes:
+- Completed adding one thread of email
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/dc38cbe6b61c2fda9748077904243a15f8a0abda)
+
+
+## [b84a5fd] - 2025-03-27
+**Author:** PythonHacker24
+
+### Changes:
+- Started progress report building; need comments from Mahmoud
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/b84a5fd836306f0ac4a18d9806315beeee036cb2)
+
+
+## [053ca2f] - 2025-03-23
+**Author:** PythonHacker24
+
+### Changes:
+- Added get file handler with proper JSON output
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/053ca2fbed242c664249e0ff92cda7ec24093c0c)
+
+
+## [58b651d] - 2025-03-23
+**Author:** PythonHacker24
+
+### Changes:
+- Set and Get Working Dir for Session Implemented and Working Direcotry Handlers
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/58b651df2645edfc0897e87a1c9e77c00fdb0998)
+
+
 ## [dae2eaf] - 2025-03-23
 **Author:** PythonHacker24
 

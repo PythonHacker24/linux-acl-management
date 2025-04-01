@@ -302,7 +302,36 @@ In addition, I have been working on deciding the interaction protocol between th
 
 ***After this point, I started working on my GSoC Proposal and interacted with my mentors for feedbacks and updated it as per their recommendations.***
 
+## [10 March 2025]
+
+On this day, I started working on the prototype project and made my first commit. 
+
+[Initialized Project](https://github.com/PythonHacker24/linux-acl-management/commit/1e5749816b2c9a0d005eb7b5903c23849d37d958)
+[Added Makefile](http://github.com/PythonHacker24/linux-acl-management/commit/b4e48782b4754c9c8f96a26341752f7c88639119)
+[Decided to add Slog](https://github.com/PythonHacker24/linux-acl-management/commit/42322c251b655f67d8ed4c914210b5fb9fdca92f)
+
+## [19 March 2025]
+
+I kept working on the prototype and researched on the project for gRPC and Linux daemons. I made commits in the code with the researched information. 
+
+[Added gRPC daemons and connected to the backend with yaml files](https://github.com/PythonHacker24/linux-acl-management/commit/6e062a1586b763c6cebdc4c114925b884eb27d36)
+[Added README.md](https://github.com/PythonHacker24/linux-acl-management/commit/28bc4389c08e7f26f056aff21c5fda89fe7d8a0e)
+[Fixed end of the README.md](https://github.com/PythonHacker24/linux-acl-management/commit/518b12cacae9391d576cd3b6a562121ba6d00cdc)
+[Removed Makefile for now](https://github.com/PythonHacker24/linux-acl-management/commit/5db8f12bc62fe877932116d43b3b5bf5a327d918)
+[Started JWT auth, implemented middleware](https://github.com/PythonHacker24/linux-acl-management/commit/ac37b677f3f76764a49dd737fbfd75e94c5a4b76)
+[LDAP Authentication successful](https://github.com/PythonHacker24/linux-acl-management/commit/0862674a5a04b9d081e43246c7d4eb9157b4046c)
+
+## [20 March 2025]
+
+[Made progress with Session Manager](https://github.com/PythonHacker24/linux-acl-management/commit/0642d7823dd7eb77d8ee5bf879267168b03e63c0)
+[Completed Session Management and successfully tested](https://github.com/PythonHacker24/linux-acl-management/commit/99f0083ed2b9e3dad2421272d25a7aaec4cae39b)
+[Session Manager Completed](https://github.com/PythonHacker24/linux-acl-management/commit/1036e0a4659c05342aac1b3988c333bb459f7b3d)
+
 ## [21 March 2025]
+
+I completed session manager code on this day. 
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/2a34697a069eab2a1a0f5951904da85eefb2fce7)
 
 **I continued with my questions which came during proposal writing and prototyping:**
 
@@ -372,6 +401,22 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 Please note that Robert will conduct separate technical evaluations of the codebase. This documentation will serve as critical supporting material during assessments.
 
 ***Upon this email, I started building the docs for changelogs and kept working on the prototype and proposal***
+
+## [23 March 2025]
+
+Today, I focused on writing more handlers and middlewares for authentication. 
+
+[Added current working directory, intialized handlers and started progress documentation](https://github.com/PythonHacker24/linux-acl-management/commit/423654e60a5d03b324d3bce3787301a0faebf81d)
+[Create main.yml for docs deployment](https://github.com/PythonHacker24/linux-acl-management/commit/87f85acbfda9802b57fea459c52eb30814ae135e)
+[Update main.yml](https://github.com/PythonHacker24/linux-acl-management/commit/58912db01062f2e871bd059bb7c07f7fa0631d1c)
+[Updated docs with Prototype Section and README.md for Progress Docs Link](https://github.com/PythonHacker24/linux-acl-management/commit/2ee3484848272ae479d6dc6471e6be8cc538a37a)
+[Updated docs with prototype section and README.md with updated progress docs link](https://github.com/PythonHacker24/linux-acl-management/commit/f4425d4c3047367e3cd0ee2bd41ce3e13f836455)
+[Added Changelog to the Docs with all commit messages and links to it + automated the process with a Python Script](https://github.com/PythonHacker24/linux-acl-management/commit/aea906b9aacb520fd8c9473502c6fb1429d2f9c3)
+[Update main.yml](https://github.com/PythonHacker24/linux-acl-management/commit/019d3fb86181698826fd21c6a1c5f47585f57406)
+[Handler Implemented for Setting Current Working Directory](https://github.com/PythonHacker24/linux-acl-management/commit/8b858f8191e60d3a5af6228721065a586e92300f)
+[Implemented Set and Get Current Working Directory Handlers and Fixed Auth Middleware](https://github.com/PythonHacker24/linux-acl-management/commit/dae2eaf390a0d6a3426afa86f373442264b7a0e4)
+[Set and Get Working Dir for Session Implemented and Working Direcotry Handlers](https://github.com/PythonHacker24/linux-acl-management/commit/58b651df2645edfc0897e87a1c9e77c00fdb0998)
+[Added get file handler with proper JSON output](https://github.com/PythonHacker24/linux-acl-management/commit/053ca2fbed242c664249e0ff92cda7ec24093c0c)
 
 ## [24 March 2025]
 
@@ -502,6 +547,8 @@ In short, the BeeGFS servers running beegfs-meta.service/beegfs-server.service a
 
 ## [27 March 2025]
 
+On this day, I started writing progress docs as per the instructions of Mahmoud.
+
 **Here, I needed to rise abobe BeeGFS and study filesystems like NFS which differ in ACL managements. So I proposed the following in context to BeeGFS:**
 
 Okay, so I need to revert from the previous assumptions of BeeGFS. I went through its path since I remembered BMI is using BeeGFS and the /mnt was mentioned, which led me to that path. I am trying to be as close to BMI's requirements as possible and will try not to divert from that. 
@@ -571,4 +618,6 @@ filesystems:
 
 That diagram looks correct to me, and you can start updating the proposal.
 
+## [1 April 2025]
 
+On this day, I made the progress docs up to date and ready to update it further during the whole journey.

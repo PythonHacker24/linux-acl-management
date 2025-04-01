@@ -302,6 +302,12 @@ In addition, I have been working on deciding the interaction protocol between th
 
 ***After this point, I started working on my GSoC Proposal and interacted with my mentors for feedbacks and updated it as per their recommendations.***
 
+## [10 March 2025]
+
+On this day, I started working on the prototype project and made my first commit. 
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/1e5749816b2c9a0d005eb7b5903c23849d37d958)
+
 ## [21 March 2025]
 
 **I continued with my questions which came during proposal writing and prototyping:**
