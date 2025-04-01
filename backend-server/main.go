@@ -20,10 +20,11 @@ func main() {
         slog.Error("Error loading config", "Error", err.Error())
     }
 
+    fmt.Printf("Base Path set to: %s \n", backendConfig.BasePath)
+
     // Connecting to File Server Daemons
     for _, server := range backendConfig.Servers {
         fmt.Printf("Loaded gRPC server: Method %s at %s mounted \n", server.Method, server.Path)
-        // fmt.Printf("Remote Configurations: Host: %s at Port: %s \n", server.Remote.Host, server.Remote.Port)
     }
 
     for _, server := range backendConfig.Servers {
