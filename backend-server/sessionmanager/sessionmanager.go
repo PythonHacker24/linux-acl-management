@@ -31,7 +31,7 @@ func CreateSession(username string) {
         Expiry:             time.Now().Add(config.SessionTimeout),
         Timer:              time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) }),
         TransactionQueue:   list.New(),
-        CurrentWorkingDir:  backendConfig.MountPath[0].MountPoint,
+        CurrentWorkingDir:  backendConfig.BasePath,
     }
 
     config.Sessions[username] = session 

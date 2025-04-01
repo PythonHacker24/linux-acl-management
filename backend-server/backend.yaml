@@ -1,16 +1,34 @@
-mount:
-  - mount-point: "mnt/" 
+config:
+  - basePath: "/mnt"
 
 servers:
-  - name: "server1"
-    address: "127.0.0.1:3333"
-  - name: "server2"
-    address: "127.0.0.1:5555"
-  - name: "server3"
-    address: "127.0.0.1:6666"
+  - path: "/beegfs/labs"
+    method: "local"
 
-operations:
-  - read: false
-  - write: false
-  - delete: false
-  - update: false
+  - path: "/beegfs/administration"
+    method: "local"
+
+  - path: "/labs-data"
+    method: "remote"
+    remote:
+      host: "127.0.0.1"
+      port: 3333 
+
+  - path: "/admin-data"
+    method: "remote"
+    remote:
+      host: "127.0.0.1"
+      port: 5555
+
+  - path: "/test-data"
+    method: "remote"
+    remote:
+      host: "127.0.0.1"
+      port: 6666
+
+
+# operations:
+#   - read: false
+#   - write: false
+#   - delete: false
+#   - update: false

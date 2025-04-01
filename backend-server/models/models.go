@@ -11,28 +11,23 @@ type HealthResponse struct {
     Status string `json:"status"`
 }
 
-// ServerConfig represents a single gRPC server in the YAML
-type ServerConfig struct {
-	Name    string `yaml:"name"`
-	Address string `yaml:"address"`
-}
-
-type Mount struct {
-    MountPoint string `yaml:"mount-point"`
-}
-
-type Operation struct {
-    Read    bool    `yaml:"read"` 
-    Write   bool    `yaml:"write"`
-    Delete  bool    `yaml:"delete"`
-    Update  bool    `yaml:"update"`
-}
-
-// Config represents the entire YAML structure
+// Contains complete configurations from YAML file
 type Config struct {
-    MountPath   []Mount         `yaml:"mount"` 
-	Servers     []ServerConfig  `yaml:"servers"`
-    Operations  []Operation     `yaml:"operations"`
+	BasePath string   `yaml:"basePath"`
+	Servers  []Server `yaml:"servers"`
+}
+
+// Contains server configurations from YAML file
+type Server struct {
+	Path   string  `yaml:"path"`
+	Method string  `yaml:"method"`
+	Remote *Remote `yaml:"remote,omitempty"`
+}
+
+// Contains remote configurations from YAML file
+type Remote struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
 }
 
 // User struct for login request

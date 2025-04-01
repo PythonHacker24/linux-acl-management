@@ -22,7 +22,8 @@ func main() {
 
     // Connecting to File Server Daemons
     for _, server := range backendConfig.Servers {
-        fmt.Printf("Loaded gRPC server: %s at %s mounted \n", server.Name, server.Address)
+        fmt.Printf("Loaded gRPC server: Method %s at %s mounted \n", server.Method, server.Path)
+        // fmt.Printf("Remote Configurations: Host: %s at Port: %s \n", server.Remote.Host, server.Remote.Port)
     }
 
     for _, server := range backendConfig.Servers {
@@ -52,25 +53,6 @@ func main() {
     mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
 
     mux.Handle("GET /list-files", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.ListFilesInDir)))
-
-    // This works on files only and not directories. These hanlders allow you to get download the file, delete the file from the servers, upload a new file or update the file. These files must be in the current directory - which is tracked in the session itself.
-
-    /* NOT THE PART OF PROTOTYPE - WOULD BE DONE AT THE END */ 
-    if backendConfig.Operations[0].Read {
-        mux.Handle("GET /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetFile)))
-    }
-
-    if backendConfig.Operations[0].Delete {
-        mux.Handle("DELETE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.DeleteFile)))
-    }
-
-    if backendConfig.Operations[0].Write {
-        mux.Handle("POST /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UploadFile)))
-    }
-
-    if backendConfig.Operations[0].Update {
-        mux.Handle("UPDATE /file", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.UpdateFile)))
-    }
 
     // Permission Management Endpoints
     
