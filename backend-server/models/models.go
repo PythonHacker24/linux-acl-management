@@ -24,12 +24,18 @@ type LdapConfig struct {
     LdapSearchBase  string  `yaml:"ldap-search-base"` 
 }
 
+type DeploymentConfig struct {
+    Host    string      `yaml:"host"` 
+    Port    int         `yaml:"port"`
+}
+
 // Contains complete configurations from YAML file
 type Config struct {
-    TransactionLogRedis []Redis         `yaml:"transaction-logs-redis"`
-    LdapConfig          []LdapConfig    `yaml:"ldap-config"`
-	BasePath            string          `yaml:"basePath"`
-	Servers             []Server        `yaml:"servers"`
+    DeploymentConfig    []DeploymentConfig  `yaml:"deployment-config"`
+    TransactionLogRedis []Redis             `yaml:"transaction-logs-redis"`
+    LdapConfig          []LdapConfig        `yaml:"ldap-config"`
+	BasePath            string              `yaml:"basePath"`
+	Servers             []Server            `yaml:"servers"`
 }
 
 // Contains server configurations from YAML file

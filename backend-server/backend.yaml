@@ -1,3 +1,7 @@
+deployment-config:
+  - host: "localhost"
+    port: 9999
+
 transaction-logs-redis:
   - address: "localhost:6379"
     password: ""

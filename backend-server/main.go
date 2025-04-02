@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"backend-server/config"
 	"backend-server/handlers"
@@ -59,8 +60,8 @@ func main() {
     
     // User Settings APIs (For the future) 
 
-    slog.Info("Server Started Listening", "Host", config.Host, "Port", config.Port)
-    if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Host, config.Port), mux); err != nil {
+    slog.Info("Server Started Listening", "Host", config.BackendConfig.DeploymentConfig[0].Host, "Port", strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port))
+    if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.BackendConfig.DeploymentConfig[0].Host, strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), mux); err != nil {
         slog.Error(fmt.Sprintf("Failed to start server at port %s", config.Port), "Error", err.Error())
     }
 }
