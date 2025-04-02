@@ -15,6 +15,7 @@ import (
 	"backend-server/ldap"
 	"backend-server/models"
 	"backend-server/sessionmanager"
+    "backend-server/utils"
 )
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -139,13 +140,18 @@ func SetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
     config.Sessions[username].Mutex.Lock()
     defer config.Sessions[username].Mutex.Unlock()
 
-    currentDir := config.Sessions[username].CurrentWorkingDir
-	newDir := filepath.Join(currentDir, req.SetWorkingDir)
+    backendConfig, err := utils.LoadConfig("./backend.yaml")
+    if err != nil {
+        slog.Error("Error loading config", "Error", err.Error())
+    }
+
+    // currentDir := config.Sessions[username].CurrentWorkingDir
+	newDir := filepath.Join(backendConfig.BasePath, req.SetWorkingDir)
 	config.Sessions[username].CurrentWorkingDir = newDir
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "{'currentDir': %s}", newDir)
+    fmt.Fprintf(w, "{'currentDir': '%s'}", newDir)
 }
 
 func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
@@ -205,20 +211,4 @@ func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(fileList); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-}
-
-func GetFile(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func UploadFile(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func DeleteFile(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func UpdateFile(w http.ResponseWriter, r *http.Request) {
-
 }

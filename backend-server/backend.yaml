@@ -1,4 +1,4 @@
-basePath: "/mnt"
+basePath: "mnt"
 
 servers:
   - path: "/beegfs/labs"
