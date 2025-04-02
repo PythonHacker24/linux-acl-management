@@ -12,20 +12,15 @@ import (
     "github.com/redis/go-redis/v9"
 )
 
-const(
-    Host = "localhost"
-    Port = "9999"
+var ( 
+    Sessions = make(map[string]*models.Session)
+    SessionMutex = sync.Mutex{}
+    TransactionLogsRedisClient *redis.Client
+    TransactionLogsRedisCtx = context.Background()
+    BackendConfig *models.Config
 )
 
-var Sessions = make(map[string]*models.Session)
-var SessionMutex = sync.Mutex{}
-
 const SessionTimeout = 5 * time.Minute
-
-var TransactionLogsRedisClient *redis.Client
-var TransactionLogsRedisCtx = context.Background()
-
-var BackendConfig *models.Config
 
 func InitTransactionLogsRedis(db int, address, password string) {
     TransactionLogsRedisClient = redis.NewClient(&redis.Options{

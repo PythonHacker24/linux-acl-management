@@ -16,6 +16,8 @@ import (
 	"backend-server/models"
 	"backend-server/sessionmanager"
     "backend-server/utils"
+
+    "github.com/redis/go-redis/v9"
 )
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +88,8 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = sessionmanager.AddTransaction(username, txnReq.Transaction)
+    var txnID string
+	txnID, err = sessionmanager.AddTransaction(username, txnReq.Transaction)
     if err != nil {
         fmt.Fprintf(w, "Failed to add transaction")
         return
@@ -94,7 +97,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Transaction added")
+    fmt.Fprintf(w, fmt.Sprintf("Transaction added: %s", txnID))
 }
 
 func GetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
@@ -211,4 +214,43 @@ func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(fileList); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func GetTransactionResult(w http.ResponseWriter, r *http.Request) {
+	username, err := authentication.GetUsernameFromJWT(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	txnID := r.URL.Query().Get("txnID")
+	if txnID == "" {
+		http.Error(w, "Missing txnID", http.StatusBadRequest)
+		return
+	}
+
+	storedUsername, err := config.TransactionLogsRedisClient.Get(config.TransactionLogsRedisCtx, "user:"+txnID).Result()
+	if err == redis.Nil {
+		http.Error(w, "Transaction ID not found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, "Error fetching transaction ownership", http.StatusInternalServerError)
+		return
+	}
+
+	if storedUsername != username {
+        http.Error(w, "Forbidden: You don't own the transaction", http.StatusForbidden)
+		return
+	}
+
+	result, err := config.TransactionLogsRedisClient.Get(config.TransactionLogsRedisCtx, txnID).Result()
+	if err == redis.Nil {
+		http.Error(w, "Transaction ID not found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, "Error fetching transaction result", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{"txnID": txnID, "result": result})
 }

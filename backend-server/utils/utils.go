@@ -6,6 +6,7 @@ import (
 	"backend-server/models"
 
 	"gopkg.in/yaml.v3"
+    "github.com/google/uuid"
 )
 
 func LoadConfig(filename string) (*models.Config, error) {
@@ -21,4 +22,8 @@ func LoadConfig(filename string) (*models.Config, error) {
     }
 
     return &config, nil
+}
+
+func GenerateTxnID() string {
+	return uuid.New().String()
 }

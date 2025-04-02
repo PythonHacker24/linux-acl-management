@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+    "strings"
 
 	"backend-server/models"
 	"backend-server/config"
@@ -48,58 +49,73 @@ func ExpireSession(username string) {
     }
 }
 
-func AddTransaction(username string, txn string) error {
-    config.SessionMutex.Lock()
-    defer config.SessionMutex.Unlock()
+func AddTransaction(username, txn string) (string, error) {
+	config.SessionMutex.Lock()
+	session, exists := config.Sessions[username]
+	config.SessionMutex.Unlock()
 
-    // First check if the session exists
-    session, exists := config.Sessions[username]
-    if !exists {
-        slog.Info("Session Not Found, Transaction Rejected", "User", username, "Transaction", txn)
-        return fmt.Errorf("Session Not Found Transaction Rejected")
-    }
+	if !exists {
+		return "", fmt.Errorf("session not found")
+	}
 
-    session.Mutex.Lock()
-    defer session.Mutex.Unlock()
+	session.Mutex.Lock()
+	defer session.Mutex.Unlock()
 
-    session.TransactionQueue.PushBack(txn)
+	txnID := utils.GenerateTxnID() // Generate unique transaction ID
+	session.TransactionQueue.PushBack(txnID + ":" + txn) 
 
-    if session.Timer != nil {
-        session.Timer.Stop()
-    }
+	// Store txnID and username in Redis
+	err := config.TransactionLogsRedisClient.Set(config.TransactionLogsRedisCtx, txnID, "PENDING", 0).Err()
+	if err != nil {
+		return "", fmt.Errorf("failed to store txnID in Redis")
+	}
 
-    slog.Info("Transaction added successfully", "User", username, "Transaction", txn)
-    return nil
+	err = config.TransactionLogsRedisClient.Set(config.TransactionLogsRedisCtx, "user:"+txnID, username, 0).Err()
+	if err != nil {
+		return "", fmt.Errorf("failed to store txnID ownership in Redis")
+	}
+
+	if session.Timer != nil {
+		session.Timer.Stop()
+	}
+
+	return txnID, nil
 }
 
 // This function starts processing all the transactions in the queue one by one
 func ProcessTransactions(username string, session *models.Session) {
-    session.Mutex.Lock()
-    defer session.Mutex.Unlock()
+	session.Mutex.Lock()
+	defer session.Mutex.Unlock()
 
-    counter := 0
-    for session.TransactionQueue.Len() > 0 {
-        element := session.TransactionQueue.Front()
-        session.TransactionQueue.Remove(element)
-        
-        // TRANSACTION SHOULD BE PROCESSED HERE
-        dummyFunc(counter)
-        counter++
-        
-        slog.Info("Processed transaction", "User", username, "Element", element)
-    }
+	for session.TransactionQueue.Len() > 0 {
+		element := session.TransactionQueue.Front()
+		session.TransactionQueue.Remove(element)
 
-    // At this point, all the transactions must be process in the queue
-    if session.Timer != nil {
-        session.Timer.Stop()
-    }
-    session.Timer = time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) })
-    slog.Info("Session timeout restarted", "User", username)
+		txnData := element.Value.(string)
+		parts := strings.SplitN(txnData, ":", 2) // txnID:txn
+		txnID, txn := parts[0], parts[1]
+
+		result := dummyFunc(txn)
+
+		// Store result in Redis
+		err := config.TransactionLogsRedisClient.Set(config.TransactionLogsRedisCtx, txnID, result, 0).Err()
+		if err != nil {
+			slog.Error("Failed to store transaction result in Redis", "txnID", txnID)
+		}
+
+		slog.Info("Processed transaction", "User", username, "txnID", txnID, "Result", result)
+	}
+
+	if session.Timer != nil {
+		session.Timer.Stop()
+	}
+	session.Timer = time.AfterFunc(config.SessionTimeout, func() { ExpireSession(username) })
 }
 
-func dummyFunc(counter int) {
-    slog.Info(fmt.Sprintf("Transaction Started %d", counter))
+func dummyFunc(txn string) string {
+    slog.Info(fmt.Sprintf("Transaction Started: Txn %s", txn))
     time.Sleep(2 * time.Second)
+    return fmt.Sprintf("Executed: Txn: %s", txn)
 }
 
 func TransactionWorker() {
