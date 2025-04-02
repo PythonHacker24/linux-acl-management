@@ -10,15 +10,15 @@ import (
 	"backend-server/middleware"
 	"backend-server/services"
 	"backend-server/sessionmanager"
-	"backend-server/utils"
 )
 
 func main() {
-    // Loading Config file 
-    backendConfig, err := utils.LoadConfig("./backend.yaml")
-    if err != nil {
-        slog.Error("Error loading config", "Error", err.Error())
-    }
+
+    config.InitYamlConfig("./backend.yaml")
+
+    backendConfig := config.BackendConfig
+
+    config.InitTransactionLogsRedis(backendConfig.TransactionLogRedis[0].DB, backendConfig.TransactionLogRedis[0].Address, backendConfig.TransactionLogRedis[0].Password)
 
     fmt.Printf("Base Path set to: %s \n", backendConfig.BasePath)
 

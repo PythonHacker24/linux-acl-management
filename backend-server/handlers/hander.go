@@ -49,7 +49,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    authStatus := ldap.AuthenticateUser(user.Username, user.Password, config.LdapSearchBase)
+    authStatus := ldap.AuthenticateUser(user.Username, user.Password, config.BackendConfig.LdapConfig[0].LdapSearchBase)
     if !authStatus {
         http.Error(w, "Invalid credentials", http.StatusUnauthorized)
         return

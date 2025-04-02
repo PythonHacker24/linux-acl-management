@@ -13,14 +13,14 @@ import (
 // Failed authentication can potentially mean attempt to unauthorized access, so it would be logged.
 
 func AuthenticateUser(username, userPassword, searchBase string) bool {
-    l, err := ldap.DialURL(config.LdapServer)
+    l, err := ldap.DialURL(config.BackendConfig.LdapConfig[0].LdapServer)
     if err != nil {
         slog.Error("Failed to connect to LDAP Server", "Error", err.Error())
         return false
     }
     defer l.Close()
 
-    err = l.Bind(config.LdapBindDN, config.LdapPassword)
+    err = l.Bind(config.BackendConfig.LdapConfig[0].LdapBindDN, config.BackendConfig.LdapConfig[0].LdapPassword)
     if err != nil {
         slog.Error("Admin authentication failed", "Error", err.Error())
         return false

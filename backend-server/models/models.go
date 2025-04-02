@@ -11,10 +11,25 @@ type HealthResponse struct {
     Status string `json:"status"`
 }
 
+type Redis struct {
+    Address     string  `yaml:"address"`   
+    Password    string  `yaml:"password"`
+    DB          int     `yaml:"db"`  
+}
+
+type LdapConfig struct {    
+    LdapServer      string  `yaml:"ldap-server"`
+    LdapBindDN      string  `yaml:"ldap-bind-dn"`
+    LdapPassword    string  `yaml:"ldap-password"`
+    LdapSearchBase  string  `yaml:"ldap-search-base"` 
+}
+
 // Contains complete configurations from YAML file
 type Config struct {
-	BasePath string   `yaml:"basePath"`
-	Servers  []Server `yaml:"servers"`
+    TransactionLogRedis []Redis         `yaml:"transaction-logs-redis"`
+    LdapConfig          []LdapConfig    `yaml:"ldap-config"`
+	BasePath            string          `yaml:"basePath"`
+	Servers             []Server        `yaml:"servers"`
 }
 
 // Contains server configurations from YAML file
