@@ -3,6 +3,42 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [d29fd2c] - 2025-04-03
+**Author:** PythonHacker24
+
+### Changes:
+- Updated the session manager code for Redis and Async results serving
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/d29fd2c306934cec5ad7a97be511b75b0833653a)
+
+
+## [58e5ea9] - 2025-04-02
+**Author:** PythonHacker24
+
+### Changes:
+- Added deployment config option for YAML
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/58e5ea931bd538202efcc6a0f31d5349baf6e403)
+
+
+## [269c44b] - 2025-04-02
+**Author:** PythonHacker24
+
+### Changes:
+- Added more configuration options to YAML file and Added Redis for Async Response from Session Manager
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/269c44b64921ec071983bebd623e547d7369abc0)
+
+
+## [3efd17b] - 2025-04-02
+**Author:** PythonHacker24
+
+### Changes:
+- Updated CHANGELOG Docs
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/3efd17b9111895fe4cfd496dd9f61a9966273e4b)
+
+
 ## [fff2e35] - 2025-04-02
 **Author:** PythonHacker24
 
