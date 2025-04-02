@@ -3,6 +3,51 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [fff2e35] - 2025-04-02
+**Author:** PythonHacker24
+
+### Changes:
+- Fixed the handlers for /current-working-directory and backend.yaml parsing
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/fff2e3513e942570c5ef0ac85f725d1f5dad9220)
+
+
+## [6a00763] - 2025-04-02
+**Author:** PythonHacker24
+
+### Changes:
+- Fixed backend.yaml and configurations in models.go
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/6a007635ded675db0c4b194a0f979e71bbe2fabb)
+
+
+## [dca8cd4] - 2025-04-01
+**Author:** PythonHacker24
+
+### Changes:
+- Added new configuration as per new schema for config based on Robert's recommendations
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/dca8cd4e6484d0972c5ccac6ec40b6c4f7213a87)
+
+
+## [768c5bf] - 2025-04-01
+**Author:** PythonHacker24
+
+### Changes:
+- Completed added progress docs
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/768c5bf800e7fb1bd50420f1aad3872db813b324)
+
+
+## [dcd2cd7] - 2025-03-28
+**Author:** PythonHacker24
+
+### Changes:
+- Up to date report
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/dcd2cd75fe9b9bcacece6d6a77f46abf9db21c7d)
+
+
 ## [dc38cbe] - 2025-03-27
 **Author:** PythonHacker24
 

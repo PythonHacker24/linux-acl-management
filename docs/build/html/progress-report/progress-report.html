@@ -459,10 +459,30 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <section id="id16">
 <h2>[10 March 2025]<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
 <p>On this day, I started working on the prototype project and made my first commit.</p>
-<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/1e5749816b2c9a0d005eb7b5903c23849d37d958">View Commit</a></p>
+<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/1e5749816b2c9a0d005eb7b5903c23849d37d958">Initialized Project</a>
+<a class="reference external" href="http://github.com/PythonHacker24/linux-acl-management/commit/b4e48782b4754c9c8f96a26341752f7c88639119">Added Makefile</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/42322c251b655f67d8ed4c914210b5fb9fdca92f">Decided to add Slog</a></p>
 </section>
 <section id="id17">
-<h2>[21 March 2025]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<h2>[19 March 2025]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<p>I kept working on the prototype and researched on the project for gRPC and Linux daemons. I made commits in the code with the researched information.</p>
+<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/6e062a1586b763c6cebdc4c114925b884eb27d36">Added gRPC daemons and connected to the backend with yaml files</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/28bc4389c08e7f26f056aff21c5fda89fe7d8a0e">Added README.md</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/518b12cacae9391d576cd3b6a562121ba6d00cdc">Fixed end of the README.md</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/5db8f12bc62fe877932116d43b3b5bf5a327d918">Removed Makefile for now</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/ac37b677f3f76764a49dd737fbfd75e94c5a4b76">Started JWT auth, implemented middleware</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/0862674a5a04b9d081e43246c7d4eb9157b4046c">LDAP Authentication successful</a></p>
+</section>
+<section id="id18">
+<h2>[20 March 2025]<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/0642d7823dd7eb77d8ee5bf879267168b03e63c0">Made progress with Session Manager</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/99f0083ed2b9e3dad2421272d25a7aaec4cae39b">Completed Session Management and successfully tested</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/1036e0a4659c05342aac1b3988c333bb459f7b3d">Session Manager Completed</a></p>
+</section>
+<section id="id19">
+<h2>[21 March 2025]<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<p>I completed session manager code on this day.</p>
+<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/2a34697a069eab2a1a0f5951904da85eefb2fce7">View Commit</a></p>
 <p><strong>I continued with my questions which came during proposal writing and prototyping:</strong></p>
 <p>Sure, no worries. I am writing a new chapter in the proposal for the prototype, which I am working on. The good news is that the proposed session management algorithm is working well, and we can proceed. GSoC proposal submission starts tomorrow and ends on 8 April, so I would like to work more on the proposal and the prototype and get your feedback before submitting it.</p>
 <p>Also, I have one more question: We have multiple Linux File Storage Servers in orchestrated deployments. All those different servers have filesystems where users have permission and access assigned. Should the portal show the user that all the files are in the same server space and hide the orchestration (like virtual machines), or should I provide options about which server to store the file in?</p>
@@ -474,8 +494,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>In the case where there’s multiple different servers in an orchestrated deployment serving their own unique filesystem, it’s possible that all of their filesystems may be mounted on the backend server such that they’re accessible simply by navigating to a specific directory (ie. /mnt/server-1, /mnt/server-2, etc.) and I would hope that the end-user administrator deploying the software would configure it to match how their users expect to see the filesystems on their network. As such, I don’t think any special options need to be added to the application to explicitly choose a server, as this should be implicit based on the path of the file that the user’s navigating to.</p>
 <p>I do see where this may be of use for a site that’s aiming to have a single deployment of this software which supports multiple different departments at once as opposed to each individual department having their own deployment, but I wouldn’t worry about that too much for this initial phase &amp; it can always be a future improvement that’s made if needed.</p>
 </section>
-<section id="id18">
-<h2>[22 March 2025]<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h2>[22 March 2025]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
 <p><strong>I started a new thread as per Mahmoud’s instructions and started with the following question:</strong></p>
 <p>Initially, I thought I would retrieve the files and data through the daemons themselves through a network connection (precisely, through gRPC calls). Although the last email by Robert mentions that there would be mounted filesystems from the Linux File Storage Servers like /mnt/server-1, /mnt/server-2, etc. Since this is something we expect the user to set up and is out of the scope of the application, I will specify this in the documentation of the project.</p>
 <p>Coming back to the displaying of the file system, since we would be using locally mounted volumes of those Linux File Storage Servers, I would list all of the files recursively in /mnt/server-1, /mnt/server-2, etc. (this would be configured by the user in config.YAML file for us). The user will see all the content listed on the portal and can navigate to any file.</p>
@@ -505,8 +525,23 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 <p>Please note that Robert will conduct separate technical evaluations of the codebase. This documentation will serve as critical supporting material during assessments.</p>
 <p><em><strong>Upon this email, I started building the docs for changelogs and kept working on the prototype and proposal</strong></em></p>
 </section>
-<section id="id19">
-<h2>[24 March 2025]<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<section id="id21">
+<h2>[23 March 2025]<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<p>Today, I focused on writing more handlers and middlewares for authentication.</p>
+<p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/423654e60a5d03b324d3bce3787301a0faebf81d">Added current working directory, intialized handlers and started progress documentation</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/87f85acbfda9802b57fea459c52eb30814ae135e">Create main.yml for docs deployment</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/58912db01062f2e871bd059bb7c07f7fa0631d1c">Update main.yml</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/2ee3484848272ae479d6dc6471e6be8cc538a37a">Updated docs with Prototype Section and README.md for Progress Docs Link</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/f4425d4c3047367e3cd0ee2bd41ce3e13f836455">Updated docs with prototype section and README.md with updated progress docs link</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/aea906b9aacb520fd8c9473502c6fb1429d2f9c3">Added Changelog to the Docs with all commit messages and links to it + automated the process with a Python Script</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/019d3fb86181698826fd21c6a1c5f47585f57406">Update main.yml</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/8b858f8191e60d3a5af6228721065a586e92300f">Handler Implemented for Setting Current Working Directory</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/dae2eaf390a0d6a3426afa86f373442264b7a0e4">Implemented Set and Get Current Working Directory Handlers and Fixed Auth Middleware</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/58b651df2645edfc0897e87a1c9e77c00fdb0998">Set and Get Working Dir for Session Implemented and Working Direcotry Handlers</a>
+<a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/053ca2fbed242c664249e0ff92cda7ec24093c0c">Added get file handler with proper JSON output</a></p>
+</section>
+<section id="id22">
+<h2>[24 March 2025]<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s response on my earlier queires about CRUD operations:</strong></p>
 <p>Sorry for the delay in my response; I want to quickly circle back to a question you had earlier in this email thread:</p>
 <p>I also have one more question that came to me while I was writing the code for the file interaction handlers in the prototype: What file operations are users allowed to perform? Currently, I am thinking about 4: Get File, Upload File, DeleteFile, and UpdateFile. Does that sound good, or do we need more? also, are we providing a feature in the frontend to edit some files (like text files) on the frontend itself with an inbuilt text editor? in that case, the update file would do the updates with a .diff file send to the backend to patch the old files - where the mechanism will look like git.</p>
@@ -529,8 +564,8 @@ Mutex               sync.Mutex
 <p>According to this structure, when the user calls the GET /list-files, the “ls” equivalent of the function is run on the Session.CurrentWorkingDir and content are returned to the backend (and then to frontend for listing).</p>
 <p>In the earlier assumption of /mnt and doing CRUD, I used to initialize /mnt/ (as configured in backend.yaml) as default and then when user would call , would call GET /list-files, contents of /mnt/ would be listed i.e. server-1/ server-2/ … etc.</p>
 </section>
-<section id="id20">
-<h2>[25 March 2025]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<section id="id23">
+<h2>[25 March 2025]<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s response on my questions:</strong></p>
 <p>I’d recommend going ahead and keeping the previous functionality where it can access /mnt (or any other base directory as specified by the system administrator) even if the other aspects like file-content manipulation isn’t taking place/enabled within the application.</p>
 <p>Essentially, consider that the following scenario will be present on the server running the GSoC application’s backend process: the system administrator will have a parent directory (ie. /mnt or similar, like /labs) where all the filesystems/file servers being managed by the instance of the GSoC application are mounted and accessible to present the view of it all being a single filesystem tree, which should mirror how the filesystems are seen on the computational nodes (and other systems) within the network so the end-user should already be familiar with it. If they know that the file they’re trying to set permissions on is at /labs/alab/mystuff/file.txt, then it doesn’t matter which physical server it’s on because they’d just be accessing it via that common path structure.</p>
@@ -556,8 +591,8 @@ content of server-2
 <p><strong>At this point, I studied the BMI’s infrastructure once again and circled BeeGFS:</strong></p>
 <p>So I thought about this for a while, and I am the following interpretation: The BMI’s network is running BeeGFS, so we have a unified filesystem which is managing all the data. /lab/text1.txt and /lab/text2.txt can be on any server (server-1 or server-2) and is completely abstracted from the user. Now I will consider that the backend server has /mnt/file-system mounted from which I can access all the data. I will still see /mnt/file-system/lab/text1.txt and /mnt/file-system/lab/text2.txt in them. The users will also see it in this way. But now Prof. X want to change the permissions for /mnt/file-system/lab/text1.txt so they interact with the frontend to initiate the changes, which goes to the backend, which resolves the place where /mnt/file-system/lab/text1.txt resides on physical servers and contacts it’s daemons to modify the file permissions.</p>
 </section>
-<section id="id21">
-<h2>[26 March 2025]<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<section id="id24">
+<h2>[26 March 2025]<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
 <p><strong>At this point of time, the discussion about various filesystems was started. I considered BeeGFS to be the point of interest at this point. I did extensive research on BeeGFS and it’s structure. Robert had following comments:</strong></p>
 <p>This looks very close, and I believe we’re thinking along the same path but just want to make sure; the below workflow is what I know would be needed for BMI’s storage network, assuming all the separate modular daemons discussed previously are incorporated into the application design:
 Prof. X wants to change permissions on /labs/xlab/project1.txt
@@ -585,8 +620,9 @@ Backend daemon reports request status to fronend for display to end-user.</p>
 <p>Trusting that the filesystem(s) mounted on the GSoC backend server (or other servers running the GSoC daemons that will actually modify the ACLs) will handle the appropriate steps necessary for their particular structure when issued a request to update the ACLs is all that matters; in the case of BeeGFS for example, the GSoC app shouldn’t need to directly interact with the metadata servers because just taking an action on the file at /mnt/beegfs/labs/testfile.txt will already handle the necessary communication with the metadata &amp; storage servers behind-the-scenes. There’s no need to specifically code the app for BeeGFS compatibility, because it appears as any other filesystem to the backend server &amp; will support the necessary system calls like those used by getfacl/setfacl.</p>
 <p>In short, the BeeGFS servers running beegfs-meta.service/beegfs-server.service are to be considered as black boxes and out-of-scope since they can’t even access the data they’re storing safely without beegfs-client.service running on them; for all intents &amp; purposes the GSoC backend server (or the server running the ACL modification daemons, if we choose to have that separate from the orchestration/management backend server) should be considered the “storage server” because it will have access to the filesystem since we intend to configure &amp; set up the beegfs-client.service SystemD service on it.</p>
 </section>
-<section id="id22">
-<h2>[27 March 2025]<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h2>[27 March 2025]<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h2>
+<p>On this day, I started writing progress docs as per the instructions of Mahmoud.</p>
 <p><strong>Here, I needed to rise abobe BeeGFS and study filesystems like NFS which differ in ACL managements. So I proposed the following in context to BeeGFS:</strong></p>
 <p>Okay, so I need to revert from the previous assumptions of BeeGFS. I went through its path since I remembered BMI is using BeeGFS and the /mnt was mentioned, which led me to that path. I am trying to be as close to BMI’s requirements as possible and will try not to divert from that.</p>
 <p>As I can interpret, modifying permissions for /mnt/beegfs/labs/testfile.txt will automatically update the ACL permissions all over the filesystem, and we shouldn’t worry about how it happens since BeeGFS is already handling it (or any other filesystem would have the provision to handle it). I am assuming that  /mnt/beegfs/labs/testfile.txt is mounted to the backend server (please correct me if I am wrong here).</p>
@@ -628,6 +664,10 @@ port: 5001</p></li>
 </ul>
 <p><strong>Robert approved it:</strong></p>
 <p>That diagram looks correct to me, and you can start updating the proposal.</p>
+</section>
+<section id="april-2025">
+<h2>[1 April 2025]<a class="headerlink" href="#april-2025" title="Link to this heading">¶</a></h2>
+<p>On this day, I made the progress docs up to date and ready to update it further during the whole journey.</p>
 </section>
 </section>
 
@@ -697,12 +737,16 @@ port: 5001</p></li>
 <li><a class="reference internal" href="#id14">[8 March 2025]</a></li>
 <li><a class="reference internal" href="#id15">[9 March 2025]</a></li>
 <li><a class="reference internal" href="#id16">[10 March 2025]</a></li>
-<li><a class="reference internal" href="#id17">[21 March 2025]</a></li>
-<li><a class="reference internal" href="#id18">[22 March 2025]</a></li>
-<li><a class="reference internal" href="#id19">[24 March 2025]</a></li>
-<li><a class="reference internal" href="#id20">[25 March 2025]</a></li>
-<li><a class="reference internal" href="#id21">[26 March 2025]</a></li>
-<li><a class="reference internal" href="#id22">[27 March 2025]</a></li>
+<li><a class="reference internal" href="#id17">[19 March 2025]</a></li>
+<li><a class="reference internal" href="#id18">[20 March 2025]</a></li>
+<li><a class="reference internal" href="#id19">[21 March 2025]</a></li>
+<li><a class="reference internal" href="#id20">[22 March 2025]</a></li>
+<li><a class="reference internal" href="#id21">[23 March 2025]</a></li>
+<li><a class="reference internal" href="#id22">[24 March 2025]</a></li>
+<li><a class="reference internal" href="#id23">[25 March 2025]</a></li>
+<li><a class="reference internal" href="#id24">[26 March 2025]</a></li>
+<li><a class="reference internal" href="#id25">[27 March 2025]</a></li>
+<li><a class="reference internal" href="#april-2025">[1 April 2025]</a></li>
 </ul>
 </li>
 </ul>
