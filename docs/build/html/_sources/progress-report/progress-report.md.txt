@@ -621,3 +621,19 @@ That diagram looks correct to me, and you can start updating the proposal.
 ## [1 April 2025]
 
 On this day, I made the progress docs up to date and ready to update it further during the whole journey.
+
+## [2 April 2025]
+
+I worked with fixing components in the backend code and optimizing a few functions. I was trying to solve the problem of asynchronous computing large transactions and then notifying the frontend once the transaction in the queue are executed. To make this possible, I decided to use Redis, which is a high performance, fast I/O operation database since it's an in-memory database. The Redis stores all the transactions in itself whenever registered and marks itself as PENDING till the transaction is executed. Once executed, the transaction in Redis is updated with the result which the frontend can fetch. Till the exection, frontend polls the backend. In the final project, a better mechanism than polling can be employed (event driven?). 
+
+*I also thought about the idea of allowing users to cancel transactions in the queue before thy are executed. This will depend on factors such as pending transactions ahead of that one transaction, so this need a thorough thought and would be done duing the development of the final project is time permits.*
+
+So I added more options to the YAML configuration file to make it possible and worked with implemting and testing the Redis database integration. Since this integration introduces various updates in other handlers, all the handlers wherever necessary were updated. 
+
+## [3 April 2025]
+
+I finally completed Redis integration and successfully tested Async responses, which worked very well. So I decided to update the proposal, which was very long and significant changed were to be made. I email Robert Tweedy with the final proposal for review and recieved comments. Everything looked well, just needed one clarification and some proof reading.
+
+## [4 April 2025]
+
+**I finalized the proposal in detail and submitted the proposal on the GSoC 2025 portal.**
