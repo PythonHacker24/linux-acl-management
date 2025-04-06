@@ -7,7 +7,7 @@ transaction-logs-redis:
     password: ""
     db: 0
 
-basePath: "mnt"
+basePath: ""
 
 servers:
   - path: "/beegfs/labs"

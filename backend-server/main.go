@@ -19,9 +19,14 @@ func main() {
 
     backendConfig := config.BackendConfig
 
-    config.InitTransactionLogsRedis(backendConfig.TransactionLogRedis[0].DB, backendConfig.TransactionLogRedis[0].Address, backendConfig.TransactionLogRedis[0].Password)
+    basePath := backendConfig.BasePath
+    fmt.Printf("Base Path set to: %s \n", basePath)
+    if basePath == "" || basePath == "/" {
+        fmt.Println("Base Path not set, considering mount paths as absolute paths")
+        backendConfig.BasePath = ""
+    }
 
-    fmt.Printf("Base Path set to: %s \n", backendConfig.BasePath)
+    config.InitTransactionLogsRedis(backendConfig.TransactionLogRedis[0].DB, backendConfig.TransactionLogRedis[0].Address, backendConfig.TransactionLogRedis[0].Password)
 
     // Connecting to File Server Daemons
     for _, server := range backendConfig.Servers {
