@@ -45,7 +45,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Validate input
     if user.Username == "" || user.Password == "" {
         http.Error(w, "Username and password are required", http.StatusBadRequest)
         return
@@ -97,7 +96,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, fmt.Sprintf("Transaction added: %s", txnID))
+    fmt.Fprintf(w, "Transaction added: %s", txnID)
 }
 
 func GetCurrentWorkingDir(w http.ResponseWriter, r *http.Request) {
@@ -178,23 +177,20 @@ func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Get file owner and group
 		sys := info.Sys().(*syscall.Stat_t)
 		uid := fmt.Sprint(sys.Uid)
 		gid := fmt.Sprint(sys.Gid)
 
-		// Convert UID and GID to user and group names
 		usr, err := user.LookupId(uid)
 		if err != nil {
-			usr = &user.User{Username: uid} // Fallback to UID
+			usr = &user.User{Username: uid} 
 		}
 
 		grp, err := user.LookupGroupId(gid)
 		if err != nil {
-			grp = &user.Group{Name: gid} // Fallback to GID
+			grp = &user.Group{Name: gid}
 		}
 
-		// Append file info to list
 		fileList = append(fileList, models.FileInfo{
 			Name:        file.Name(),
 			Size:        info.Size(),
@@ -206,11 +202,9 @@ func ListFilesInDir(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	// Set response headers
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	// Encode response as JSON
 	if err := json.NewEncoder(w).Encode(fileList); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
