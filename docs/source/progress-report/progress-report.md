@@ -637,3 +637,7 @@ I finally completed Redis integration and successfully tested Async responses, w
 ## [4 April 2025]
 
 **I finalized the proposal in detail and submitted the proposal on the GSoC 2025 portal.**
+
+## [5 April 2025]
+
+These days, I am reviewing the proposal even after the submission. Also, I updated the basePath and path parameters in the YAML file as per Robert's comments in the proposal review. So I updated the code for the same. 
