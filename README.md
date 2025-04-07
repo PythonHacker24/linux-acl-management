@@ -4,19 +4,6 @@ A system for managing Linux Access Control Lists (ACLs) through a web interface 
 
 Progress Docs: [https://pythonhacker24.github.io/linux-acl-management/](https://pythonhacker24.github.io/linux-acl-management/)
 
-## Project Structure
-```
-.
-├── backend-server/    # Go-based backend server
-│   ├── config/        # Configuration handling
-│   ├── handlers/      # HTTP request handlers
-│   ├── middleware/    # HTTP middleware
-│   ├── models/        # Data models
-│   ├── proto/         # Protocol Buffer definitions
-│   └── utils/         # Utility functions
-└── frontend/          # Web frontend (if applicable)
-```
-
 ## Prerequisites
 
 - Go 1.21 or later
