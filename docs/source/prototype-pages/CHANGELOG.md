@@ -3,6 +3,51 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [84cdfdf] - 2025-04-12
+**Author:** PythonHacker24
+
+### Changes:
+- Updated docs and progress report
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/84cdfdf4c9eab2ae5604cbb04d0ce22ce58604e0)
+
+
+## [422afd4] - 2025-04-12
+**Author:** PythonHacker24
+
+### Changes:
+- Refactored and Clean the main.go file
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/422afd409d83d2a57366064b4f18a5e257d62f23)
+
+
+## [9bffb77] - 2025-04-12
+**Author:** PythonHacker24
+
+### Changes:
+- Moved routes to one single function for better practice
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/9bffb779628c24a2a0de71f9674d1296e56979fc)
+
+
+## [1c22f77] - 2025-04-07
+**Author:** PythonHacker24
+
+### Changes:
+- Updated README.md
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/1c22f77da9194032912b2a3cb422989edd5e12d3)
+
+
+## [8de3e0f] - 2025-04-07
+**Author:** PythonHacker24
+
+### Changes:
+- Updated project docs and changelog
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/8de3e0ff3ca477da20e3bef4e291c436a6c47576)
+
+
 ## [70c6ff3] - 2025-04-07
 **Author:** PythonHacker24
 
