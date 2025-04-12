@@ -3,6 +3,42 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [70c6ff3] - 2025-04-07
+**Author:** PythonHacker24
+
+### Changes:
+- Refactored some parts of the code for handlers
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/70c6ff3c063b8d5a56452d1b349af2725ba9b968)
+
+
+## [66317e1] - 2025-04-07
+**Author:** PythonHacker24
+
+### Changes:
+- Added support for empty basePaths and absolute paths
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/66317e13b094495b5463a48cec41ec80f3bf7fe8)
+
+
+## [5acdd03] - 2025-04-04
+**Author:** PythonHacker24
+
+### Changes:
+- Updated the project journal
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/5acdd03e655452ffcf990b40b206c9b7175f4c07)
+
+
+## [ef21141] - 2025-04-03
+**Author:** PythonHacker24
+
+### Changes:
+- Updated docs for changelogs
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/ef21141c8387b05005e0c3b76dda2cc93847dc8e)
+
+
 ## [d29fd2c] - 2025-04-03
 **Author:** PythonHacker24
 

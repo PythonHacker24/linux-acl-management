@@ -641,3 +641,11 @@ I finally completed Redis integration and successfully tested Async responses, w
 ## [5 April 2025]
 
 These days, I am reviewing the proposal even after the submission. Also, I updated the basePath and path parameters in the YAML file as per Robert's comments in the proposal review. So I updated the code for the same. 
+
+## [6 April 2025] 
+
+From today til 11 April 2025, I was engaged fully in research about topics like implementing plugin support, transaction handler, multi core processing with golang, etc. One of the book I am referring for advanced concurrency if "Concurrency in Go" by Cox-Buday. For transaction handling, I decided to roll back and take inspiration from the actualy Linux process schedular for which I referred the book "Linux Kernel Development" by Robert Love. I am going deeper into that, but learning about various scheduling algorithm by these experienced developers. Studying about these scheduling algorithms is inspiring me a lot while improving our transaction system and especially when I am trying to build this with multi-core processing.   
+
+## [12 April 2025]
+
+I decided to refactor code in main.go file. Since a lot of development and planning was happening with rapid testing, the main.go file got cluttered. This causes issues when thinking about edges cases and implementing error handling for it. 
