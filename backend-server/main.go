@@ -13,6 +13,31 @@ import (
 	"backend-server/sessionmanager"
 )
 
+func setupRoutes() *http.ServeMux {
+	mux := http.NewServeMux()
+
+    // Health Check Endpoint
+    mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
+
+    // Frontend Handlers 
+    mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
+    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.TransactionHandler)))
+    mux.Handle("GET /transaction-result", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetTransactionResult)))
+    
+    // list files handler -> GET METHOD
+
+    mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetCurrentWorkingDir)))
+    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
+
+    mux.Handle("GET /list-files", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.ListFilesInDir)))
+
+    // Permission Management Endpoints
+
+    // User Settings APIs (For the future) 
+
+	return mux
+}
+
 func main() {
 
     config.InitYamlConfig("./backend.yaml")
@@ -45,26 +70,7 @@ func main() {
 	go sessionmanager.TransactionWorker()
 
     // Setting up endpoints for interactions
-    mux := http.NewServeMux()
-
-    // Health Check Endpoint
-    mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
-
-    // Frontend Handlers 
-    mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
-    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.TransactionHandler)))
-    mux.Handle("GET /transaction-result", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetTransactionResult)))
-    
-    // list files handler -> GET METHOD
-
-    mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetCurrentWorkingDir)))
-    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
-
-    mux.Handle("GET /list-files", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.ListFilesInDir)))
-
-    // Permission Management Endpoints
-
-    // User Settings APIs (For the future) 
+    mux := setupRoutes() 
 
     slog.Info("Server Started Listening", "Host", config.BackendConfig.DeploymentConfig[0].Host, "Port", strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port))
     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.BackendConfig.DeploymentConfig[0].Host, strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), mux); err != nil {
