@@ -3,6 +3,42 @@
 🔗 **GitHub Repository:** [https://github.com/PythonHacker24/linux-acl-management](https://github.com/PythonHacker24/linux-acl-management)
 
 
+## [25f274a] - 2025-04-17
+**Author:** PythonHacker24
+
+### Changes:
+- Configured Multi Core Executions to Take Max Value from Config YAML file
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/25f274a0a831017cc3ffdb7ce91c35734422c8ea)
+
+
+## [70fa6c6] - 2025-04-17
+**Author:** PythonHacker24
+
+### Changes:
+- Multi Core Processing Enabled for Transaction Workers
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/70fa6c60ec9c3de61a03812c3b53b7e1f80abc2f)
+
+
+## [6f59211] - 2025-04-17
+**Author:** PythonHacker24
+
+### Changes:
+- Created seperate module for routes for cleaner architecture
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/6f5921150b227c03babe4a34e68d27d5c42afffc)
+
+
+## [1fdedf3] - 2025-04-12
+**Author:** PythonHacker24
+
+### Changes:
+- Updated CHANGELOG.md
+
+[View Commit](https://github.com/PythonHacker24/linux-acl-management/commit/1fdedf3c7b0052b1409039cdbf61892eb19fa4e9)
+
+
 ## [84cdfdf] - 2025-04-12
 **Author:** PythonHacker24
 
