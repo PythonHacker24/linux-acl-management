@@ -649,3 +649,11 @@ From today til 11 April 2025, I was engaged fully in research about topics like 
 ## [12 April 2025]
 
 I decided to refactor code in main.go file. Since a lot of development and planning was happening with rapid testing, the main.go file got cluttered. This causes issues when thinking about edges cases and implementing error handling for it. 
+
+## [17 April 2025]
+
+Worked on implementing multiple transaction executor workers for multi core cpus. As per the configurations, multiple routines would be deployed which would work independently and in parallel. 
+
+The important thing here is process management. Although the design of session manager is designed to be safe (by using mutexes and making sure we prevent race conditions, starvation, etc.), it's highly essential for to keep testing the code with dynamic debugging. To make sure the design is safe and sound, more research and practices are being followed by me. 
+
+One more design pattern that I am particulary interested in is the fan-in-fan-out approach where all the transactions are like conveyor belt and each worker takes coming transactions and execute them. It is definetly going to be interesting to checkout this approach and compare it with current implementation.
