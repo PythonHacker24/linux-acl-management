@@ -45,10 +45,12 @@ func init() {
 func main() {
 
 	officialCPUCount := runtime.NumCPU()
-	maxCPUs := 16 // MODIFY THIS TO CONFIG FILE
+	maxCPUs := config.BackendConfig.DeploymentConfig[0].MaxTransactionWorkers // MODIFY THIS TO CONFIG FILE
 	
 	numWorkers := maxCPUs
-	if maxCPUs < officialCPUCount {
+	if maxCPUs == 0 {
+		numWorkers = 1
+	} else if maxCPUs < officialCPUCount {
 		numWorkers = maxCPUs
 	}
 

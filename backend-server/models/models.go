@@ -25,8 +25,9 @@ type LdapConfig struct {
 }
 
 type DeploymentConfig struct {
-    Host    string      `yaml:"host"` 
-    Port    int         `yaml:"port"`
+    Host    				string      `yaml:"host"` 
+    Port    				int         `yaml:"port"`
+	MaxTransactionWorkers  	int			`yaml:"max-transaction-workers"`
 }
 
 // Contains complete configurations from YAML file
