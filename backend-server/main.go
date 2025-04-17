@@ -4,20 +4,22 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"runtime"
 	"strconv"
+	"sync"
 
 	"backend-server/config"
+	"backend-server/routes"
 	"backend-server/services"
 	"backend-server/sessionmanager"
-	"backend-server/routes"
 )
 
 func init() {
     config.InitYamlConfig("./backend.yaml")
 
     backendConfig := config.BackendConfig
-
     basePath := backendConfig.BasePath
+
     slog.Info("Base Path set to", "BasePath", basePath)
     if basePath == "" || basePath == "/" {
         slog.Info("Base Path not set, considering mount paths as absolute paths")
@@ -38,11 +40,29 @@ func init() {
         slog.Info("Loaded gRPC server", "Method", server.Method, "Mount", server.Path)
 		go services.ConnectToServer(server)
 	}
-
-	go sessionmanager.TransactionWorker()
 }
 
 func main() {
+
+	officialCPUCount := runtime.NumCPU()
+	maxCPUs := 16 // MODIFY THIS TO CONFIG FILE
+	
+	numWorkers := maxCPUs
+	if maxCPUs < officialCPUCount {
+		numWorkers = maxCPUs
+	}
+
+	slog.Info("Spawning GoRoutines: ", numWorkers)
+
+	var TransactionWorkersWg sync.WaitGroup
+	TransactionWorkersWg.Add(numWorkers)
+
+	for i := 0; i < numWorkers; i++ {
+		go func(workerID int) {
+			defer TransactionWorkersWg.Done()
+			sessionmanager.TransactionWorker(workerID)
+		}(i)
+	}
 
     mux := routes.SetupRoutes() 
 
@@ -50,4 +70,6 @@ func main() {
     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.BackendConfig.DeploymentConfig[0].Host, strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), mux); err != nil {
         slog.Error(fmt.Sprintf("Failed to start server at port %s", strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), "Error", err.Error())
     }
+
+	TransactionWorkersWg.Wait()
 }

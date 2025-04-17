@@ -4,12 +4,12 @@ import (
 	"container/list"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
-    "strings"
 
-	"backend-server/models"
 	"backend-server/config"
-    "backend-server/utils"
+	"backend-server/models"
+	"backend-server/utils"
 )
 
 func CreateSession(username string) {
@@ -118,8 +118,8 @@ func dummyFunc(txn string) string {
     return fmt.Sprintf("Executed: Txn: %s", txn)
 }
 
-func TransactionWorker() {
-    slog.Info("Transaction worker started")
+func TransactionWorker(workerID int) {
+	slog.Info("Transaction worker started", "Worked ID", workerID)
     for {
         config.SessionMutex.Lock()
         // Create a local copy of config.Sessions to process
@@ -137,7 +137,7 @@ func TransactionWorker() {
             ProcessTransactions(username, session)
         }
 
-        slog.Info("Transaction worker finished all the transactions")
+		slog.Info("Transaction worker finished all the transactions", "Worked ID", workerID)
         time.Sleep(2 * time.Second)
     }
 }
