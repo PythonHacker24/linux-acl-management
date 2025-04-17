@@ -7,10 +7,9 @@ import (
 	"strconv"
 
 	"backend-server/config"
-	"backend-server/handlers"
-	"backend-server/middleware"
 	"backend-server/services"
 	"backend-server/sessionmanager"
+	"backend-server/routes"
 )
 
 func init() {
@@ -45,31 +44,10 @@ func init() {
 
 func main() {
 
-    mux := setupRoutes() 
+    mux := routes.SetupRoutes() 
 
     slog.Info("Server Started Listening", "Host", config.BackendConfig.DeploymentConfig[0].Host, "Port", strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port))
     if err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.BackendConfig.DeploymentConfig[0].Host, strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), mux); err != nil {
         slog.Error(fmt.Sprintf("Failed to start server at port %s", strconv.Itoa(config.BackendConfig.DeploymentConfig[0].Port)), "Error", err.Error())
     }
-}
-
-func setupRoutes() *http.ServeMux {
-	mux := http.NewServeMux()
-
-    mux.Handle("/health", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HealthHandler)))
-
-    mux.Handle("/login", middleware.LoggingMiddleware(http.HandlerFunc(handlers.LoginHandler)))
-    mux.Handle("POST /issue-transaction", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.TransactionHandler)))
-    mux.Handle("GET /transaction-result", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetTransactionResult)))
-    
-    mux.Handle("GET /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.GetCurrentWorkingDir)))
-    mux.Handle("POST /current-working-directory", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.SetCurrentWorkingDir)))
-
-    mux.Handle("GET /list-files", middleware.LoggingMiddleware(middleware.AuthenticationMiddleware(handlers.ListFilesInDir)))
-
-    // Permission Management Endpoints
-
-    // User Settings APIs (For the future) 
-
-	return mux
 }
