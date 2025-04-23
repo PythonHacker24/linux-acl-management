@@ -251,39 +251,43 @@
           <section id="progress-report-for-acl-management-gsoc-project">
 <h1>Progress Report for ACL Management GSoC Project<a class="headerlink" href="#progress-report-for-acl-management-gsoc-project" title="Link to this heading">¶</a></h1>
 <section id="april-2025">
-<h2>[17 April 2025]<a class="headerlink" href="#april-2025" title="Link to this heading">¶</a></h2>
+<h2>[23 April 2025]<a class="headerlink" href="#april-2025" title="Link to this heading">¶</a></h2>
+<p>Reversed the order of progress report as per Robert Tweedy’s suggestion.</p>
+</section>
+<section id="id1">
+<h2>[17 April 2025]<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>Worked on implementing multiple transaction executor workers for multi core cpus. As per the configurations, multiple routines would be deployed which would work independently and in parallel.</p>
 <p>The important thing here is process management. Although the design of session manager is designed to be safe (by using mutexes and making sure we prevent race conditions, starvation, etc.), it’s highly essential for to keep testing the code with dynamic debugging. To make sure the design is safe and sound, more research and practices are being followed by me.</p>
 <p>One more design pattern that I am particulary interested in is the fan-in-fan-out approach where all the transactions are like conveyor belt and each worker takes coming transactions and execute them. It is definetly going to be interesting to checkout this approach and compare it with current implementation.</p>
 </section>
-<section id="id1">
-<h2>[12 April 2025]<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h2>[12 April 2025]<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>I decided to refactor code in main.go file. Since a lot of development and planning was happening with rapid testing, the main.go file got cluttered. This causes issues when thinking about edges cases and implementing error handling for it.</p>
 </section>
-<section id="id2">
-<h2>[6 April 2025]<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h2>[6 April 2025]<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p>From today til 11 April 2025, I was engaged fully in research about topics like implementing plugin support, transaction handler, multi core processing with golang, etc. One of the book I am referring for advanced concurrency if “Concurrency in Go” by Cox-Buday. For transaction handling, I decided to roll back and take inspiration from the actualy Linux process schedular for which I referred the book “Linux Kernel Development” by Robert Love. I am going deeper into that, but learning about various scheduling algorithm by these experienced developers. Studying about these scheduling algorithms is inspiring me a lot while improving our transaction system and especially when I am trying to build this with multi-core processing.</p>
 </section>
-<section id="id3">
-<h2>[5 April 2025]<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h2>[5 April 2025]<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <p>These days, I am reviewing the proposal even after the submission. Also, I updated the basePath and path parameters in the YAML file as per Robert’s comments in the proposal review. So I updated the code for the same.</p>
 </section>
-<section id="id4">
-<h2>[4 April 2025]<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="id5">
+<h2>[4 April 2025]<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <p><strong>I finalized the proposal in detail and submitted the proposal on the GSoC 2025 portal.</strong></p>
 </section>
-<section id="id5">
-<h2>[3 April 2025]<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h2>[3 April 2025]<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
 <p>I finally completed Redis integration and successfully tested Async responses, which worked very well. So I decided to update the proposal, which was very long and significant changed were to be made. I email Robert Tweedy with the final proposal for review and recieved comments. Everything looked well, just needed one clarification and some proof reading.</p>
 </section>
-<section id="id6">
-<h2>[2 April 2025]<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h2>[2 April 2025]<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
 <p>I worked with fixing components in the backend code and optimizing a few functions. I was trying to solve the problem of asynchronous computing large transactions and then notifying the frontend once the transaction in the queue are executed. To make this possible, I decided to use Redis, which is a high performance, fast I/O operation database since it’s an in-memory database. The Redis stores all the transactions in itself whenever registered and marks itself as PENDING till the transaction is executed. Once executed, the transaction in Redis is updated with the result which the frontend can fetch. Till the exection, frontend polls the backend. In the final project, a better mechanism than polling can be employed (event driven?).</p>
 <p><em>I also thought about the idea of allowing users to cancel transactions in the queue before thy are executed. This will depend on factors such as pending transactions ahead of that one transaction, so this need a thorough thought and would be done duing the development of the final project is time permits.</em></p>
 <p>So I added more options to the YAML configuration file to make it possible and worked with implemting and testing the Redis database integration. Since this integration introduces various updates in other handlers, all the handlers wherever necessary were updated.</p>
 </section>
-<section id="id7">
-<h2>[1 April 2025]<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<section id="id8">
+<h2>[1 April 2025]<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
 <p>On this day, I made the progress docs up to date and ready to update it further during the whole journey.</p>
 </section>
 <section id="march-2025">
@@ -331,8 +335,8 @@ port: 5001</p></li>
 <p><strong>Robert approved it:</strong></p>
 <p>That diagram looks correct to me, and you can start updating the proposal.</p>
 </section>
-<section id="id8">
-<h2>[26 March 2025]<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<section id="id9">
+<h2>[26 March 2025]<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
 <p><strong>At this point of time, the discussion about various filesystems was started. I considered BeeGFS to be the point of interest at this point. I did extensive research on BeeGFS and it’s structure. Robert had following comments:</strong></p>
 <p>This looks very close, and I believe we’re thinking along the same path but just want to make sure; the below workflow is what I know would be needed for BMI’s storage network, assuming all the separate modular daemons discussed previously are incorporated into the application design:
 Prof. X wants to change permissions on /labs/xlab/project1.txt
@@ -360,8 +364,8 @@ Backend daemon reports request status to fronend for display to end-user.</p>
 <p>Trusting that the filesystem(s) mounted on the GSoC backend server (or other servers running the GSoC daemons that will actually modify the ACLs) will handle the appropriate steps necessary for their particular structure when issued a request to update the ACLs is all that matters; in the case of BeeGFS for example, the GSoC app shouldn’t need to directly interact with the metadata servers because just taking an action on the file at /mnt/beegfs/labs/testfile.txt will already handle the necessary communication with the metadata &amp; storage servers behind-the-scenes. There’s no need to specifically code the app for BeeGFS compatibility, because it appears as any other filesystem to the backend server &amp; will support the necessary system calls like those used by getfacl/setfacl.</p>
 <p>In short, the BeeGFS servers running beegfs-meta.service/beegfs-server.service are to be considered as black boxes and out-of-scope since they can’t even access the data they’re storing safely without beegfs-client.service running on them; for all intents &amp; purposes the GSoC backend server (or the server running the ACL modification daemons, if we choose to have that separate from the orchestration/management backend server) should be considered the “storage server” because it will have access to the filesystem since we intend to configure &amp; set up the beegfs-client.service SystemD service on it.</p>
 </section>
-<section id="id9">
-<h2>[25 March 2025]<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<section id="id10">
+<h2>[25 March 2025]<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s response on my questions:</strong></p>
 <p>I’d recommend going ahead and keeping the previous functionality where it can access /mnt (or any other base directory as specified by the system administrator) even if the other aspects like file-content manipulation isn’t taking place/enabled within the application.</p>
 <p>Essentially, consider that the following scenario will be present on the server running the GSoC application’s backend process: the system administrator will have a parent directory (ie. /mnt or similar, like /labs) where all the filesystems/file servers being managed by the instance of the GSoC application are mounted and accessible to present the view of it all being a single filesystem tree, which should mirror how the filesystems are seen on the computational nodes (and other systems) within the network so the end-user should already be familiar with it. If they know that the file they’re trying to set permissions on is at /labs/alab/mystuff/file.txt, then it doesn’t matter which physical server it’s on because they’d just be accessing it via that common path structure.</p>
@@ -387,8 +391,8 @@ content of server-2
 <p><strong>At this point, I studied the BMI’s infrastructure once again and circled BeeGFS:</strong></p>
 <p>So I thought about this for a while, and I am the following interpretation: The BMI’s network is running BeeGFS, so we have a unified filesystem which is managing all the data. /lab/text1.txt and /lab/text2.txt can be on any server (server-1 or server-2) and is completely abstracted from the user. Now I will consider that the backend server has /mnt/file-system mounted from which I can access all the data. I will still see /mnt/file-system/lab/text1.txt and /mnt/file-system/lab/text2.txt in them. The users will also see it in this way. But now Prof. X want to change the permissions for /mnt/file-system/lab/text1.txt so they interact with the frontend to initiate the changes, which goes to the backend, which resolves the place where /mnt/file-system/lab/text1.txt resides on physical servers and contacts it’s daemons to modify the file permissions.</p>
 </section>
-<section id="id10">
-<h2>[24 March 2025]<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<section id="id11">
+<h2>[24 March 2025]<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s response on my earlier queires about CRUD operations:</strong></p>
 <p>Sorry for the delay in my response; I want to quickly circle back to a question you had earlier in this email thread:</p>
 <p>I also have one more question that came to me while I was writing the code for the file interaction handlers in the prototype: What file operations are users allowed to perform? Currently, I am thinking about 4: Get File, Upload File, DeleteFile, and UpdateFile. Does that sound good, or do we need more? also, are we providing a feature in the frontend to edit some files (like text files) on the frontend itself with an inbuilt text editor? in that case, the update file would do the updates with a .diff file send to the backend to patch the old files - where the mechanism will look like git.</p>
@@ -411,8 +415,8 @@ Mutex               sync.Mutex
 <p>According to this structure, when the user calls the GET /list-files, the “ls” equivalent of the function is run on the Session.CurrentWorkingDir and content are returned to the backend (and then to frontend for listing).</p>
 <p>In the earlier assumption of /mnt and doing CRUD, I used to initialize /mnt/ (as configured in backend.yaml) as default and then when user would call , would call GET /list-files, contents of /mnt/ would be listed i.e. server-1/ server-2/ … etc.</p>
 </section>
-<section id="id11">
-<h2>[23 March 2025]<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<section id="id12">
+<h2>[23 March 2025]<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
 <p>Today, I focused on writing more handlers and middlewares for authentication.</p>
 <p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/423654e60a5d03b324d3bce3787301a0faebf81d">Added current working directory, intialized handlers and started progress documentation</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/87f85acbfda9802b57fea459c52eb30814ae135e">Create main.yml for docs deployment</a>
@@ -426,8 +430,8 @@ Mutex               sync.Mutex
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/58b651df2645edfc0897e87a1c9e77c00fdb0998">Set and Get Working Dir for Session Implemented and Working Direcotry Handlers</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/053ca2fbed242c664249e0ff92cda7ec24093c0c">Added get file handler with proper JSON output</a></p>
 </section>
-<section id="id12">
-<h2>[22 March 2025]<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<section id="id13">
+<h2>[22 March 2025]<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
 <p><strong>I started a new thread as per Mahmoud’s instructions and started with the following question:</strong></p>
 <p>Initially, I thought I would retrieve the files and data through the daemons themselves through a network connection (precisely, through gRPC calls). Although the last email by Robert mentions that there would be mounted filesystems from the Linux File Storage Servers like /mnt/server-1, /mnt/server-2, etc. Since this is something we expect the user to set up and is out of the scope of the application, I will specify this in the documentation of the project.</p>
 <p>Coming back to the displaying of the file system, since we would be using locally mounted volumes of those Linux File Storage Servers, I would list all of the files recursively in /mnt/server-1, /mnt/server-2, etc. (this would be configured by the user in config.YAML file for us). The user will see all the content listed on the portal and can navigate to any file.</p>
@@ -457,8 +461,8 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 <p>Please note that Robert will conduct separate technical evaluations of the codebase. This documentation will serve as critical supporting material during assessments.</p>
 <p><em><strong>Upon this email, I started building the docs for changelogs and kept working on the prototype and proposal</strong></em></p>
 </section>
-<section id="id13">
-<h2>[21 March 2025]<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<section id="id14">
+<h2>[21 March 2025]<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
 <p>I completed session manager code on this day.</p>
 <p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/2a34697a069eab2a1a0f5951904da85eefb2fce7">View Commit</a></p>
 <p><strong>I continued with my questions which came during proposal writing and prototyping:</strong></p>
@@ -472,14 +476,14 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 <p>In the case where there’s multiple different servers in an orchestrated deployment serving their own unique filesystem, it’s possible that all of their filesystems may be mounted on the backend server such that they’re accessible simply by navigating to a specific directory (ie. /mnt/server-1, /mnt/server-2, etc.) and I would hope that the end-user administrator deploying the software would configure it to match how their users expect to see the filesystems on their network. As such, I don’t think any special options need to be added to the application to explicitly choose a server, as this should be implicit based on the path of the file that the user’s navigating to.</p>
 <p>I do see where this may be of use for a site that’s aiming to have a single deployment of this software which supports multiple different departments at once as opposed to each individual department having their own deployment, but I wouldn’t worry about that too much for this initial phase &amp; it can always be a future improvement that’s made if needed.</p>
 </section>
-<section id="id14">
-<h2>[20 March 2025]<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h2>[20 March 2025]<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
 <p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/0642d7823dd7eb77d8ee5bf879267168b03e63c0">Made progress with Session Manager</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/99f0083ed2b9e3dad2421272d25a7aaec4cae39b">Completed Session Management and successfully tested</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/1036e0a4659c05342aac1b3988c333bb459f7b3d">Session Manager Completed</a></p>
 </section>
-<section id="id15">
-<h2>[19 March 2025]<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
+<section id="id16">
+<h2>[19 March 2025]<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
 <p>I kept working on the prototype and researched on the project for gRPC and Linux daemons. I made commits in the code with the researched information.</p>
 <p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/6e062a1586b763c6cebdc4c114925b884eb27d36">Added gRPC daemons and connected to the backend with yaml files</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/28bc4389c08e7f26f056aff21c5fda89fe7d8a0e">Added README.md</a>
@@ -488,15 +492,15 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/ac37b677f3f76764a49dd737fbfd75e94c5a4b76">Started JWT auth, implemented middleware</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/0862674a5a04b9d081e43246c7d4eb9157b4046c">LDAP Authentication successful</a></p>
 </section>
-<section id="id16">
-<h2>[10 March 2025]<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
+<section id="id17">
+<h2>[10 March 2025]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
 <p>On this day, I started working on the prototype project and made my first commit.</p>
 <p><a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/1e5749816b2c9a0d005eb7b5903c23849d37d958">Initialized Project</a>
 <a class="reference external" href="http://github.com/PythonHacker24/linux-acl-management/commit/b4e48782b4754c9c8f96a26341752f7c88639119">Added Makefile</a>
 <a class="reference external" href="https://github.com/PythonHacker24/linux-acl-management/commit/42322c251b655f67d8ed4c914210b5fb9fdca92f">Decided to add Slog</a></p>
 </section>
-<section id="id17">
-<h2>[9 March 2025]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<section id="id18">
+<h2>[9 March 2025]<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
 <p><strong>My updated design:</strong></p>
 <p>I went through the getfacl and setfacl docs, went around and tested it on my Arch Linux system, and read about it in depth.</p>
 <p>Based upon that, I have modified my system design as shown below:</p>
@@ -507,8 +511,8 @@ Thorough documentation (this is separate from the proposal) carries equal priori
 <p>In addition, I have been working on deciding the interaction protocol between the daemon and the backend server. gRPC catches my attention for remote connections since our endpoints will be well-defined. As mentioned, Unix domain sockets seem to be ideal for local connections.</p>
 <p><em><strong>After this point, I started working on my GSoC Proposal and interacted with my mentors for feedbacks and updated it as per their recommendations.</strong></em></p>
 </section>
-<section id="id18">
-<h2>[8 March 2025]<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<section id="id19">
+<h2>[8 March 2025]<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s comments on my reponse:</strong></p>
 <p>I highly recommend that you check the Manual pages for the setfacl &amp; getfacl commands to get an understanding of what they do, as they only manage extended file permissions &amp; aren’t user-management commands; an online version of them is available here, but it should also be available from any Linux system with the appropriate acl package installed via the man command (the package name differs depending on distribution):
 https://linux.die.net/man/1/setfacl
@@ -519,8 +523,8 @@ LDAP exists &amp; that it’s able to query the LDAP server given the appropriat
 The underlying servers (backend/frontend/storage servers/other servers on the network that are outside of the scope of this project) are already configured to use the central LDAP servers to look-up user names/account UIDs/group membership/etc. and match them together for system-level purposes, so the GSoC application does not need to worry about this. Put another way, all the accounts in LDAP “exist” on all the servers, so a command like id aditya or getent passwd account_uid could be run on any server &amp; would return the same result regardless of the server it was executed on, even though the account doesn’t exist in the server’s /etc/passwd file.</p>
 <p>There should be pre-existing open-source projects that can provide the basic features of this functionality within the GSoC application, so I’d recommend just reviewing those &amp; selecting the one that you feel is the best fit for inclusion with the application (make sure to review their OSS licenses &amp; ensure that they’re compatible with the ones required as part of the GSoC!) rather than trying to code an LDAP client implementation from scratch.</p>
 </section>
-<section id="id19">
-<h2>[7 March 2025]<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h2>[7 March 2025]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
 <p><strong>Robert’s comments on latest architecture:</strong></p>
 <p>This latest diagram looks like it’s nearly there, but I do have the following comments about it:</p>
 <ul class="simple">
@@ -544,8 +548,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>This log can be either deleted after the end of the transaction or stored in the database if configured to be. In the prior case, this will allow us to revert back if the transactions fail in the execution period and be true only if the full operation is completed. In the later ones, a transaction can be reverted back anytime (like git). Again, limits can be implemented here (in case we need to skip big transactions).</p>
 <p>Let me know what you think. After the LDAP part is clear, I would like to finalize the design and then work on the lower levels of software implementation, which I would use in the GSoC proposal to sum it up.</p>
 </section>
-<section id="id20">
-<h2>[6 March 2025]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<section id="id21">
+<h2>[6 March 2025]<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
 <p><img alt="LDAP" src="../_images/ldap_6_march.png" /></p>
 <p>The upper diagram is the high-level system design and below is a transaction scheduler I am working on.</p>
 <p>I took all your emails and compiled each requirement and constraints; and came up with this which fits closest to that list. Let me know what you think. I think this one is much closer to what you are looking for (since I understood the LDAP purpose and ACLs in Linux Servers in better detail).</p>
@@ -553,8 +557,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>So explain it a bit in here; as soon as the user logs in - they create a session in the backend which is responsible to handle everything the frontend has to do with (this makes our backend server stateful). Each session has its own queue of processes. Processes contain 1 transaction. Here, a transaction is a consistent operation which is true if the operation succeeds and false if it leaves midway (and reverts things back). When a user does some clicks on the frontend and attempts some operations; the frontend shows that they are scheduled (like the upload bar in google drive which uploads in the background and shows the process bar). The session appends the process in a queue. The first in process gets first out and is executed by the transaction executer. If a user quits midway (due to any reason; like an emergency power off on desktop); the backend keeps executing the process as it’s scheduled. It executes all of it and when the queue is empty; exits and the session is successfully closed.</p>
 <p>Moving more advanced; if we have a local database that keeps a copy of the queue; it would provide more redundancy in case the backend application crashes midway or server goes offline. This will allow us to keep track of the queue and not end up messing up the permissions in these edge cases. I know that it will not be able to recover 100% but this small integration will improve the consistency drastically.</p>
 </section>
-<section id="id21">
-<h2>[5 March 2025]<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<section id="id22">
+<h2>[5 March 2025]<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
 <p><strong>More questions from me:</strong></p>
 <p>After working through the day, I have circled back on this: How much computational power do we have, or does it even matter for the GSoC project?</p>
 <p>The reason why I stuck around the computational nodes is due to edge cases where millions of files are updated at once. If we consider only the backend server and Linux storage servers to do so, then handling millions of file updates would be resource-intensive and time-consuming. Are we assuming they both are sufficient to carry out the process in the expected time?</p>
@@ -565,8 +569,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>Regarding LDAP: This is being used for basic authentication &amp; user sign-in, along with identifying the Linux/POSIX groups that user accounts are members of, but nothing related to actual file permissions since this is a filesystem-level function. I’d advise not requiring that specific changes be made to the LDAP instance in order for this application to function (ie. no mandatory need to make user groups specific for the app’s functions to identify users) and instead leave it up to the IT teams deploying the app to configure things in a way that best suits their environment by providing options in the app to designate one or more (if appropriate) groups to use for things like granting additional admin privileges in the app.</p>
 <p>The use of getfacl and setfacl don’t involve the creation of users on the servers, they work with the existing users already known to the servers (or UIDs if a user doesn’t exist; this type of situation can occur for one reason or another &amp; should be something that the GSoC application can modify/support just in case). Since our servers are connected with our internal LDAP infrastructure, they know the details of all our users as well &amp; there won’t be an issue.</p>
 </section>
-<section id="id22">
-<h2>[4 March 2025]<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
+<section id="id23">
+<h2>[4 March 2025]<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
 <p>**My response on Robert’s Email: **</p>
 <p>Okay, that clears it up: I don’t need to jump around computation nodes and consider it part of our product. Our users can have them if they want (and Emory has one), but it’s not a requirement in the project. The final question here is, are we going to make use of computational nodes when we deploy it inside the BMI network? I am unsure if I understand the use of computational nodes in your existing infrastructure, but I guess it’s for doing heavy computation tasks related to data operations. For example, a permission change of 1 Million files has been requested, so the computational nodes schedule the job, which updates the permissions in the data storage unit.</p>
 <p>However, as mentioned, I would not consider keeping computational nodes as part of the GSoC project. Also, it’s clear to me that you need a monolith server (running as a VM) that can handle all operations. This approach works for me, and I will follow it.</p>
@@ -585,8 +589,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p><strong>Second Email:</strong></p>
 <p>Currently, I can imagine the LDAP being used just for basic authentication and user sign-in and sign-up. I went through different uses of LDAP (like file permissions), so I was wondering if BMI is using it that way. If it’s a basic user auth, then I would be using it as it is in the project.</p>
 </section>
-<section id="id23">
-<h2>[3 March 2025]<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
+<section id="id24">
+<h2>[3 March 2025]<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
 <p><strong>My response on Robert’s comments:</strong></p>
 <p>Okay, all the above instructions and requirements are clear to me. It seems reasonable, and the Redis idea can be added as a module and developed in later stages.</p>
 <p>As Robert sent in the last emails, I have reviewed the current BMI architecture in detail. The big question is: How much is BMI’s current implementation willing to change?</p>
@@ -610,8 +614,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>If this application is using PostgreSQL/Redis/etc. for its own internal purposes (caching, state management, etc.) then that’s fine, however note that when deployed it will be adjacent to and not part of the data-access pipeline for the underlying filesystem; the computational nodes will access the filesystem &amp; its data via standard existing methods, with the node/filesystem validating access permissions using the combination of standard POSIX &amp; extended Linux ACLs applied to the directory path being accessed. They will not be making separate calls out to a PostgreSQL database to do a custom permissions lookup, as that would imply they’re accessing the filesystem/data via some sort of middleware layer that controls access to the filesystem &amp; is performing those lookups.</p>
 <p>If you want to start writing the GSoC proposal I think that’s fine, but I need to defer to Mahmoud to confirm as he has more familiarity with the GSoC program than I do &amp; is more familiar with the overall GSoC process. I would definitely recommend making sure the scope of the project is understood before writing the final proposal, as from our recent emails I worry that there’s more potential for scope-creep with this project than had been anticipated &amp; it could inadvertently lead to development time spent focused on things that are actually out of scope of the main goal.</p>
 </section>
-<section id="id24">
-<h2>[1 March 2025]<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h2>[1 March 2025]<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h2>
 <p>Robert’s response on my last email:</p>
 <p>By “If we have a million files with us, then reading the whole state after a change is challenging and time-consuming” are you referring to reading the state of the entire filesystem, only the directories/files that were updated during that particular transaction, or just the active working directory currently being viewed by the end-user in the application (regardless of whether there were changes in its subdirectories being performed as part of the latest transaction)? I personally think that if a user gets so many files into a single directory (no subdirectories) that it’s causing an issue for the underlying filesystem to read the state of that directory then it’s a data-management/organization issue on the end-user’s side of things &amp; they should interpret the overall slowness as a reason to better organize their data for faster performance (which is out of scope for this GSoC application to rectify).</p>
 <p>Additionally, while it is definitely important to make sure that the application makes only reasonable calls to the underlying research filesystem for information when needed so that it doesn’t bog it down with unnecessary requests, it shouldn’t be left to the application to always assume that it must handle its own filesystem state caching process as opposed to just making requests from the filesystem directly when necessary. In our particular case, our underlying storage system is already making use of dedicated metadata servers so that the actual data storage node is only being accessed when the research data itself needs to be retrieved/written; running commands like ls,chmod,getfacl,etc. are fine &amp; usually do not take that much time to complete for simple non-recursive lookups (though they can take at least a few hours if working recursively to apply changes on a large set of data, like if a researcher decides to recursively make a change to their entire /labs/mylab/ directory, but this is anticipated due to the sheer quantity of changes that would need to be made), and it would be acceptable to us to just have the application perform direct queries from the filesystem using standard APIs or commands like ls and getfacl since we have already tuned our underlying storage infrastructure to handle this at reasonable speeds in most circumstances; the GSoC application doesn’t need to be aware of our metadata servers specifically, because any interaction with the filesystem that requires their use is transparently passed along to the metadata servers when needed.</p>
@@ -626,36 +630,36 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>More precisely, when the user triggers a huge permission change affecting 10,000 files, the file server updates it, provides status through EDA, and serves the user. Once the big change is made, the file server updates Redis through notification, and the user dashboard updates with Redis content. Now, the user can log in and reload any amount of time; the file server is not affected.</p>
 <p>I am currently working extensively on these calculations since we will not be able to make many changes in the advanced stages of the project.</p>
 </section>
-<section id="id25">
-<h2>[26 February 2025]<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h2>
+<section id="id26">
+<h2>[26 February 2025]<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h2>
 <p><strong>Robert had the following comments on my response:</strong></p>
 <p>Regarding all of the details about the hash tables vs. Event-Driven Architecture, I can see benefit for having EDA set up monitoring the status of requests made by an end user (lets say a user submits a cascading permissions change request that will take hours to complete due to the number of files that need to be changed; this would allow for the application to provide some sort of status/progress update regarding the request until it completes), but I’m not sure that it should be used as an attempt to see all changes taking place on the filesystem in general since these could occur in large quantities for multiple reasons (computational jobs on the research cluster creating new files and immediately adjusting permissions as part of the job’s process, for example) and would be very costly to track vs. just reading the current state as-is when a query about a directory/file is made through the application.</p>
 <p>If you do feel that including EDA is still worthwhile for the project, then either RabbitMQ or Apache Kafka sound fine to me &amp; you’re free to use whichever one you’d prefer to work with.</p>
 </section>
-<section id="id26">
-<h2>[23 February 2025]<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h2>[23 February 2025]<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h2>
 <p><strong>I responded to the above email with the following respose:</strong></p>
 <p>I think proceeding with the second approach would be preferable. It nearly fits with the current implementation and would be more productive.</p>
 <p>In answering the first question, I would need to weigh the comparison between the hashes approach and reading the current state while working on the lower-level system design. I understand the constraints now about our massive amount of storage, and I will address it in the next deck. One of my ideas for this purpose is Event-Driven Architecture, where all the changes would be pushed into the messaging queue for the backend to read and note. Here, RabbitMQ or Apache Kafka can be used. Let me know what you think about this.</p>
 <p>For the second point, I will surely keep those things in mind. I will ensure that we avoid the lower levels of the file system API as much as possible. Also, since the front end will be shipped with the application, I will ensure that we don’t use CDNs.</p>
 <p>In summary, I will develop an updated mid-level combined with a lower-level system design now and send the deck, and then I can start writing the code.</p>
 </section>
-<section id="id27">
-<h2>[22 February 2025]<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h2>
+<section id="id28">
+<h2>[22 February 2025]<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h2>
 <p><strong>Robert Tweedy provided with the follow feedbacks after reviewing the slides:</strong></p>
 <ol class="arabic simple">
 <li><p>Regarding “Proposed System Design for 1st Approach” (slide 6): There’s a mention of using Hash Tables for tracking changes to the underlying filesystem to notify the application’s backend &amp; frontend processes as part of a responsive change-detection mechanism. I’d highly recommend weighing the benefits of setting this up (&amp; the additional storage required to store said hash tables) vs. just having the application read the current state of the filesystem when it loads the particular branch of the directory tree it’s currently working with. Our storage volume is ~3.1PB in size (with many thousands/millions of small files in some directory tree branches) and the separate storage of entire filesystem state in a Hash Table could take up multiple Gigabytes (not to mention the very long initial scan of the filesystem to initialize this hash table). Please let me know if I’ve misunderstood the intention here.</p></li>
 <li><p>Using Golang for the backend/APIs/daemons/etc. is acceptable, along with Python as needed. Using “C” for lower level operations should be fine as well, but it’s also perfectly acceptable to have the application make a call to the getfacl and setfacl commands in the background as needed rather than trying to mess with super low-level filesystem APIs. Javascript for the frontend development is acceptable, and any major JS libraries (jQuery, React.js, Angular, etc.) can be used as well as long as they can be packaged with the application (ie. no calls to external CDNs to load Jquery; it needs to be self-hosted within the application itself).</p></li>
 </ol>
 </section>
-<section id="id28">
-<h2>[18 February 2025]<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h2>
+<section id="id29">
+<h2>[18 February 2025]<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
 <p>The meeting was held on this day and 3 of us got together in a meeting for the first time and discussed in-depth about the project architecture. I presented slides containing my proposal of solution and sent an email with the updated slides.</p>
 <p>Link to the slides: <a class="reference download internal" download="" href="../_downloads/46b5722156b5150c679e7c44a0eac056/Introduction-meeting-revised-slides.pdf"><span class="xref download myst">Download the PDF</span></a></p>
 <p><em><strong>After this meeting, a lot of emails where exchanged. Each response given by me was based on research done on previous emails by Robert. I considered it to be best if I added email contents here since they contain everything I came upto during the discussion phase. During this time, mentors suggested me not to rush with writing ode and first finalize all the requirements, which I did through these conversations.</strong></em></p>
 </section>
-<section id="id29">
-<h2>[13 February 2025]<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
+<section id="id30">
+<h2>[13 February 2025]<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h2>
 <p>An updated architecture was proposed:</p>
 <p><img alt="updated" src="../_images/updated-13-feb.png" /></p>
 <p><strong>Here is my response with the attached email:</strong></p>
@@ -671,8 +675,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <p>Apart from this, I want to ask: Can we use Golang for the backend and writing daemons? The selection of Golang is due to its simplicity, performance, concurrency model, powerful, well-maintained standard libraries (by Google themselves), ease of deployment and distribution, etc. It’s specifically built for servers; honestly, I can write a whole proposal on why Golang can be a good choice for this project. Although Go has huge accessibility to lower-level features we need, in case we are somewhere limited, I would use C or Rust as per the requirements.</p>
 <p>On the same day, a meeting was scheduled where I, Mahmound and Robert discussed about the project in detail.</p>
 </section>
-<section id="id30">
-<h2>[12 February 2025]<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h2>
+<section id="id31">
+<h2>[12 February 2025]<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h2>
 <p>Comments from Robert Tweedy arrived on the proposed designs. Here are the comments by Robert Tweedy:</p>
 <ol class="arabic simple">
 <li><p>This architecture seems like a reasonable layout; it’s not specifically what BMI has (in our case nearly all of our access would be through what’s listed as “Remote Access” on that diagram, &amp; we don’t have an on-site backup server; we also have some separate storage systems too which aren’t directly connected to the main “central” storage &amp; we weren’t concerned about these for the purposes of this project as they’re not intended for mass-user sharing of data) but is a reasonable architecture to work from and a good testing architecture for the project’s application (which shouldn’t care too much about the actual network architecture - it’s the access to the underlying filesystem with the data that matters, &amp; it can be assumed the server the application’s running on will have access to it).</p></li>
@@ -680,8 +684,8 @@ The underlying servers (backend/frontend/storage servers/other servers on the ne
 <li><p>End-users may not have direct SSH/SFTP access to the underlying storage server nor the ability to establish NFS/SMB mounts depending on security architecture from the IT team &amp; might only be able to interact with the storage through an IT-managed mountpoint on a computational server/node (this is definitely the case in BMI; all access to our /labs volume is done by interacting with the IT-managed mountpoints on the systems, mounted either as NFS or via the BeeGFS client we’re using). The ACL Management Application box on the diagram looks fine to me, as long as the “ACL Service” is in fact applying the ACLs to the underlying filesystem &amp; can tolerate changes if made outside of the application directly on the storage servers (likely by the IT team).</p></li>
 </ol>
 </section>
-<section id="id31">
-<h2>[10 February 2025]<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h2>
+<section id="id32">
+<h2>[10 February 2025]<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h2>
 <p>I started researching about the topic and proposed my first designs to Mahmoud. I had primarly 3 questions:</p>
 <ol class="arabic simple">
 <li><p>I created this diagram to visualize what I think current researchers use in their network storage. Is this something that you are expecting?
@@ -695,8 +699,8 @@ Is this something you would consider to be in the right direction? (the primary 
 </ol>
 <p>Mahmoud invited me for a Zoom call on Tuesday. We had a successful first meeting and I got introducted to the GSoC organization.</p>
 </section>
-<section id="id32">
-<h2>[9 February 2025]<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h2>
+<section id="id33">
+<h2>[9 February 2025]<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h2>
 <p>The conversation was initiated with Mahmoud Zeydabadinezhad on an Email thread introducing myself and providng compherensive detials about me. This includes all my Social handles relevant to GSoC project, motivation, and a CV for detailed informatiom about my work.</p>
 <p>On the same day, Mahmoud responded with an offer to have a quick call after some discussion about the relevant project.</p>
 <p>I asked about selecting projects given my the organization and Mahmoud suggested me with Project #1 (Securing Linux Storage with ACLs: An Open-Source Web Management Interface for Enhanced Data Protection).</p>
@@ -751,41 +755,42 @@ Is this something you would consider to be in the right direction? (the primary 
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Progress Report for ACL Management GSoC Project</a><ul>
-<li><a class="reference internal" href="#april-2025">[17 April 2025]</a></li>
-<li><a class="reference internal" href="#id1">[12 April 2025]</a></li>
-<li><a class="reference internal" href="#id2">[6 April 2025]</a></li>
-<li><a class="reference internal" href="#id3">[5 April 2025]</a></li>
-<li><a class="reference internal" href="#id4">[4 April 2025]</a></li>
-<li><a class="reference internal" href="#id5">[3 April 2025]</a></li>
-<li><a class="reference internal" href="#id6">[2 April 2025]</a></li>
-<li><a class="reference internal" href="#id7">[1 April 2025]</a></li>
+<li><a class="reference internal" href="#april-2025">[23 April 2025]</a></li>
+<li><a class="reference internal" href="#id1">[17 April 2025]</a></li>
+<li><a class="reference internal" href="#id2">[12 April 2025]</a></li>
+<li><a class="reference internal" href="#id3">[6 April 2025]</a></li>
+<li><a class="reference internal" href="#id4">[5 April 2025]</a></li>
+<li><a class="reference internal" href="#id5">[4 April 2025]</a></li>
+<li><a class="reference internal" href="#id6">[3 April 2025]</a></li>
+<li><a class="reference internal" href="#id7">[2 April 2025]</a></li>
+<li><a class="reference internal" href="#id8">[1 April 2025]</a></li>
 <li><a class="reference internal" href="#march-2025">[27 March 2025]</a></li>
-<li><a class="reference internal" href="#id8">[26 March 2025]</a></li>
-<li><a class="reference internal" href="#id9">[25 March 2025]</a></li>
-<li><a class="reference internal" href="#id10">[24 March 2025]</a></li>
-<li><a class="reference internal" href="#id11">[23 March 2025]</a></li>
-<li><a class="reference internal" href="#id12">[22 March 2025]</a></li>
-<li><a class="reference internal" href="#id13">[21 March 2025]</a></li>
-<li><a class="reference internal" href="#id14">[20 March 2025]</a></li>
-<li><a class="reference internal" href="#id15">[19 March 2025]</a></li>
-<li><a class="reference internal" href="#id16">[10 March 2025]</a></li>
-<li><a class="reference internal" href="#id17">[9 March 2025]</a></li>
-<li><a class="reference internal" href="#id18">[8 March 2025]</a></li>
-<li><a class="reference internal" href="#id19">[7 March 2025]</a></li>
-<li><a class="reference internal" href="#id20">[6 March 2025]</a></li>
-<li><a class="reference internal" href="#id21">[5 March 2025]</a></li>
-<li><a class="reference internal" href="#id22">[4 March 2025]</a></li>
-<li><a class="reference internal" href="#id23">[3 March 2025]</a></li>
-<li><a class="reference internal" href="#id24">[1 March 2025]</a></li>
+<li><a class="reference internal" href="#id9">[26 March 2025]</a></li>
+<li><a class="reference internal" href="#id10">[25 March 2025]</a></li>
+<li><a class="reference internal" href="#id11">[24 March 2025]</a></li>
+<li><a class="reference internal" href="#id12">[23 March 2025]</a></li>
+<li><a class="reference internal" href="#id13">[22 March 2025]</a></li>
+<li><a class="reference internal" href="#id14">[21 March 2025]</a></li>
+<li><a class="reference internal" href="#id15">[20 March 2025]</a></li>
+<li><a class="reference internal" href="#id16">[19 March 2025]</a></li>
+<li><a class="reference internal" href="#id17">[10 March 2025]</a></li>
+<li><a class="reference internal" href="#id18">[9 March 2025]</a></li>
+<li><a class="reference internal" href="#id19">[8 March 2025]</a></li>
+<li><a class="reference internal" href="#id20">[7 March 2025]</a></li>
+<li><a class="reference internal" href="#id21">[6 March 2025]</a></li>
+<li><a class="reference internal" href="#id22">[5 March 2025]</a></li>
+<li><a class="reference internal" href="#id23">[4 March 2025]</a></li>
+<li><a class="reference internal" href="#id24">[3 March 2025]</a></li>
+<li><a class="reference internal" href="#id25">[1 March 2025]</a></li>
 <li><a class="reference internal" href="#february-2025">[27 February 2025]</a></li>
-<li><a class="reference internal" href="#id25">[26 February 2025]</a></li>
-<li><a class="reference internal" href="#id26">[23 February 2025]</a></li>
-<li><a class="reference internal" href="#id27">[22 February 2025]</a></li>
-<li><a class="reference internal" href="#id28">[18 February 2025]</a></li>
-<li><a class="reference internal" href="#id29">[13 February 2025]</a></li>
-<li><a class="reference internal" href="#id30">[12 February 2025]</a></li>
-<li><a class="reference internal" href="#id31">[10 February 2025]</a></li>
-<li><a class="reference internal" href="#id32">[9 February 2025]</a></li>
+<li><a class="reference internal" href="#id26">[26 February 2025]</a></li>
+<li><a class="reference internal" href="#id27">[23 February 2025]</a></li>
+<li><a class="reference internal" href="#id28">[22 February 2025]</a></li>
+<li><a class="reference internal" href="#id29">[18 February 2025]</a></li>
+<li><a class="reference internal" href="#id30">[13 February 2025]</a></li>
+<li><a class="reference internal" href="#id31">[12 February 2025]</a></li>
+<li><a class="reference internal" href="#id32">[10 February 2025]</a></li>
+<li><a class="reference internal" href="#id33">[9 February 2025]</a></li>
 </ul>
 </li>
 </ul>
